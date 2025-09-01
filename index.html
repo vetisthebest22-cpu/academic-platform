@@ -1225,15 +1225,16 @@
     </div>
 
     <script>
-        // Firebase Configuration - استبدل هذه البيانات ببيانات مشروعك الحقيقي
+        // Firebase Configuration - إعدادات المشروع الحقيقية
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyCqUMo8ii1XR4FmfdXulcbcbmfDrTRaMBM",
+            authDomain: "academic-platform-2024.firebaseapp.com",
+            databaseURL: "https://academic-platform-2024-default-rtdb.firebaseio.com",
+            projectId: "academic-platform-2024",
+            storageBucket: "academic-platform-2024.firebasestorage.app",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:d2b520027f6c506b30033e",
+            measurementId: "G-QJ0Y5TFTRN"
         };
 
         // Initialize Firebase
@@ -2177,80 +2178,4 @@
                     </button>
                     <button onclick="toggleFavorite('${material.id}')" 
                             class="px-3 py-1 text-sm ${isFavorite ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-red-200">
-                        ${isFavorite ? '❤️ مفضل' : '🤍 إضافة للمفضلة'}
-                    </button>
-                    <button onclick="downloadMaterial('${material.id}')" 
-                            class="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200">
-                        ${material.type === 'url' ? '🔗 فتح' : '⬇️ تحميل'}
-                    </button>
-                    ${currentUser && currentUser.isAdmin ? `<button onclick="deleteMaterial('${material.id}')" class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">🗑️ حذف</button>` : ''}
-                </div>
-            `;
-            
-            return item;
-        }
-
-        // File handling
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.currentTarget.classList.add('dragover');
-        }
-
-        function handleFileDrop(event) {
-            event.preventDefault();
-            event.currentTarget.classList.remove('dragover');
-            
-            const files = Array.from(event.dataTransfer.files);
-            processFiles(files);
-        }
-
-        function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            processFiles(files);
-        }
-
-        function processFiles(files) {
-            files.forEach(file => {
-                const material = {
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                    name: file.name,
-                    type: getFileType(file.name),
-                    size: formatFileSize(file.size),
-                    uploadDate: new Date().toLocaleDateString('ar-SA'),
-                    file: file,
-                    subjectId: currentSubject.id,
-                    materialType: currentMaterialType,
-                    examType: currentExamType
-                };
-                
-                addMaterial(material);
-            });
-            
-            // Clear file input
-            document.getElementById('fileInput').value = '';
-        }
-
-        function handleAddUrl() {
-            const url = document.getElementById('urlInput').value.trim();
-            
-            if (url && isValidUrl(url)) {
-                const material = {
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                    name: extractNameFromUrl(url),
-                    type: 'url',
-                    url: url,
-                    uploadDate: new Date().toLocaleDateString('ar-SA'),
-                    subjectId: currentSubject.id,
-                    materialType: currentMaterialType,
-                    examType: currentExamType
-                };
-                
-                addMaterial(material);
-                document.getElementById('urlInput').value = '';
-            } else {
-                alert('يرجى إدخال رابط صحيح');
-            }
-        }
-
-        function addMaterial(material)
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786906a546d32ae',t:'MTc1Njc0ODU0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+                        ${isFavorite ? '❤️ مفضل' : '❤<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786e1a8253e32ae',t:'MTc1Njc1MTg3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>{var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786906a546d32ae',t:'MTc1Njc0ODU0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

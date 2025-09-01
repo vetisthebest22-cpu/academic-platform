@@ -187,52 +187,6 @@
             opacity: 1;
         }
 
-        .admin-panel {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .admin-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .post-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-
-        .post-card:hover {
-            border-left-color: #9333ea;
-            transform: translateX(-5px);
-        }
-
-        .chat-message {
-            animation: messageSlide 0.3s ease-out;
-        }
-
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .material-item {
-            transition: all 0.3s ease;
-        }
-
-        .material-item:hover {
-            background: #f8fafc;
-            border-color: #9333ea;
-        }
-
-        .year-tab {
-            transition: all 0.3s ease;
-        }
-
-        .year-tab.active {
-            background: #9333ea;
-            color: white;
-        }
-
         .notification-popup {
             position: fixed;
             top: 100px;
@@ -248,7 +202,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50">
     <!-- Connection Status -->
     <div id="connectionStatus" class="connection-status connecting">
         🔄 جاري الاتصال...
@@ -262,220 +216,196 @@
     <!-- Notification Container -->
     <div id="notificationContainer"></div>
 
-    <!-- Login/Home Page -->
-    <div id="homePage" class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-purple-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center shadow-lg">
-                            <span class="text-white font-bold text-lg">🏥</span>
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-bold text-gray-900">المنصة الأكاديمية</h1>
-                            <p class="text-sm text-purple-600">لجنة الطب والجراحة البيطرية</p>
-                        </div>
+    <!-- Main Container -->
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <div class="w-80 bg-white shadow-xl border-l border-gray-200 flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-200 bg-gradient-to-l from-purple-600 to-purple-800 text-white">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">🏥</span>
                     </div>
-                    
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <button onclick="showLoginModal()" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-md">
-                            🔑 تسجيل الدخول
-                        </button>
-                        <button onclick="showRegisterModal()" class="px-6 py-2 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium">
-                            📝 إنشاء حساب
-                        </button>
+                    <div>
+                        <h1 class="text-xl font-bold">المنصة الأكاديمية</h1>
+                        <p class="text-purple-100 text-sm">لجنة الطب والجراحة البيطرية</p>
                     </div>
                 </div>
             </div>
-        </header>
 
-        <!-- Hero Section -->
-        <section class="gradient-bg text-white py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="fade-in">
-                    <h1 class="text-5xl font-bold mb-6">مرحباً بك في المنصة الأكاديمية</h1>
-                    <p class="text-xl mb-8 opacity-90">منصة شاملة لطلبة كلية الطب البيطري - جميع المصادر الأكاديمية في مكان واحد</p>
-                    <div class="flex justify-center space-x-4 space-x-reverse">
-                        <button onclick="showLoginModal()" class="px-8 py-3 bg-white text-purple-700 rounded-lg hover:bg-gray-100 transition-colors font-semibold shadow-lg">
-                            🚀 ابدأ الآن
-                        </button>
-                        <button class="px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-purple-700 transition-colors font-semibold">
-                            📖 تعرف أكثر
-                        </button>
+            <!-- User Info -->
+            <div id="userInfo" class="p-4 border-b border-gray-200 bg-purple-50">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                        <span id="userAvatar">👤</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-semibold text-gray-900" id="userName">مرحباً بك</div>
+                        <div class="text-sm text-purple-600" id="userYear">قم بتسجيل الدخول</div>
+                    </div>
+                    <div class="flex items-center space-x-1 space-x-reverse text-sm text-green-600">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        <span id="onlineUsersCount">0</span>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Features Section -->
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">ما تقدمه المنصة</h2>
-                    <p class="text-lg text-gray-600">كل ما تحتاجه في رحلتك الأكاديمية</p>
-                </div>
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="switchTab('login')" id="loginTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                    <span class="text-xl">🔑</span>
+                    <span>تسجيل الدخول</span>
+                </button>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="card-hover bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
-                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span class="text-3xl">📑</span>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3">السلايدات</h3>
-                        <p class="text-gray-600">جميع المحاضرات والعروض التقديمية منظمة حسب السنة والفصل</p>
-                    </div>
+                <button onclick="switchTab('register')" id="registerTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                    <span class="text-xl">📝</span>
+                    <span>إنشاء حساب</span>
+                </button>
+
+                <div id="loggedInNav" class="hidden space-y-2">
+                    <button onclick="switchTab('materials')" id="materialsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">📚</span>
+                        <span>المواد الدراسية</span>
+                    </button>
                     
-                    <div class="card-hover bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
-                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span class="text-3xl">🎙️</span>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3">التسجيلات</h3>
-                        <p class="text-gray-600">تسجيلات صوتية ومرئية للمحاضرات والشروحات المهمة</p>
-                    </div>
+                    <button onclick="switchTab('posts')" id="postsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">📝</span>
+                        <span>المنشورات</span>
+                    </button>
                     
-                    <div class="card-hover bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
-                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span class="text-3xl">📝</span>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3">الملخصات</h3>
-                        <p class="text-gray-600">ملخصات شاملة ومراجعات سريعة لجميع المواد</p>
+                    <button onclick="switchTab('chat')" id="chatTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">💬</span>
+                        <span>الدردشة</span>
+                    </button>
+                    
+                    <button onclick="switchTab('profile')" id="profileTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">👤</span>
+                        <span>الملف الشخصي</span>
+                    </button>
+
+                    <div id="adminNav" class="hidden">
+                        <button onclick="switchTab('admin')" id="adminTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                            <span class="text-xl">🛠️</span>
+                            <span>لوحة التحكم</span>
+                        </button>
                     </div>
                 </div>
-            </div>
-        </section>
+            </nav>
 
-        <!-- Footer -->
-        <footer class="bg-gray-900 text-white py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <p class="text-lg">منصة أكاديمية مقدمة من لجنة الطب والجراحة البيطرية – كلية الطب البيطري</p>
-                <p class="text-gray-400 mt-2">© 2024 جميع الحقوق محفوظة</p>
+            <!-- Logout Button -->
+            <div id="logoutSection" class="hidden p-4 border-t border-gray-200">
+                <button onclick="logout()" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2 space-x-reverse">
+                    <span>🚪</span>
+                    <span>تسجيل الخروج</span>
+                </button>
             </div>
-        </footer>
-    </div>
-
-    <!-- Main Platform (Hidden initially) -->
-    <div id="mainPlatform" class="hidden min-h-screen">
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-purple-100 sticky top-0 z-40">
-            <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center shadow-md">
-                            <span class="text-white font-bold">🏥</span>
-                        </div>
-                        <div>
-                            <h1 class="text-lg font-bold text-gray-900">المنصة الأكاديمية</h1>
-                            <p class="text-xs text-purple-600">لجنة الطب والجراحة البيطرية</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Navigation -->
-                    <nav class="hidden md:flex space-x-6 space-x-reverse">
-                        <button onclick="switchMainTab('home')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
-                            🏠 الرئيسية
-                        </button>
-                        <button onclick="switchMainTab('materials')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
-                            📚 المواد
-                        </button>
-                        <button onclick="switchMainTab('posts')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
-                            📝 المنشورات
-                        </button>
-                        <button onclick="switchMainTab('chat')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
-                            💬 الدردشة
-                        </button>
-                    </nav>
-                    
-                    <!-- User Menu -->
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <!-- Online Users Count -->
-                        <div class="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                            <span id="onlineUsersCount">1</span>
-                            <span>متصل</span>
-                        </div>
-                        
-                        <!-- User Profile -->
-                        <div class="relative">
-                            <button id="userMenuBtn" class="flex items-center space-x-2 space-x-reverse text-gray-700 hover:text-purple-600 transition-colors">
-                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                    <span id="userAvatar">ط</span>
-                                </div>
-                                <span class="hidden md:block font-medium" id="userName">طالب الطب البيطري</span>
-                                <span class="text-sm">⌄</span>
-                            </button>
-                            
-                            <!-- User Dropdown -->
-                            <div id="userDropdown" class="hidden absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                                <div class="py-2">
-                                    <div class="px-4 py-2 border-b border-gray-100">
-                                        <div class="text-sm font-medium text-gray-900" id="userFullName">طالب الطب البيطري</div>
-                                        <div class="text-xs text-gray-500" id="userYear">السنة الأولى</div>
-                                    </div>
-                                    <button onclick="switchMainTab('profile')" class="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 space-x-reverse">
-                                        <span>👤</span>
-                                        <span>الملف الشخصي</span>
-                                    </button>
-                                    <button id="logoutBtn" class="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 space-x-reverse">
-                                        <span>🚪</span>
-                                        <span>تسجيل الخروج</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        </div>
 
         <!-- Main Content -->
-        <main id="homeSection" class="p-6 bg-gray-50 min-h-screen">
+        <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Welcome Section -->
-            <div class="text-center py-16">
-                <div class="max-w-2xl mx-auto">
-                    <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                        <span class="text-white text-4xl">🎓</span>
+            <div id="welcomeSection" class="flex-1 flex items-center justify-center bg-gradient-to-br from-purple-600 to-purple-800">
+                <div class="text-center text-white p-8">
+                    <div class="w-32 h-32 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-8">
+                        <span class="text-6xl">🎓</span>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">مرحباً بك في المنصة الأكاديمية</h2>
-                    <p class="text-lg text-gray-600 mb-8">منصة شاملة لطلبة كلية الطب البيطري</p>
-                    
-                    <!-- Quick Actions -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-                        <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100 card-hover">
-                            <div class="text-3xl mb-3">📚</div>
-                            <h3 class="font-semibold text-gray-900 mb-2">المواد الدراسية</h3>
-                            <p class="text-sm text-gray-600 mb-4">تصفح جميع المواد حسب السنة والفصل</p>
-                            <button onclick="switchMainTab('materials')" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                                استكشف المواد
-                            </button>
-                        </div>
-                        
-                        <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100 card-hover">
-                            <div class="text-3xl mb-3">💬</div>
-                            <h3 class="font-semibold text-gray-900 mb-2">الدردشة</h3>
-                            <p class="text-sm text-gray-600 mb-4">تواصل مع زملائك في الدراسة</p>
-                            <button onclick="switchMainTab('chat')" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                                ابدأ المحادثة
-                            </button>
-                        </div>
-                        
-                        <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100 card-hover">
-                            <div class="text-3xl mb-3">📝</div>
-                            <h3 class="font-semibold text-gray-900 mb-2">المنشورات</h3>
-                            <p class="text-sm text-gray-600 mb-4">اطلع على آخر الأخبار والإعلانات</p>
-                            <button onclick="switchMainTab('posts')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                عرض المنشورات
-                            </button>
-                        </div>
+                    <h1 class="text-4xl font-bold mb-4">مرحباً بك في المنصة الأكاديمية</h1>
+                    <p class="text-xl text-purple-100 mb-8">منصة شاملة لطلبة كلية الطب البيطري</p>
+                    <div class="text-lg text-purple-200">
+                        قم بتسجيل الدخول أو إنشاء حساب جديد للبدء
                     </div>
                 </div>
             </div>
-        </main>
 
-        <!-- Materials Section -->
-        <div id="materialsSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <div class="max-w-6xl mx-auto">
+            <!-- Login Section -->
+            <div id="loginSection" class="hidden flex-1 flex items-center justify-center p-8">
+                <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-2xl">🔑</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">تسجيل الدخول</h2>
+                        <p class="text-gray-600 mt-2">أدخل بياناتك للوصول إلى المنصة</p>
+                    </div>
+
+                    <form id="loginForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
+                            <input type="text" id="loginUsername" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="أدخل اسم المستخدم">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
+                            <input type="password" id="loginPassword" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="أدخل كلمة المرور">
+                        </div>
+
+                        <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
+                            🔑 تسجيل الدخول
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Register Section -->
+            <div id="registerSection" class="hidden flex-1 flex items-center justify-center p-8">
+                <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-2xl">📝</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900">إنشاء حساب جديد</h2>
+                        <p class="text-gray-600 mt-2">انضم إلى المنصة الأكاديمية</p>
+                    </div>
+
+                    <form id="registerForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الاسم الكامل</label>
+                            <input type="text" id="registerName" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="أدخل اسمك الكامل">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
+                            <input type="text" id="registerUsername" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="اختر اسم مستخدم">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
+                            <select id="registerYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">اختر السنة</option>
+                                <option value="1">السنة الأولى</option>
+                                <option value="2">السنة الثانية</option>
+                                <option value="3">السنة الثالثة</option>
+                                <option value="4">السنة الرابعة</option>
+                                <option value="5">السنة الخامسة</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
+                            <input type="password" id="registerPassword" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="أدخل كلمة مرور قوية">
+                        </div>
+
+                        <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
+                            📝 إنشاء الحساب
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Materials Section -->
+            <div id="materialsSection" class="hidden flex-1 flex flex-col">
                 <!-- Header -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
+                <div class="bg-white shadow-sm border-b border-gray-200 p-6">
                     <div class="flex justify-between items-center">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900">📚 المواد الدراسية</h2>
@@ -490,42 +420,42 @@
                 </div>
 
                 <!-- Year Tabs -->
-                <div class="bg-white rounded-lg shadow-md mb-6 border border-gray-100">
-                    <div class="flex flex-wrap border-b border-gray-200">
-                        <button onclick="switchYear(1)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="1">
+                <div class="bg-white border-b border-gray-200">
+                    <div class="flex space-x-1 space-x-reverse p-4">
+                        <button onclick="switchYear(1)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="1">
                             السنة الأولى
                         </button>
-                        <button onclick="switchYear(2)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="2">
+                        <button onclick="switchYear(2)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="2">
                             السنة الثانية
                         </button>
-                        <button onclick="switchYear(3)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="3">
+                        <button onclick="switchYear(3)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="3">
                             السنة الثالثة
                         </button>
-                        <button onclick="switchYear(4)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="4">
+                        <button onclick="switchYear(4)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="4">
                             السنة الرابعة
                         </button>
-                        <button onclick="switchYear(5)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="5">
+                        <button onclick="switchYear(5)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="5">
                             السنة الخامسة
                         </button>
                     </div>
                 </div>
 
                 <!-- Materials Content -->
-                <div id="materialsContent" class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📚</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">اختر السنة الدراسية</h3>
-                        <p class="text-gray-600">انقر على إحدى السنوات أعلاه لعرض المواد المتاحة</p>
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div id="materialsContent">
+                        <div class="text-center py-16">
+                            <div class="text-6xl mb-4">📚</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">اختر السنة الدراسية</h3>
+                            <p class="text-gray-600">انقر على إحدى السنوات أعلاه لعرض المواد المتاحة</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Posts Section -->
-        <div id="postsSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <div class="max-w-4xl mx-auto">
+            <!-- Posts Section -->
+            <div id="postsSection" class="hidden flex-1 flex flex-col">
                 <!-- Header -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
+                <div class="bg-white shadow-sm border-b border-gray-200 p-6">
                     <div class="flex justify-between items-center">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
@@ -539,70 +469,66 @@
                     </div>
                 </div>
                 
-                <!-- Posts Container -->
-                <div id="postsContainer">
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📝</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
-                        <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Section -->
-        <div id="chatSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-white rounded-lg shadow-md border border-gray-100 h-96 flex flex-col">
-                    <!-- Chat Header -->
-                    <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="font-semibold text-purple-900 flex items-center">
-                                    <span class="mr-2">💬</span>
-                                    الدردشة العامة
-                                </h3>
-                                <p class="text-sm text-purple-600">دردشة مباشرة مع جميع المستخدمين المتصلين</p>
-                            </div>
-                            <div class="text-sm text-purple-600">
-                                <span id="onlineChatUsers">1</span> متصل الآن
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Messages -->
-                    <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
-                        <div class="text-center text-gray-500 py-8">
-                            <div class="text-4xl mb-2">💬</div>
-                            <p>ابدأ محادثة جديدة!</p>
-                        </div>
-                    </div>
-
-                    <!-- Chat Input -->
-                    <div class="p-4 border-t border-gray-200">
-                        <div class="flex space-x-2 space-x-reverse">
-                            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." 
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                                   onkeypress="if(event.key==='Enter') sendMessage()">
-                            <button onclick="sendMessage()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                                📤 إرسال
-                            </button>
+                <!-- Posts Content -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div id="postsContainer">
+                        <div class="text-center py-16">
+                            <div class="text-6xl mb-4">📝</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
+                            <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Profile Section -->
-        <div id="profileSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <div class="max-w-2xl mx-auto">
-                <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+            <!-- Chat Section -->
+            <div id="chatSection" class="hidden flex-1 flex flex-col">
+                <!-- Chat Header -->
+                <div class="bg-white shadow-sm border-b border-gray-200 p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                                <span class="ml-2">💬</span>
+                                الدردشة العامة
+                            </h2>
+                            <p class="text-gray-600 mt-1">دردشة مباشرة مع جميع المستخدمين المتصلين</p>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span id="onlineChatUsers">0</span> متصل الآن
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-2">💬</div>
+                        <p>ابدأ محادثة جديدة!</p>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="bg-white border-t border-gray-200 p-4">
+                    <div class="flex space-x-2 space-x-reverse">
+                        <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." 
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                               onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button onclick="sendMessage()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                            📤 إرسال
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profileSection" class="hidden flex-1 flex items-center justify-center p-8">
+                <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
                     <div class="text-center mb-6">
                         <div class="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
-                            <span id="profileAvatar">ط</span>
+                            <span id="profileAvatar">👤</span>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900" id="profileName">طالب الطب البيطري</h2>
-                        <p class="text-gray-600" id="profileYear">السنة الأولى</p>
+                        <h2 class="text-2xl font-bold text-gray-900" id="profileName">اسم المستخدم</h2>
+                        <p class="text-gray-600" id="profileYear">السنة الدراسية</p>
                     </div>
                     
                     <div class="space-y-4">
@@ -636,162 +562,47 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Admin Panel -->
-        <div id="adminPanel" class="hidden p-6 admin-panel min-h-screen">
-            <div class="max-w-6xl mx-auto">
-                <div class="admin-card rounded-lg shadow-xl p-6 mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">🛠️ لوحة التحكم الإدارية</h2>
-                    <p class="text-gray-600">إدارة المنصة والمحتوى</p>
+            <!-- Admin Panel -->
+            <div id="adminSection" class="hidden flex-1 overflow-y-auto p-6 bg-gradient-to-br from-purple-600 to-purple-800">
+                <div class="max-w-6xl mx-auto">
+                    <div class="bg-white bg-opacity-95 rounded-lg shadow-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">🛠️ لوحة التحكم الإدارية</h2>
+                        <p class="text-gray-600">إدارة المنصة والمحتوى</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Users Management -->
+                        <div class="bg-white bg-opacity-95 rounded-lg shadow-lg p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">👥 إدارة المستخدمين</h3>
+                            <div class="text-3xl font-bold text-purple-600 mb-2" id="totalUsers">0</div>
+                            <p class="text-sm text-gray-600 mb-4">إجمالي المستخدمين</p>
+                            <button onclick="showUsersModal()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                عرض المستخدمين
+                            </button>
+                        </div>
+
+                        <!-- Posts Management -->
+                        <div class="bg-white bg-opacity-95 rounded-lg shadow-lg p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">📝 إدارة المنشورات</h3>
+                            <div class="text-3xl font-bold text-blue-600 mb-2" id="totalPosts">0</div>
+                            <p class="text-sm text-gray-600 mb-4">إجمالي المنشورات</p>
+                            <button onclick="showAddPostModal()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                إضافة منشور
+                            </button>
+                        </div>
+
+                        <!-- Materials Management -->
+                        <div class="bg-white bg-opacity-95 rounded-lg shadow-lg p-6">
+                            <h3 class="font-semibold text-gray-900 mb-4">📚 إدارة المواد</h3>
+                            <div class="text-3xl font-bold text-green-600 mb-2" id="totalMaterials">0</div>
+                            <p class="text-sm text-gray-600 mb-4">إجمالي المواد</p>
+                            <button onclick="showAddMaterialModal()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                إضافة مادة
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Users Management -->
-                    <div class="admin-card rounded-lg shadow-lg p-6">
-                        <h3 class="font-semibold text-gray-900 mb-4">👥 إدارة المستخدمين</h3>
-                        <div class="text-3xl font-bold text-purple-600 mb-2" id="totalUsers">0</div>
-                        <p class="text-sm text-gray-600 mb-4">إجمالي المستخدمين</p>
-                        <button onclick="showUsersModal()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                            عرض المستخدمين
-                        </button>
-                    </div>
-
-                    <!-- Posts Management -->
-                    <div class="admin-card rounded-lg shadow-lg p-6">
-                        <h3 class="font-semibold text-gray-900 mb-4">📝 إدارة المنشورات</h3>
-                        <div class="text-3xl font-bold text-blue-600 mb-2" id="totalPosts">0</div>
-                        <p class="text-sm text-gray-600 mb-4">إجمالي المنشورات</p>
-                        <button onclick="showAddPostModal()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            إضافة منشور
-                        </button>
-                    </div>
-
-                    <!-- Materials Management -->
-                    <div class="admin-card rounded-lg shadow-lg p-6">
-                        <h3 class="font-semibold text-gray-900 mb-4">📚 إدارة المواد</h3>
-                        <div class="text-3xl font-bold text-green-600 mb-2" id="totalMaterials">0</div>
-                        <p class="text-sm text-gray-600 mb-4">إجمالي المواد</p>
-                        <button onclick="showAddMaterialModal()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                            إضافة مادة
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 welcome-popup">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span class="text-white text-2xl">🔑</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">تسجيل الدخول</h2>
-                    <p class="text-gray-600">أدخل بياناتك للوصول إلى المنصة</p>
-                </div>
-
-                <form id="loginForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
-                        <input type="text" id="loginUsername" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                               placeholder="أدخل اسم المستخدم">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
-                        <input type="password" id="loginPassword" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                               placeholder="أدخل كلمة المرور">
-                    </div>
-
-                    <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
-                        🔑 تسجيل الدخول
-                    </button>
-                </form>
-
-                <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">
-                        ليس لديك حساب؟ 
-                        <button onclick="showRegisterModal()" class="text-purple-600 hover:text-purple-500 font-medium">
-                            إنشاء حساب جديد
-                        </button>
-                    </p>
-                </div>
-
-                <button onclick="closeModal('loginModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
-                    <span class="text-xl">✕</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 welcome-popup">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                        <span class="text-white text-2xl">📝</span>
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">إنشاء حساب جديد</h2>
-                    <p class="text-gray-600">انضم إلى المنصة الأكاديمية</p>
-                </div>
-
-                <form id="registerForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">الاسم الكامل</label>
-                        <input type="text" id="registerName" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                               placeholder="أدخل اسمك الكامل">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
-                        <input type="text" id="registerUsername" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                               placeholder="اختر اسم مستخدم">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
-                        <select id="registerYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <option value="">اختر السنة</option>
-                            <option value="1">السنة الأولى</option>
-                            <option value="2">السنة الثانية</option>
-                            <option value="3">السنة الثالثة</option>
-                            <option value="4">السنة الرابعة</option>
-                            <option value="5">السنة الخامسة</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
-                        <input type="password" id="registerPassword" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                               placeholder="أدخل كلمة مرور قوية">
-                    </div>
-
-                    <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
-                        📝 إنشاء الحساب
-                    </button>
-                </form>
-
-                <div class="mt-6 text-center">
-                    <p class="text-sm text-gray-600">
-                        لديك حساب بالفعل؟ 
-                        <button onclick="showLoginModal()" class="text-purple-600 hover:text-purple-500 font-medium">
-                            تسجيل الدخول
-                        </button>
-                    </p>
-                </div>
-
-                <button onclick="closeModal('registerModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
-                    <span class="text-xl">✕</span>
-                </button>
             </div>
         </div>
     </div>
@@ -952,7 +763,7 @@
     <script>
         // Application State
         let currentUser = null;
-        let currentMainTab = 'home';
+        let currentTab = 'welcome';
         let currentYear = 1;
         let isOnline = false;
         let syncInterval = null;
@@ -968,14 +779,6 @@
                     apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
                     binId: '676b8c8ead19ca34f8d5b7b8',
                     baseUrl: 'https://api.jsonbin.io/v3'
-                }
-            },
-            {
-                name: 'Pastebin',
-                config: {
-                    apiKey: 'your_pastebin_key',
-                    pasteId: 'your_paste_id',
-                    baseUrl: 'https://pastebin.com/api'
                 }
             }
         ];
@@ -1008,7 +811,7 @@
             console.log('🚀 تهيئة المنصة الأكاديمية...');
             setupEventListeners();
             checkLoginStatus();
-            loadDataFromLocalStorage(); // Load local data first
+            loadDataFromLocalStorage();
             updateConnectionStatus('connecting');
             
             // Try to connect to cloud with retry mechanism
@@ -1024,32 +827,25 @@
                 try {
                     console.log(`🔄 محاولة الاتصال ${attempt + 1}/${MAX_RETRY_ATTEMPTS}...`);
                     await connectToCloud();
-                    return; // Success, exit retry loop
+                    return;
                 } catch (error) {
                     console.error(`❌ فشلت المحاولة ${attempt + 1}:`, error);
                     
                     if (attempt < MAX_RETRY_ATTEMPTS - 1) {
-                        // Try next provider
                         currentProvider = (currentProvider + 1) % CLOUD_PROVIDERS.length;
                         console.log(`🔄 التبديل إلى مزود آخر: ${CLOUD_PROVIDERS[currentProvider].name}`);
-                        
-                        // Wait before retry
                         await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
                     }
                 }
             }
             
-            // All attempts failed
             console.log('❌ فشل الاتصال بجميع المزودين، التبديل للوضع المحلي');
             updateConnectionStatus('offline');
             isOnline = false;
             showNotification('تم التبديل للوضع المحلي - البيانات محفوظة محلياً', 'warning');
-            
-            // Retry connection every 60 seconds
             setTimeout(connectToCloudWithRetry, 60000);
         }
 
-        // Cloud connection functions
         async function connectToCloud() {
             const provider = CLOUD_PROVIDERS[currentProvider];
             console.log(`🔄 محاولة الاتصال بـ ${provider.name}...`);
@@ -1069,16 +865,14 @@
             console.log('✅ تم الاتصال بالسحابة بنجاح');
             showNotification('تم الاتصال بالسحابة بنجاح', 'success');
             
-            // Start sync interval
             if (syncInterval) clearInterval(syncInterval);
-            syncInterval = setInterval(syncWithCloud, 30000); // Every 30 seconds
+            syncInterval = setInterval(syncWithCloud, 30000);
         }
 
         async function connectToJSONBin(config) {
             try {
                 await loadDataFromJSONBin(config);
             } catch (error) {
-                // If loading fails, try to create/update the bin
                 console.log('🔄 محاولة إنشاء/تحديث البيانات...');
                 await saveDataToJSONBin(config);
             }
@@ -1102,17 +896,13 @@
                 const cloudData = await response.json();
                 
                 if (cloudData && typeof cloudData === 'object') {
-                    // Merge cloud data with local data
                     const mergedData = mergeData(academicData, cloudData);
                     
                     if (mergedData.lastUpdated !== academicData.lastUpdated) {
                         academicData = mergedData;
                         lastSyncTime = academicData.lastUpdated;
                         saveDataToLocalStorage();
-                        
-                        // Update UI
                         updateUIAfterDataLoad();
-                        
                         console.log('📥 تم تحميل البيانات من السحابة');
                     }
                 }
@@ -1159,27 +949,22 @@
             }
         }
 
-        // Smart data merging function
         function mergeData(localData, cloudData) {
             const merged = { ...localData };
             
-            // Merge arrays by ID, keeping the most recent items
             ['users', 'posts', 'materials', 'chatMessages'].forEach(key => {
                 if (cloudData[key] && Array.isArray(cloudData[key])) {
                     const localItems = merged[key] || [];
                     const cloudItems = cloudData[key] || [];
                     
-                    // Create a map of all items by ID
                     const itemsMap = new Map();
                     
-                    // Add local items first
                     localItems.forEach(item => {
                         if (item.id) {
                             itemsMap.set(item.id, item);
                         }
                     });
                     
-                    // Add/update with cloud items
                     cloudItems.forEach(item => {
                         if (item.id) {
                             const existing = itemsMap.get(item.id);
@@ -1193,7 +978,6 @@
                 }
             });
             
-            // Merge other properties
             if (cloudData.onlineUsers) {
                 merged.onlineUsers = { ...merged.onlineUsers, ...cloudData.onlineUsers };
             }
@@ -1202,7 +986,6 @@
                 merged.settings = { ...merged.settings, ...cloudData.settings };
             }
             
-            // Use the most recent timestamp
             if (cloudData.lastUpdated && (!merged.lastUpdated || new Date(cloudData.lastUpdated) > new Date(merged.lastUpdated))) {
                 merged.lastUpdated = cloudData.lastUpdated;
             }
@@ -1214,18 +997,12 @@
             if (!isOnline || !currentUser) return;
             
             try {
-                // Update online status
                 updateOnlineUsersCount();
                 
                 const provider = CLOUD_PROVIDERS[currentProvider];
                 
-                // Save to cloud
                 if (provider.name === 'JSONBin') {
                     await saveDataToJSONBin(provider.config);
-                }
-                
-                // Load from cloud to get updates from other users
-                if (provider.name === 'JSONBin') {
                     await loadDataFromJSONBin(provider.config);
                 }
                 
@@ -1233,34 +1010,27 @@
                 console.error('خطأ في المزامنة:', error);
                 updateConnectionStatus('offline');
                 isOnline = false;
-                
-                // Try to reconnect
                 setTimeout(connectToCloudWithRetry, 30000);
             }
         }
 
         function updateUIAfterDataLoad() {
-            // Update chat messages
-            if (currentMainTab === 'chat') {
+            if (currentTab === 'chat') {
                 loadChatMessages();
             }
             
-            // Update posts
-            if (currentMainTab === 'posts') {
+            if (currentTab === 'posts') {
                 loadPosts();
             }
             
-            // Update materials
-            if (currentMainTab === 'materials') {
+            if (currentTab === 'materials') {
                 loadMaterials(currentYear);
             }
             
-            // Update admin stats
             if (currentUser && currentUser.isAdmin) {
                 updateAdminStats();
             }
             
-            // Update online users count
             updateOnlineUsersCount();
         }
 
@@ -1319,7 +1089,6 @@
                     academicData = mergeData(academicData, parsedData);
                     lastSyncTime = savedSyncTime;
                     console.log('📁 تم تحميل البيانات المحلية');
-                    
                     updateUIAfterDataLoad();
                 }
             } catch (error) {
@@ -1329,14 +1098,12 @@
 
         function updateOnlineUsersCount() {
             if (currentUser) {
-                // Add current user to online users
                 academicData.onlineUsers[currentUser.id] = {
                     name: currentUser.name,
                     avatar: currentUser.avatar,
                     lastSeen: new Date().toISOString()
                 };
                 
-                // Remove users who haven't been seen for more than 5 minutes
                 const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
                 Object.keys(academicData.onlineUsers).forEach(userId => {
                     const lastSeen = new Date(academicData.onlineUsers[userId].lastSeen);
@@ -1347,7 +1114,6 @@
                 
                 const onlineCount = Object.keys(academicData.onlineUsers).length;
                 
-                // Update UI elements
                 const onlineElements = ['onlineUsersCount', 'onlineChatUsers'];
                 onlineElements.forEach(id => {
                     const element = document.getElementById(id);
@@ -1358,277 +1124,12 @@
             }
         }
 
-        // Chat functions
-        function loadChatMessages() {
-            const messagesContainer = document.getElementById('chatMessages');
-            if (!messagesContainer) return;
-            
-            messagesContainer.innerHTML = '';
-            
-            if (academicData.chatMessages.length === 0) {
-                messagesContainer.innerHTML = `
-                    <div class="text-center text-gray-500 py-8">
-                        <div class="text-4xl mb-2">💬</div>
-                        <p>ابدأ محادثة جديدة!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Show last 50 messages
-            const recentMessages = academicData.chatMessages.slice(-50);
-            recentMessages.forEach(message => {
-                displayChatMessage(message);
-            });
-            
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function displayChatMessage(message) {
-            const messagesContainer = document.getElementById('chatMessages');
-            if (!messagesContainer) return;
-            
-            const isCurrentUser = currentUser && message.userId === currentUser.id;
-            const messageTime = new Date(message.timestamp).toLocaleTimeString('ar-SA', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            
-            const messageElement = document.createElement('div');
-            messageElement.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'} chat-message`;
-            
-            messageElement.innerHTML = `
-                <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    isCurrentUser 
-                        ? 'bg-purple-600 text-white' 
-                        : 'bg-gray-200 text-gray-900'
-                }">
-                    ${!isCurrentUser ? `<div class="text-xs font-semibold mb-1 opacity-75">${message.userName}</div>` : ''}
-                    <div class="text-sm">${escapeHtml(message.text)}</div>
-                    <div class="text-xs opacity-75 mt-1">${messageTime}</div>
-                </div>
-            `;
-            
-            messagesContainer.appendChild(messageElement);
-        }
-
-        function sendMessage() {
-            const chatInput = document.getElementById('chatInput');
-            if (!chatInput || !currentUser) return;
-            
-            const messageText = chatInput.value.trim();
-            if (!messageText) return;
-            
-            const message = {
-                id: Date.now().toString(),
-                userId: currentUser.id,
-                userName: currentUser.name,
-                text: messageText,
-                timestamp: new Date().toISOString()
-            };
-            
-            academicData.chatMessages.push(message);
-            displayChatMessage(message);
-            
-            chatInput.value = '';
-            
-            const messagesContainer = document.getElementById('chatMessages');
-            if (messagesContainer) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            
-            // Update user message count
-            if (currentUser) {
-                const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
-                if (userIndex !== -1) {
-                    academicData.users[userIndex].messageCount = (academicData.users[userIndex].messageCount || 0) + 1;
-                }
-            }
-            
-            saveDataToLocalStorage();
-            if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
-            }
-        }
-
-        // Posts functions
-        function loadPosts() {
-            const postsContainer = document.getElementById('postsContainer');
-            if (!postsContainer) return;
-            
-            if (academicData.posts.length === 0) {
-                postsContainer.innerHTML = `
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📝</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
-                        <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Sort posts by date (newest first)
-            const sortedPosts = [...academicData.posts].sort((a, b) => 
-                new Date(b.timestamp) - new Date(a.timestamp)
-            );
-            
-            postsContainer.innerHTML = sortedPosts.map(post => `
-                <div class="post-card bg-white rounded-lg shadow-md p-6 mb-4 border border-gray-100">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center space-x-3 space-x-reverse">
-                            <div class="w-10 h-10 bg-${getPostTypeColor(post.type)}-100 rounded-full flex items-center justify-center">
-                                <span class="text-${getPostTypeColor(post.type)}-600">${getPostTypeIcon(post.type)}</span>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">${escapeHtml(post.title)}</h3>
-                                <p class="text-sm text-gray-500">${formatDate(post.timestamp)}</p>
-                            </div>
-                        </div>
-                        <span class="px-3 py-1 bg-${getPostTypeColor(post.type)}-100 text-${getPostTypeColor(post.type)}-800 text-xs font-medium rounded-full">
-                            ${getPostTypeLabel(post.type)}
-                        </span>
-                    </div>
-                    <div class="text-gray-700 leading-relaxed">
-                        ${escapeHtml(post.content).replace(/\n/g, '<br>')}
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
-                        بواسطة: ${escapeHtml(post.authorName)}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function addPost(title, content, type) {
-            if (!currentUser || !currentUser.isAdmin) return false;
-            
-            const post = {
-                id: Date.now().toString(),
-                title: title,
-                content: content,
-                type: type,
-                authorId: currentUser.id,
-                authorName: currentUser.name,
-                timestamp: new Date().toISOString()
-            };
-            
-            academicData.posts.unshift(post);
-            
-            saveDataToLocalStorage();
-            if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
-            }
-            
-            if (currentMainTab === 'posts') {
-                loadPosts();
-            }
-            
-            showNotification('تم إضافة المنشور بنجاح', 'success');
-            return true;
-        }
-
-        // Materials functions
-        function loadMaterials(year) {
-            const materialsContent = document.getElementById('materialsContent');
-            if (!materialsContent) return;
-            
-            const yearMaterials = academicData.materials.filter(m => m.year === year);
-            
-            if (yearMaterials.length === 0) {
-                materialsContent.innerHTML = `
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📚</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد مواد للسنة ${getYearName(year)}</h3>
-                        <p class="text-gray-600">ستظهر المواد الدراسية هنا عند إضافتها</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Group materials by type
-            const groupedMaterials = yearMaterials.reduce((groups, material) => {
-                const type = material.type;
-                if (!groups[type]) groups[type] = [];
-                groups[type].push(material);
-                return groups;
-            }, {});
-            
-            materialsContent.innerHTML = `
-                <div class="space-y-6">
-                    ${Object.entries(groupedMaterials).map(([type, materials]) => `
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="mr-2">${getMaterialTypeIcon(type)}</span>
-                                ${getMaterialTypeLabel(type)}
-                                <span class="mr-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                                    ${materials.length}
-                                </span>
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                ${materials.map(material => `
-                                    <div class="material-item bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md">
-                                        <h4 class="font-medium text-gray-900 mb-2">${escapeHtml(material.name)}</h4>
-                                        ${material.description ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(material.description)}</p>` : ''}
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs text-gray-500">${formatDate(material.timestamp)}</span>
-                                            <a href="${material.link}" target="_blank" rel="noopener noreferrer" 
-                                               class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
-                                                📖 فتح
-                                            </a>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function addMaterial(name, year, type, link, description) {
-            if (!currentUser || !currentUser.isAdmin) return false;
-            
-            const material = {
-                id: Date.now().toString(),
-                name: name,
-                year: parseInt(year),
-                type: type,
-                link: link,
-                description: description,
-                authorId: currentUser.id,
-                authorName: currentUser.name,
-                timestamp: new Date().toISOString()
-            };
-            
-            academicData.materials.push(material);
-            
-            saveDataToLocalStorage();
-            if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
-            }
-            
-            if (currentMainTab === 'materials' && currentYear === parseInt(year)) {
-                loadMaterials(currentYear);
-            }
-            
-            showNotification('تم إضافة المادة بنجاح', 'success');
-            return true;
-        }
-
         // Navigation functions
-        function switchMainTab(tabName) {
-            currentMainTab = tabName;
+        function switchTab(tabName) {
+            currentTab = tabName;
             
             // Hide all sections
-            const sections = ['homeSection', 'materialsSection', 'postsSection', 'chatSection', 'profileSection', 'adminPanel'];
+            const sections = ['welcomeSection', 'loginSection', 'registerSection', 'materialsSection', 'postsSection', 'chatSection', 'profileSection', 'adminSection'];
             sections.forEach(sectionId => {
                 const section = document.getElementById(sectionId);
                 if (section) {
@@ -1636,25 +1137,20 @@
                 }
             });
             
-            // Update navigation buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-purple-600', 'font-semibold');
-                btn.classList.add('text-gray-700');
+            // Update sidebar buttons
+            document.querySelectorAll('.sidebar-item').forEach(btn => {
+                btn.classList.remove('active');
             });
             
             // Show selected section
-            let targetSection = tabName + 'Section';
-            if (tabName === 'admin') targetSection = 'adminPanel';
-            
-            const section = document.getElementById(targetSection);
+            const section = document.getElementById(tabName + 'Section');
             if (section) {
                 section.classList.remove('hidden');
                 
-                // Update active nav button
-                const navBtn = document.querySelector(`[onclick="switchMainTab('${tabName}')"]`);
-                if (navBtn) {
-                    navBtn.classList.remove('text-gray-700');
-                    navBtn.classList.add('text-purple-600', 'font-semibold');
+                // Update active sidebar button
+                const sidebarBtn = document.getElementById(tabName + 'Tab');
+                if (sidebarBtn) {
+                    sidebarBtn.classList.add('active');
                 }
             }
             
@@ -1685,57 +1181,17 @@
             
             // Update year tabs
             document.querySelectorAll('.year-tab').forEach(tab => {
-                tab.classList.remove('active', 'border-purple-600', 'text-purple-600');
-                tab.classList.add('border-transparent', 'text-gray-700');
+                tab.classList.remove('bg-purple-600', 'text-white');
+                tab.classList.add('text-gray-700', 'hover:bg-gray-100');
             });
             
             const activeTab = document.querySelector(`[data-year="${year}"]`);
             if (activeTab) {
-                activeTab.classList.add('active', 'border-purple-600', 'text-purple-600');
-                activeTab.classList.remove('border-transparent', 'text-gray-700');
+                activeTab.classList.add('bg-purple-600', 'text-white');
+                activeTab.classList.remove('text-gray-700', 'hover:bg-gray-100');
             }
             
             loadMaterials(year);
-        }
-
-        // Profile functions
-        function loadProfile() {
-            if (!currentUser) return;
-            
-            const elements = {
-                profileAvatar: currentUser.avatar,
-                profileName: currentUser.name,
-                profileYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
-                profileUsername: currentUser.username,
-                profileRegDate: formatDate(currentUser.registrationDate || currentUser.loginTime),
-                profileMessages: currentUser.messageCount || 0,
-                profileLogins: currentUser.loginCount || 1
-            };
-            
-            Object.entries(elements).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                }
-            });
-        }
-
-        // Admin functions
-        function updateAdminStats() {
-            if (!currentUser || !currentUser.isAdmin) return;
-            
-            const stats = {
-                totalUsers: academicData.users.length,
-                totalPosts: academicData.posts.length,
-                totalMaterials: academicData.materials.length
-            };
-            
-            Object.entries(stats).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                }
-            });
         }
 
         // Authentication functions
@@ -1744,7 +1200,7 @@
             if (savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
-                    showMainPlatform();
+                    showLoggedInState();
                 } catch (error) {
                     console.error('Error parsing saved user:', error);
                     localStorage.removeItem('currentUser');
@@ -1775,32 +1231,6 @@
             const addMaterialForm = document.getElementById('addMaterialForm');
             if (addMaterialForm) {
                 addMaterialForm.addEventListener('submit', handleAddMaterial);
-            }
-            
-            // User menu
-            const userMenuBtn = document.getElementById('userMenuBtn');
-            if (userMenuBtn) {
-                userMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const dropdown = document.getElementById('userDropdown');
-                    if (dropdown) {
-                        dropdown.classList.toggle('hidden');
-                    }
-                });
-            }
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function() {
-                const dropdown = document.getElementById('userDropdown');
-                if (dropdown) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-            
-            // Logout button
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', handleLogout);
             }
         }
 
@@ -1841,7 +1271,6 @@
                     loginCount: (existingUser.loginCount || 0) + 1
                 };
                 
-                // Update user data
                 const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
                 if (userIndex !== -1) {
                     academicData.users[userIndex] = { ...currentUser };
@@ -1858,10 +1287,8 @@
                 }
             }
             
-            closeModal('loginModal');
-            showMainPlatform();
+            showLoggedInState();
             showWelcomePopup(currentUser.name);
-            
             showNotification(`مرحباً ${currentUser.name}!`, 'success');
         }
 
@@ -1909,10 +1336,8 @@
                 }
             }
             
-            closeModal('registerModal');
-            showMainPlatform();
+            showLoggedInState();
             showWelcomePopup(name);
-            
             showNotification(`مرحباً ${name}! تم إنشاء حسابك بنجاح`, 'success');
         }
 
@@ -1954,62 +1379,22 @@
             }
         }
 
-        function handleLogout() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                // Remove from online users
-                if (currentUser && academicData.onlineUsers[currentUser.id]) {
-                    delete academicData.onlineUsers[currentUser.id];
-                    if (isOnline) {
-                        const provider = CLOUD_PROVIDERS[currentProvider];
-                        if (provider.name === 'JSONBin') {
-                            saveDataToJSONBin(provider.config).catch(console.error);
-                        }
-                    }
-                }
-                
-                // Clear sync interval
-                if (syncInterval) {
-                    clearInterval(syncInterval);
-                    syncInterval = null;
-                }
-                
-                // Clear user data
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                
-                // Show home page
-                const homePage = document.getElementById('homePage');
-                const mainPlatform = document.getElementById('mainPlatform');
-                
-                if (homePage && mainPlatform) {
-                    homePage.classList.remove('hidden');
-                    mainPlatform.classList.add('hidden');
-                }
-                
-                // Reset forms
-                const forms = ['loginForm', 'registerForm'];
-                forms.forEach(formId => {
-                    const form = document.getElementById(formId);
-                    if (form) form.reset();
-                });
-                
-                showNotification('تم تسجيل الخروج بنجاح', 'info');
-            }
-        }
-
-        function showMainPlatform() {
-            const homePage = document.getElementById('homePage');
-            const mainPlatform = document.getElementById('mainPlatform');
+        function showLoggedInState() {
+            // Hide login/register tabs
+            const loginTab = document.getElementById('loginTab');
+            const registerTab = document.getElementById('registerTab');
+            if (loginTab) loginTab.classList.add('hidden');
+            if (registerTab) registerTab.classList.add('hidden');
             
-            if (homePage && mainPlatform) {
-                homePage.classList.add('hidden');
-                mainPlatform.classList.remove('hidden');
-            }
+            // Show logged in navigation
+            const loggedInNav = document.getElementById('loggedInNav');
+            const logoutSection = document.getElementById('logoutSection');
+            if (loggedInNav) loggedInNav.classList.remove('hidden');
+            if (logoutSection) logoutSection.classList.remove('hidden');
             
-            // Update user info in UI
+            // Update user info
             const userElements = {
                 userName: currentUser.name,
-                userFullName: currentUser.name,
                 userYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
                 userAvatar: currentUser.avatar
             };
@@ -2021,48 +1406,380 @@
                 }
             });
             
-            // Show admin buttons if user is admin
+            // Show admin navigation if user is admin
             if (currentUser.isAdmin) {
-                const adminElements = ['adminMaterialsBtn', 'adminPostsBtn'];
-                adminElements.forEach(id => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.classList.remove('hidden');
-                    }
-                });
+                const adminNav = document.getElementById('adminNav');
+                const adminButtons = ['adminMaterialsBtn', 'adminPostsBtn'];
                 
-                // Add admin navigation
-                const nav = document.querySelector('nav');
-                if (nav && !document.querySelector('[onclick="switchMainTab(\'admin\')"]')) {
-                    const adminBtn = document.createElement('button');
-                    adminBtn.onclick = () => switchMainTab('admin');
-                    adminBtn.className = 'nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors';
-                    adminBtn.innerHTML = '🛠️ الإدارة';
-                    nav.appendChild(adminBtn);
-                }
+                if (adminNav) adminNav.classList.remove('hidden');
+                adminButtons.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.classList.remove('hidden');
+                });
             }
             
+            // Switch to materials tab
+            switchTab('materials');
             updateOnlineUsersCount();
             updateUIAfterDataLoad();
         }
 
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                if (currentUser && academicData.onlineUsers[currentUser.id]) {
+                    delete academicData.onlineUsers[currentUser.id];
+                    if (isOnline) {
+                        const provider = CLOUD_PROVIDERS[currentProvider];
+                        if (provider.name === 'JSONBin') {
+                            saveDataToJSONBin(provider.config).catch(console.error);
+                        }
+                    }
+                }
+                
+                if (syncInterval) {
+                    clearInterval(syncInterval);
+                    syncInterval = null;
+                }
+                
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                
+                // Reset UI to logged out state
+                const loginTab = document.getElementById('loginTab');
+                const registerTab = document.getElementById('registerTab');
+                const loggedInNav = document.getElementById('loggedInNav');
+                const logoutSection = document.getElementById('logoutSection');
+                const adminNav = document.getElementById('adminNav');
+                
+                if (loginTab) loginTab.classList.remove('hidden');
+                if (registerTab) registerTab.classList.remove('hidden');
+                if (loggedInNav) loggedInNav.classList.add('hidden');
+                if (logoutSection) logoutSection.classList.add('hidden');
+                if (adminNav) adminNav.classList.add('hidden');
+                
+                // Reset user info
+                const userName = document.getElementById('userName');
+                const userYear = document.getElementById('userYear');
+                const userAvatar = document.getElementById('userAvatar');
+                
+                if (userName) userName.textContent = 'مرحباً بك';
+                if (userYear) userYear.textContent = 'قم بتسجيل الدخول';
+                if (userAvatar) userAvatar.textContent = '👤';
+                
+                // Reset forms
+                const forms = ['loginForm', 'registerForm'];
+                forms.forEach(formId => {
+                    const form = document.getElementById(formId);
+                    if (form) form.reset();
+                });
+                
+                switchTab('welcome');
+                showNotification('تم تسجيل الخروج بنجاح', 'info');
+            }
+        }
+
+        // Chat functions
+        function loadChatMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
+            messagesContainer.innerHTML = '';
+            
+            if (academicData.chatMessages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-2">💬</div>
+                        <p>ابدأ محادثة جديدة!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const recentMessages = academicData.chatMessages.slice(-50);
+            recentMessages.forEach(message => {
+                displayChatMessage(message);
+            });
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function displayChatMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
+            const isCurrentUser = currentUser && message.userId === currentUser.id;
+            const messageTime = new Date(message.timestamp).toLocaleTimeString('ar-SA', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4`;
+            
+            messageElement.innerHTML = `
+                <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    isCurrentUser 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-white text-gray-900 shadow-md'
+                }">
+                    ${!isCurrentUser ? `<div class="text-xs font-semibold mb-1 opacity-75">${message.userName}</div>` : ''}
+                    <div class="text-sm">${escapeHtml(message.text)}</div>
+                    <div class="text-xs opacity-75 mt-1">${messageTime}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            if (!chatInput || !currentUser) return;
+            
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+            
+            const message = {
+                id: Date.now().toString(),
+                userId: currentUser.id,
+                userName: currentUser.name,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.chatMessages.push(message);
+            displayChatMessage(message);
+            
+            chatInput.value = '';
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            if (currentUser) {
+                const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    academicData.users[userIndex].messageCount = (academicData.users[userIndex].messageCount || 0) + 1;
+                }
+            }
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
+            }
+        }
+
+        // Posts functions
+        function loadPosts() {
+            const postsContainer = document.getElementById('postsContainer');
+            if (!postsContainer) return;
+            
+            if (academicData.posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
+                        <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedPosts = [...academicData.posts].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            
+            postsContainer.innerHTML = sortedPosts.map(post => `
+                <div class="bg-white rounded-lg shadow-md p-6 mb-4 border-l-4 border-${getPostTypeColor(post.type)}-500">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <div class="w-10 h-10 bg-${getPostTypeColor(post.type)}-100 rounded-full flex items-center justify-center">
+                                <span class="text-${getPostTypeColor(post.type)}-600">${getPostTypeIcon(post.type)}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">${escapeHtml(post.title)}</h3>
+                                <p class="text-sm text-gray-500">${formatDate(post.timestamp)}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-${getPostTypeColor(post.type)}-100 text-${getPostTypeColor(post.type)}-800 text-xs font-medium rounded-full">
+                            ${getPostTypeLabel(post.type)}
+                        </span>
+                    </div>
+                    <div class="text-gray-700 leading-relaxed">
+                        ${escapeHtml(post.content).replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
+                        بواسطة: ${escapeHtml(post.authorName)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addPost(title, content, type) {
+            if (!currentUser || !currentUser.isAdmin) return false;
+            
+            const post = {
+                id: Date.now().toString(),
+                title: title,
+                content: content,
+                type: type,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.posts.unshift(post);
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
+            }
+            
+            if (currentTab === 'posts') {
+                loadPosts();
+            }
+            
+            showNotification('تم إضافة المنشور بنجاح', 'success');
+            return true;
+        }
+
+        // Materials functions
+        function loadMaterials(year) {
+            const materialsContent = document.getElementById('materialsContent');
+            if (!materialsContent) return;
+            
+            const yearMaterials = academicData.materials.filter(m => m.year === year);
+            
+            if (yearMaterials.length === 0) {
+                materialsContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد مواد للسنة ${getYearName(year)}</h3>
+                        <p class="text-gray-600">ستظهر المواد الدراسية هنا عند إضافتها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const groupedMaterials = yearMaterials.reduce((groups, material) => {
+                const type = material.type;
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(material);
+                return groups;
+            }, {});
+            
+            materialsContent.innerHTML = `
+                <div class="space-y-6">
+                    ${Object.entries(groupedMaterials).map(([type, materials]) => `
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="ml-2">${getMaterialTypeIcon(type)}</span>
+                                ${getMaterialTypeLabel(type)}
+                                <span class="mr-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                                    ${materials.length}
+                                </span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${materials.map(material => `
+                                    <div class="material-card rounded-lg p-4 border hover:shadow-lg transition-all">
+                                        <h4 class="font-medium text-gray-900 mb-2">${escapeHtml(material.name)}</h4>
+                                        ${material.description ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(material.description)}</p>` : ''}
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs text-gray-500">${formatDate(material.timestamp)}</span>
+                                            <a href="${material.link}" target="_blank" rel="noopener noreferrer" 
+                                               class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
+                                                📖 فتح
+                                            </a>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function addMaterial(name, year, type, link, description) {
+            if (!currentUser || !currentUser.isAdmin) return false;
+            
+            const material = {
+                id: Date.now().toString(),
+                name: name,
+                year: parseInt(year),
+                type: type,
+                link: link,
+                description: description,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.materials.push(material);
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
+            }
+            
+            if (currentTab === 'materials' && currentYear === parseInt(year)) {
+                loadMaterials(currentYear);
+            }
+            
+            showNotification('تم إضافة المادة بنجاح', 'success');
+            return true;
+        }
+
+        // Profile functions
+        function loadProfile() {
+            if (!currentUser) return;
+            
+            const elements = {
+                profileAvatar: currentUser.avatar,
+                profileName: currentUser.name,
+                profileYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
+                profileUsername: currentUser.username,
+                profileRegDate: formatDate(currentUser.registrationDate || currentUser.loginTime),
+                profileMessages: currentUser.messageCount || 0,
+                profileLogins: currentUser.loginCount || 1
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+        }
+
+        // Admin functions
+        function updateAdminStats() {
+            if (!currentUser || !currentUser.isAdmin) return;
+            
+            const stats = {
+                totalUsers: academicData.users.length,
+                totalPosts: academicData.posts.length,
+                totalMaterials: academicData.materials.length
+            };
+            
+            Object.entries(stats).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+        }
+
         // Modal functions
-        function showLoginModal() {
-            closeModal('registerModal');
-            const modal = document.getElementById('loginModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
-
-        function showRegisterModal() {
-            closeModal('loginModal');
-            const modal = document.getElementById('registerModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
-
         function showAddPostModal() {
             if (!currentUser || !currentUser.isAdmin) {
                 showNotification('غير مسموح لك بإضافة منشورات', 'error');
@@ -2124,7 +1841,7 @@
             
             notification.innerHTML = `
                 <div class="flex items-center">
-                    <span class="text-lg mr-2">${icon}</span>
+                    <span class="text-lg ml-2">${icon}</span>
                     <span class="text-sm font-medium text-gray-900">${escapeHtml(message)}</span>
                 </div>
             `;
@@ -2246,7 +1963,7 @@
                 console.log('🔄 محاولة إعادة الاتصال...');
                 connectToCloudWithRetry();
             }
-        }, 60000); // Check every minute
+        }, 60000);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9787684b603232ae',t:'MTc1Njc1NzM4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97877319103332ae',t:'MTc1Njc1NzgzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

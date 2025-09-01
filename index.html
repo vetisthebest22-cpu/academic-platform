@@ -287,6 +287,17 @@
                         <span>الامتحانات</span>
                     </button>
                     
+                    <button onclick="switchTab('notifications')" id="notificationsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse relative">
+                        <span class="text-xl">🔔</span>
+                        <span>الإشعارات</span>
+                        <span id="notificationBadge" class="hidden absolute top-2 left-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center notification-badge">0</span>
+                    </button>
+                    
+                    <button onclick="switchTab('favorites')" id="favoritesTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">❤️</span>
+                        <span>المفضلة</span>
+                    </button>
+                    
                     <button onclick="switchTab('tools')" id="toolsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
                         <span class="text-xl">🛠️</span>
                         <span>الأدوات</span>
@@ -566,11 +577,11 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900">📝 الامتحانات والاختبارات</h2>
-                            <p class="text-gray-600 mt-1">امتحانات سابقة ونماذج اختبارات</p>
+                            <p class="text-gray-600 mt-1">جدول الامتحانات والاختبارات القادمة</p>
                         </div>
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="showCreateExamModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                                ➕ إنشاء اختبار
+                        <div id="adminExamButtons" class="hidden flex space-x-2 space-x-reverse">
+                            <button onclick="showAddExamModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                ➕ إضافة امتحان
                             </button>
                             <button onclick="showExamStatsModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                                 📊 الإحصائيات
@@ -582,17 +593,17 @@
                 <!-- Exam Categories -->
                 <div class="bg-white border-b border-gray-200">
                     <div class="flex space-x-1 space-x-reverse p-4 overflow-x-auto">
-                        <button onclick="switchExamCategory('midterm')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="midterm">
+                        <button onclick="switchExamCategory('all')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-blue-600 text-white" data-category="all">
+                            جميع الامتحانات
+                        </button>
+                        <button onclick="switchExamCategory('midterm')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100" data-category="midterm">
                             امتحانات نصفية
                         </button>
-                        <button onclick="switchExamCategory('final')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="final">
+                        <button onclick="switchExamCategory('final')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100" data-category="final">
                             امتحانات نهائية
                         </button>
-                        <button onclick="switchExamCategory('quiz')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="quiz">
+                        <button onclick="switchExamCategory('quiz')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100" data-category="quiz">
                             اختبارات قصيرة
-                        </button>
-                        <button onclick="switchExamCategory('practice')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="practice">
-                            تمارين تفاعلية
                         </button>
                     </div>
                 </div>
@@ -600,52 +611,64 @@
                 <!-- Exams Content -->
                 <div class="flex-1 overflow-y-auto p-6">
                     <div id="examsContent">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Sample Exam Cards -->
-                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-gray-900">امتحان التشريح - نصفي</h3>
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">متاح</span>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-4">امتحان نصفي في مادة التشريح للسنة الأولى</p>
-                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                    <span>⏱️ 60 دقيقة</span>
-                                    <span>❓ 30 سؤال</span>
-                                </div>
-                                <button onclick="startExam('anatomy-midterm')" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                                    🚀 بدء الامتحان
-                                </button>
-                            </div>
+                        <div class="text-center py-16">
+                            <div class="text-6xl mb-4">📝</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد امتحانات مجدولة حالياً</h3>
+                            <p class="text-gray-600">ستظهر الامتحانات المجدولة هنا عند إضافتها</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-gray-900">اختبار الفسيولوجيا</h3>
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">تفاعلي</span>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-4">اختبار تفاعلي في علم وظائف الأعضاء</p>
-                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                    <span>⏱️ 45 دقيقة</span>
-                                    <span>❓ 25 سؤال</span>
-                                </div>
-                                <button onclick="startExam('physiology-quiz')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                    🎯 بدء الاختبار
-                                </button>
-                            </div>
+            <!-- Notifications Section -->
+            <div id="notificationsSection" class="hidden flex-1 flex flex-col">
+                <!-- Header -->
+                <div class="bg-white shadow-sm border-b border-gray-200 p-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">🔔 الإشعارات</h2>
+                            <p class="text-gray-600 mt-1">جميع الإشعارات والتنبيهات المهمة</p>
+                        </div>
+                        <button onclick="markAllNotificationsRead()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            ✅ تمييز الكل كمقروء
+                        </button>
+                    </div>
+                </div>
 
-                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-gray-900">مراجعة شاملة</h3>
-                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">مراجعة</span>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-4">مراجعة شاملة لجميع المواد</p>
-                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                    <span>⏱️ 90 دقيقة</span>
-                                    <span>❓ 50 سؤال</span>
-                                </div>
-                                <button onclick="startExam('comprehensive-review')" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                                    📚 بدء المراجعة
-                                </button>
-                            </div>
+                <!-- Notifications Content -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div id="notificationsContent">
+                        <div class="text-center py-16">
+                            <div class="text-6xl mb-4">🔔</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد إشعارات</h3>
+                            <p class="text-gray-600">ستظهر الإشعارات هنا عند وصولها</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favorites Section -->
+            <div id="favoritesSection" class="hidden flex-1 flex flex-col">
+                <!-- Header -->
+                <div class="bg-white shadow-sm border-b border-gray-200 p-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">❤️ المفضلة</h2>
+                            <p class="text-gray-600 mt-1">المواد والملفات المحفوظة في المفضلة</p>
+                        </div>
+                        <button onclick="clearAllFavorites()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            🗑️ مسح الكل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Favorites Content -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div id="favoritesContent">
+                        <div class="text-center py-16">
+                            <div class="text-6xl mb-4">❤️</div>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد عناصر في المفضلة</h3>
+                            <p class="text-gray-600">أضف المواد والملفات المهمة إلى المفضلة لسهولة الوصول إليها</p>
                         </div>
                     </div>
                 </div>
@@ -1139,6 +1162,105 @@
         </div>
     </div>
 
+    <!-- Add Exam Modal -->
+    <div id="addExamModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup max-h-[90vh] overflow-y-auto">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">📝</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">إضافة امتحان جديد</h2>
+                    <p class="text-gray-600">أضف امتحان جديد وأرسل إشعارات للطلاب</p>
+                </div>
+
+                <form id="addExamForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
+                        <input type="text" id="examSubject" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="مثال: التشريح">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">نوع الامتحان</label>
+                            <select id="examType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="">اختر النوع</option>
+                                <option value="midterm">امتحان نصفي</option>
+                                <option value="final">امتحان نهائي</option>
+                                <option value="quiz">اختبار قصير</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
+                            <select id="examYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <option value="">اختر السنة</option>
+                                <option value="1">السنة الأولى</option>
+                                <option value="2">السنة الثانية</option>
+                                <option value="3">السنة الثالثة</option>
+                                <option value="4">السنة الرابعة</option>
+                                <option value="5">السنة الخامسة</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الامتحان</label>
+                            <input type="date" id="examDate" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">وقت الامتحان</label>
+                            <input type="time" id="examTime" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">مكان الامتحان</label>
+                        <input type="text" id="examLocation" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="مثال: قاعة المحاضرات الكبرى">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">مدة الامتحان (بالدقائق)</label>
+                        <input type="number" id="examDuration" required min="30" max="180"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="120">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات إضافية</label>
+                        <textarea id="examNotes" rows="3"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  placeholder="أي ملاحظات مهمة للطلاب..."></textarea>
+                    </div>
+
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="flex items-center mb-2">
+                            <input type="checkbox" id="sendNotification" checked class="mr-2">
+                            <label for="sendNotification" class="text-sm font-medium text-blue-800">إرسال إشعار للطلاب</label>
+                        </div>
+                        <p class="text-xs text-blue-600">سيتم إرسال إشعار تلقائي لجميع طلاب السنة المحددة</p>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 font-medium">
+                        📝 إضافة الامتحان
+                    </button>
+                </form>
+
+                <button onclick="closeModal('addExamModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Welcome Popup -->
     <div id="welcomePopup" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -1209,6 +1331,10 @@
             materials: [],
             chatMessages: [],
             onlineUsers: {},
+            exams: [],
+            notifications: [],
+            favorites: [],
+            bookmarks: [],
             settings: {
                 name: 'المنصة الأكاديمية',
                 description: 'لجنة الطب والجراحة البيطرية',
@@ -1352,7 +1478,7 @@
         // تفعيل أزرار المدير
         function enableAdminButtons() {
             const adminButtons = [
-                'adminMaterialsBtn', 'adminPostsBtn', 'adminTab',
+                'adminMaterialsBtn', 'adminPostsBtn', 'adminTab', 'adminExamButtons',
                 'addSubjectBtn', 'addPostBtn', 'addExamBtn', 
                 'logoSettingsBtn', 'uploadSection', 'editAnnouncementsBtn',
                 'adminChatManagement'
@@ -1675,7 +1801,7 @@
             currentTab = tabName;
             
             // Hide all sections
-            const sections = ['welcomeSection', 'loginSection', 'registerSection', 'materialsSection', 'postsSection', 'chatSection', 'examsSection', 'toolsSection', 'profileSection', 'adminSection'];
+            const sections = ['welcomeSection', 'loginSection', 'registerSection', 'materialsSection', 'postsSection', 'chatSection', 'examsSection', 'notificationsSection', 'favoritesSection', 'toolsSection', 'profileSection', 'adminSection'];
             sections.forEach(sectionId => {
                 const section = document.getElementById(sectionId);
                 if (section) {
@@ -1713,6 +1839,12 @@
                     break;
                 case 'exams':
                     loadExams();
+                    break;
+                case 'notifications':
+                    loadNotifications();
+                    break;
+                case 'favorites':
+                    loadFavorites();
                     break;
                 case 'tools':
                     // Tools section is static, no loading needed
@@ -1784,6 +1916,12 @@
             if (addMaterialForm) {
                 addMaterialForm.addEventListener('submit', handleAddMaterial);
             }
+            
+            // Add exam form
+            const addExamForm = document.getElementById('addExamForm');
+            if (addExamForm) {
+                addExamForm.addEventListener('submit', handleAddExam);
+            }
         }
 
         function handleLogin(event) {
@@ -1847,6 +1985,9 @@
             if (currentUser.isAdmin) {
                 enableAdminButtons();
             }
+            
+            // تحديث شارة الإشعارات
+            updateNotificationBadge();
             
             // إشعار Socket.io بدخول المستخدم
             if (socketConnected && socket) {
@@ -1951,6 +2092,34 @@
             if (addMaterial(name, year, type, link, description)) {
                 closeModal('addMaterialModal');
                 document.getElementById('addMaterialForm').reset();
+            }
+        }
+
+        function handleAddExam(event) {
+            event.preventDefault();
+            
+            const subject = document.getElementById('examSubject').value.trim();
+            const type = document.getElementById('examType').value;
+            const year = document.getElementById('examYear').value;
+            const date = document.getElementById('examDate').value;
+            const time = document.getElementById('examTime').value;
+            const location = document.getElementById('examLocation').value.trim();
+            const duration = document.getElementById('examDuration').value;
+            const notes = document.getElementById('examNotes').value.trim();
+            const sendNotification = document.getElementById('sendNotification').checked;
+            
+            if (!subject || !type || !year || !date || !time || !location || !duration) {
+                showNotification('يرجى إدخال جميع البيانات المطلوبة', 'error');
+                return;
+            }
+            
+            const examData = {
+                subject, type, year, date, time, location, duration, notes, sendNotification
+            };
+            
+            if (addExam(examData)) {
+                closeModal('addExamModal');
+                document.getElementById('addExamForm').reset();
             }
         }
 
@@ -2273,10 +2442,16 @@
                                         ${material.description ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(material.description)}</p>` : ''}
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs text-gray-500">${formatDate(material.timestamp)}</span>
-                                            <a href="${material.link}" target="_blank" rel="noopener noreferrer" 
-                                               class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
-                                                📖 فتح
-                                            </a>
+                                            <div class="flex space-x-2 space-x-reverse">
+                                                <button onclick="addToFavorites('${material.id}', '${escapeHtml(material.name)}', '${material.link}', '${escapeHtml(material.description || '')}')" 
+                                                        class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors" title="إضافة للمفضلة">
+                                                    ❤️
+                                                </button>
+                                                <a href="${material.link}" target="_blank" rel="noopener noreferrer" 
+                                                   class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
+                                                    📖 فتح
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -2352,7 +2527,9 @@
             const stats = {
                 totalUsers: academicData.users.length,
                 totalPosts: academicData.posts.length,
-                totalMaterials: academicData.materials.length
+                totalMaterials: academicData.materials.length,
+                totalExams: academicData.exams?.length || 0,
+                totalNotifications: academicData.notifications?.length || 0
             };
             
             Object.entries(stats).forEach(([id, value]) => {
@@ -2515,6 +2692,44 @@
             return labels[type] || 'مواد';
         }
 
+        function getExamTypeColor(type) {
+            const colors = {
+                midterm: 'blue',
+                final: 'red',
+                quiz: 'green'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function getExamTypeLabel(type) {
+            const labels = {
+                midterm: 'امتحان نصفي',
+                final: 'امتحان نهائي',
+                quiz: 'اختبار قصير'
+            };
+            return labels[type] || 'امتحان';
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                exam: '📝',
+                post: '📢',
+                material: '📚',
+                system: '⚙️'
+            };
+            return icons[type] || '🔔';
+        }
+
+        function formatExamDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-SA', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
         // File upload functions
         let selectedFile = null;
 
@@ -2583,38 +2798,401 @@
 
         // Exam functions
         function loadExams() {
-            // Load exam data - for now showing static content
-            console.log('Loading exams...');
+            const examsContent = document.getElementById('examsContent');
+            if (!examsContent) return;
+            
+            if (academicData.exams.length === 0) {
+                examsContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد امتحانات مجدولة حالياً</h3>
+                        <p class="text-gray-600">ستظهر الامتحانات المجدولة هنا عند إضافتها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedExams = [...academicData.exams].sort((a, b) => 
+                new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time)
+            );
+            
+            examsContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${sortedExams.map(exam => `
+                        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-${getExamTypeColor(exam.type)}-500">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-900">${escapeHtml(exam.subject)}</h3>
+                                <span class="px-2 py-1 bg-${getExamTypeColor(exam.type)}-100 text-${getExamTypeColor(exam.type)}-800 text-xs rounded-full">
+                                    ${getExamTypeLabel(exam.type)}
+                                </span>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-600 mb-4">
+                                <div class="flex items-center">
+                                    <span class="ml-2">📅</span>
+                                    <span>${formatExamDate(exam.date)}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="ml-2">⏰</span>
+                                    <span>${exam.time}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="ml-2">📍</span>
+                                    <span>${escapeHtml(exam.location)}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="ml-2">⏱️</span>
+                                    <span>${exam.duration} دقيقة</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="ml-2">🎓</span>
+                                    <span>السنة ${getYearName(exam.year)}</span>
+                                </div>
+                            </div>
+                            ${exam.notes ? `<p class="text-sm text-gray-700 mb-4 bg-gray-50 p-3 rounded">${escapeHtml(exam.notes)}</p>` : ''}
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">${formatDate(exam.timestamp)}</span>
+                                ${currentUser && currentUser.isAdmin ? `
+                                    <div class="flex space-x-2 space-x-reverse">
+                                        <button onclick="editExam('${exam.id}')" class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                            ✏️ تعديل
+                                        </button>
+                                        <button onclick="deleteExam('${exam.id}')" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                            🗑️ حذف
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
 
         function switchExamCategory(category) {
             // Update exam category tabs
             document.querySelectorAll('.exam-category-tab').forEach(tab => {
-                tab.classList.remove('bg-green-600', 'text-white');
+                tab.classList.remove('bg-blue-600', 'text-white');
                 tab.classList.add('text-gray-700', 'hover:bg-gray-100');
             });
             
             const activeTab = document.querySelector(`[data-category="${category}"]`);
             if (activeTab) {
-                activeTab.classList.add('bg-green-600', 'text-white');
+                activeTab.classList.add('bg-blue-600', 'text-white');
                 activeTab.classList.remove('text-gray-700', 'hover:bg-gray-100');
             }
             
-            // Load exams for this category
-            console.log(`Loading exams for category: ${category}`);
+            // Filter and display exams
+            const examsContent = document.getElementById('examsContent');
+            if (!examsContent) return;
+            
+            let filteredExams = academicData.exams;
+            if (category !== 'all') {
+                filteredExams = academicData.exams.filter(exam => exam.type === category);
+            }
+            
+            if (filteredExams.length === 0) {
+                examsContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد امتحانات في هذه الفئة</h3>
+                        <p class="text-gray-600">ستظهر الامتحانات هنا عند إضافتها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Re-render with filtered exams
+            loadExams();
         }
 
-        function startExam(examId) {
-            showNotification(`بدء الامتحان: ${examId}`, 'info');
-            // Here you would implement the exam interface
+        function showAddExamModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك بإضافة امتحانات', 'error');
+                return;
+            }
+            const modal = document.getElementById('addExamModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
         }
 
-        function showCreateExamModal() {
-            showNotification('إنشاء الامتحانات متاح للمدراء قريباً', 'info');
+        function addExam(examData) {
+            if (!currentUser || !currentUser.isAdmin) return false;
+            
+            const exam = {
+                id: Date.now().toString(),
+                subject: examData.subject,
+                type: examData.type,
+                year: parseInt(examData.year),
+                date: examData.date,
+                time: examData.time,
+                location: examData.location,
+                duration: parseInt(examData.duration),
+                notes: examData.notes,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.exams.push(exam);
+            
+            // إرسال إشعارات للطلاب
+            if (examData.sendNotification) {
+                sendExamNotification(exam);
+            }
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
+            }
+            
+            if (currentTab === 'exams') {
+                loadExams();
+            }
+            
+            showNotification('تم إضافة الامتحان بنجاح', 'success');
+            return true;
+        }
+
+        function sendExamNotification(exam) {
+            const notification = {
+                id: Date.now().toString(),
+                type: 'exam',
+                title: `امتحان جديد: ${exam.subject}`,
+                message: `تم جدولة ${getExamTypeLabel(exam.type)} في مادة ${exam.subject} بتاريخ ${formatExamDate(exam.date)} في ${exam.time}`,
+                targetYear: exam.year,
+                examId: exam.id,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+            
+            academicData.notifications.push(notification);
+            updateNotificationBadge();
+            
+            // إشعار فوري للمستخدمين المتصلين
+            showNotification(`امتحان جديد: ${exam.subject} - ${formatExamDate(exam.date)}`, 'info');
+        }
+
+        function editExam(examId) {
+            showNotification('تعديل الامتحانات سيتوفر قريباً', 'info');
+        }
+
+        function deleteExam(examId) {
+            if (!currentUser || !currentUser.isAdmin) return;
+            
+            if (confirm('هل أنت متأكد من حذف هذا الامتحان؟')) {
+                const examIndex = academicData.exams.findIndex(e => e.id === examId);
+                if (examIndex !== -1) {
+                    academicData.exams.splice(examIndex, 1);
+                    saveDataToLocalStorage();
+                    
+                    if (isOnline) {
+                        const provider = CLOUD_PROVIDERS[currentProvider];
+                        if (provider.name === 'JSONBin') {
+                            saveDataToJSONBin(provider.config).catch(console.error);
+                        }
+                    }
+                    
+                    loadExams();
+                    showNotification('تم حذف الامتحان بنجاح', 'success');
+                }
+            }
         }
 
         function showExamStatsModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك بعرض الإحصائيات', 'error');
+                return;
+            }
             showNotification('إحصائيات الامتحانات ستتوفر قريباً', 'info');
+        }
+
+        // Notification functions
+        function loadNotifications() {
+            const notificationsContent = document.getElementById('notificationsContent');
+            if (!notificationsContent) return;
+            
+            const userNotifications = academicData.notifications.filter(n => 
+                !n.targetYear || n.targetYear === currentUser?.year
+            );
+            
+            if (userNotifications.length === 0) {
+                notificationsContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">🔔</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد إشعارات</h3>
+                        <p class="text-gray-600">ستظهر الإشعارات هنا عند وصولها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedNotifications = [...userNotifications].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            
+            notificationsContent.innerHTML = sortedNotifications.map(notification => `
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4 border-l-4 border-${notification.read ? 'gray' : 'blue'}-500 ${notification.read ? 'opacity-75' : ''}">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <span class="text-lg ml-2">${getNotificationIcon(notification.type)}</span>
+                                <h3 class="font-semibold text-gray-900">${escapeHtml(notification.title)}</h3>
+                                ${!notification.read ? '<span class="mr-2 w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
+                            </div>
+                            <p class="text-gray-700 mb-2">${escapeHtml(notification.message)}</p>
+                            <p class="text-sm text-gray-500">${formatDate(notification.timestamp)}</p>
+                        </div>
+                        <div class="flex space-x-2 space-x-reverse">
+                            ${!notification.read ? `
+                                <button onclick="markNotificationRead('${notification.id}')" class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                    ✅ تمييز كمقروء
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteNotification('${notification.id}')" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                🗑️ حذف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function markNotificationRead(notificationId) {
+            const notification = academicData.notifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.read = true;
+                saveDataToLocalStorage();
+                updateNotificationBadge();
+                loadNotifications();
+            }
+        }
+
+        function markAllNotificationsRead() {
+            academicData.notifications.forEach(notification => {
+                if (!notification.targetYear || notification.targetYear === currentUser?.year) {
+                    notification.read = true;
+                }
+            });
+            saveDataToLocalStorage();
+            updateNotificationBadge();
+            loadNotifications();
+            showNotification('تم تمييز جميع الإشعارات كمقروءة', 'success');
+        }
+
+        function deleteNotification(notificationId) {
+            const notificationIndex = academicData.notifications.findIndex(n => n.id === notificationId);
+            if (notificationIndex !== -1) {
+                academicData.notifications.splice(notificationIndex, 1);
+                saveDataToLocalStorage();
+                updateNotificationBadge();
+                loadNotifications();
+                showNotification('تم حذف الإشعار', 'success');
+            }
+        }
+
+        function updateNotificationBadge() {
+            if (!currentUser) return;
+            
+            const unreadCount = academicData.notifications.filter(n => 
+                !n.read && (!n.targetYear || n.targetYear === currentUser.year)
+            ).length;
+            
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+
+        // Favorites functions
+        function loadFavorites() {
+            const favoritesContent = document.getElementById('favoritesContent');
+            if (!favoritesContent) return;
+            
+            const userFavorites = academicData.favorites.filter(f => f.userId === currentUser?.id);
+            
+            if (userFavorites.length === 0) {
+                favoritesContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">❤️</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد عناصر في المفضلة</h3>
+                        <p class="text-gray-600">أضف المواد والملفات المهمة إلى المفضلة لسهولة الوصول إليها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            favoritesContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${userFavorites.map(favorite => `
+                        <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-red-500">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-semibold text-gray-900">${escapeHtml(favorite.title)}</h3>
+                                <span class="text-red-500">❤️</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">${escapeHtml(favorite.description || 'لا يوجد وصف')}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">${formatDate(favorite.timestamp)}</span>
+                                <div class="flex space-x-2 space-x-reverse">
+                                    <a href="${favorite.link}" target="_blank" class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                        📖 فتح
+                                    </a>
+                                    <button onclick="removeFromFavorites('${favorite.id}')" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                        🗑️ إزالة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function addToFavorites(materialId, title, link, description) {
+            if (!currentUser) return;
+            
+            const favorite = {
+                id: Date.now().toString(),
+                userId: currentUser.id,
+                materialId: materialId,
+                title: title,
+                link: link,
+                description: description,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.favorites.push(favorite);
+            saveDataToLocalStorage();
+            showNotification('تم إضافة العنصر إلى المفضلة', 'success');
+        }
+
+        function removeFromFavorites(favoriteId) {
+            const favoriteIndex = academicData.favorites.findIndex(f => f.id === favoriteId);
+            if (favoriteIndex !== -1) {
+                academicData.favorites.splice(favoriteIndex, 1);
+                saveDataToLocalStorage();
+                loadFavorites();
+                showNotification('تم إزالة العنصر من المفضلة', 'success');
+            }
+        }
+
+        function clearAllFavorites() {
+            if (!currentUser) return;
+            
+            if (confirm('هل أنت متأكد من مسح جميع العناصر من المفضلة؟')) {
+                academicData.favorites = academicData.favorites.filter(f => f.userId !== currentUser.id);
+                saveDataToLocalStorage();
+                loadFavorites();
+                showNotification('تم مسح جميع العناصر من المفضلة', 'success');
+            }
         }
 
         // Tools functions
@@ -2963,5 +3541,5 @@
             }
         }, 60000);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97878bbb238832ae',t:'MTc1Njc1ODgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978796e1c1cd32ae',t:'MTc1Njc1OTI5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

@@ -168,12 +168,35 @@
             background: #f59e0b;
             color: white;
         }
+
+        .sync-indicator {
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            z-index: 1000;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            background: #3b82f6;
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sync-indicator.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Connection Status -->
     <div id="connectionStatus" class="connection-status connecting">
         🔄 جاري الاتصال...
+    </div>
+
+    <!-- Sync Indicator -->
+    <div id="syncIndicator" class="sync-indicator">
+        🔄 جاري المزامنة...
     </div>
 
     <!-- Login/Home Page -->
@@ -274,43 +297,12 @@
             <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center space-x-4 space-x-reverse">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center shadow-md cursor-pointer" onclick="showLogoSettings()">
-                            <img id="platformLogo" src="" alt="🏥" class="w-full h-full rounded-full object-cover hidden">
-                            <span id="defaultLogo" class="text-white font-bold">🏥</span>
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center shadow-md">
+                            <span class="text-white font-bold">🏥</span>
                         </div>
                         <div>
                             <h1 class="text-lg font-bold text-gray-900">المنصة الأكاديمية</h1>
                             <p class="text-xs text-purple-600">لجنة الطب والجراحة البيطرية</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Main Navigation Tabs -->
-                    <div class="hidden md:flex items-center space-x-6 space-x-reverse">
-                        <button class="main-tab px-4 py-2 text-purple-600 border-b-2 border-purple-600 font-medium active" data-tab="academic" onclick="switchMainTab('academic')">
-                            📚 المواد الدراسية
-                        </button>
-                        <button class="main-tab px-4 py-2 text-gray-600 hover:text-purple-600 font-medium" data-tab="posts" onclick="switchMainTab('posts')">
-                            📝 المنشورات
-                        </button>
-                        <button class="main-tab px-4 py-2 text-gray-600 hover:text-purple-600 font-medium" data-tab="exams" onclick="switchMainTab('exams')">
-                            📅 جدول الامتحانات
-                        </button>
-                        <button class="main-tab px-4 py-2 text-gray-600 hover:text-purple-600 font-medium" data-tab="chat" onclick="switchMainTab('chat')">
-                            💬 الدردشة
-                        </button>
-                        <button id="adminTab" class="main-tab px-4 py-2 text-gray-600 hover:text-purple-600 font-medium hidden" data-tab="admin" onclick="switchMainTab('admin')">
-                            👨‍💼 الإدارة
-                        </button>
-                    </div>
-                    
-                    <!-- Search Bar -->
-                    <div class="hidden md:flex flex-1 max-w-md mx-8">
-                        <div class="relative w-full">
-                            <input type="text" id="searchInput" placeholder="البحث عن مادة أو ملف..." 
-                                   class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent search-bar">
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                <span class="text-gray-400">🔍</span>
-                            </div>
                         </div>
                     </div>
                     
@@ -322,18 +314,11 @@
                             <span id="onlineUsersCount">1</span>
                             <span>متصل</span>
                         </div>
-
-                        <!-- Notifications -->
-                        <button id="notificationBtn" class="relative p-2 text-gray-600 hover:text-purple-600 transition-colors" onclick="showNotifications()">
-                            <span class="text-xl">🔔</span>
-                            <span id="notificationCount" class="notification-badge absolute -top-1 -left-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
-                        </button>
                         
                         <!-- User Profile -->
                         <div class="relative">
                             <button id="userMenuBtn" class="flex items-center space-x-2 space-x-reverse text-gray-700 hover:text-purple-600 transition-colors">
-                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm overflow-hidden">
-                                    <img id="userProfilePic" src="" alt="" class="w-full h-full object-cover hidden">
+                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                                     <span id="userAvatar">ط</span>
                                 </div>
                                 <span class="hidden md:block font-medium" id="userName">طالب الطب البيطري</span>
@@ -347,19 +332,6 @@
                                         <div class="text-sm font-medium text-gray-900" id="userFullName">طالب الطب البيطري</div>
                                         <div class="text-xs text-gray-500" id="userYear">السنة الأولى</div>
                                     </div>
-                                    <button onclick="showUserSettings()" class="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 space-x-reverse">
-                                        <span>⚙️</span>
-                                        <span>الإعدادات</span>
-                                    </button>
-                                    <button onclick="showProfilePictureModal()" class="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 space-x-reverse">
-                                        <span>📷</span>
-                                        <span>تغيير الصورة الشخصية</span>
-                                    </button>
-                                    <button id="logoSettingsBtn" class="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2 space-x-reverse hidden" onclick="showLogoSettings()">
-                                        <span>🖼️</span>
-                                        <span>تعديل الشعار</span>
-                                    </button>
-                                    <hr class="my-1">
                                     <button id="logoutBtn" class="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 space-x-reverse">
                                         <span>🚪</span>
                                         <span>تسجيل الخروج</span>
@@ -372,392 +344,61 @@
             </div>
         </header>
 
-        <!-- Academic Section -->
-        <div id="academicSection" class="flex">
-            <!-- Sidebar -->
-            <aside class="w-80 bg-white shadow-lg border-l border-gray-200 min-h-screen overflow-y-auto">
-                <div class="p-4">
-                    <!-- Announcements Section -->
-                    <div class="mb-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold text-purple-800 flex items-center">
-                                <span class="mr-2">📢</span>
-                                الإعلانات الأكاديمية
-                            </h3>
-                            <button id="editAnnouncementsBtn" class="hidden text-purple-600 hover:text-purple-800 text-sm" onclick="editAnnouncements()">
-                                ✏️ تعديل
-                            </button>
-                        </div>
-                        <div class="space-y-2" id="sidebarAnnouncements">
-                            <div class="text-xs text-purple-700 bg-white rounded p-2 border border-purple-200">
-                                <div class="font-medium">تحديث مواد السنة الثالثة</div>
-                                <div class="text-purple-600 mt-1">تم إضافة محاضرات جديدة</div>
-                            </div>
-                            <div class="text-xs text-purple-700 bg-white rounded p-2 border border-purple-200">
-                                <div class="font-medium">موعد الامتحانات</div>
-                                <div class="text-purple-600 mt-1">جدول الامتحانات النهائية</div>
-                            </div>
-                        </div>
+        <!-- Main Content -->
+        <main class="p-6 bg-gray-50 min-h-screen">
+            <!-- Welcome Section -->
+            <div class="text-center py-16">
+                <div class="max-w-2xl mx-auto">
+                    <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                        <span class="text-white text-4xl">🎓</span>
                     </div>
-
-                    <!-- Academic Years Navigation -->
-                    <nav class="space-y-2">
-                        <div class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">السنوات الأكاديمية</div>
-                        
-                        <!-- Year 1 -->
-                        <div class="year-section">
-                            <button class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center justify-between hover:bg-purple-50" 
-                                    onclick="toggleYear(1)">
-                                <div class="flex items-center space-x-3 space-x-reverse">
-                                    <span class="text-lg">📚</span>
-                                    <span class="font-medium">السنة الأولى</span>
-                                </div>
-                                <span class="year-arrow transition-transform" id="arrow-1">◀</span>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">مرحباً بك في المنصة الأكاديمية</h2>
+                    <p class="text-lg text-gray-600 mb-8">منصة شاملة لطلبة كلية الطب البيطري</p>
+                    
+                    <!-- Quick Actions -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                        <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100 card-hover">
+                            <div class="text-3xl mb-3">📚</div>
+                            <h3 class="font-semibold text-gray-900 mb-2">المواد الدراسية</h3>
+                            <p class="text-sm text-gray-600 mb-4">تصفح جميع المواد حسب السنة والفصل</p>
+                            <button class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                استكشف المواد
                             </button>
-                            <div class="year-content hidden mr-8 mt-2 space-y-1" id="year-1">
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(1, 1)">
-                                    📖 الفصل الأول
-                                </button>
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(1, 2)">
-                                    📖 الفصل الثاني
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Year 2 -->
-                        <div class="year-section">
-                            <button class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center justify-between hover:bg-purple-50" 
-                                    onclick="toggleYear(2)">
-                                <div class="flex items-center space-x-3 space-x-reverse">
-                                    <span class="text-lg">📚</span>
-                                    <span class="font-medium">السنة الثانية</span>
-                                </div>
-                                <span class="year-arrow transition-transform" id="arrow-2">◀</span>
-                            </button>
-                            <div class="year-content hidden mr-8 mt-2 space-y-1" id="year-2">
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(2, 1)">
-                                    📖 الفصل الأول
-                                </button>
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(2, 2)">
-                                    📖 الفصل الثاني
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Year 3 -->
-                        <div class="year-section">
-                            <button class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center justify-between hover:bg-purple-50" 
-                                    onclick="toggleYear(3)">
-                                <div class="flex items-center space-x-3 space-x-reverse">
-                                    <span class="text-lg">📚</span>
-                                    <span class="font-medium">السنة الثالثة</span>
-                                </div>
-                                <span class="year-arrow transition-transform" id="arrow-3">◀</span>
-                            </button>
-                            <div class="year-content hidden mr-8 mt-2 space-y-1" id="year-3">
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(3, 1)">
-                                    📖 الفصل الأول
-                                </button>
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(3, 2)">
-                                    📖 الفصل الثاني
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Year 4 -->
-                        <div class="year-section">
-                            <button class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center justify-between hover:bg-purple-50" 
-                                    onclick="toggleYear(4)">
-                                <div class="flex items-center space-x-3 space-x-reverse">
-                                    <span class="text-lg">📚</span>
-                                    <span class="font-medium">السنة الرابعة</span>
-                                </div>
-                                <span class="year-arrow transition-transform" id="arrow-4">◀</span>
-                            </button>
-                            <div class="year-content hidden mr-8 mt-2 space-y-1" id="year-4">
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(4, 1)">
-                                    📖 الفصل الأول
-                                </button>
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(4, 2)">
-                                    📖 الفصل الثاني
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Year 5 -->
-                        <div class="year-section">
-                            <button class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center justify-between hover:bg-purple-50" 
-                                    onclick="toggleYear(5)">
-                                <div class="flex items-center space-x-3 space-x-reverse">
-                                    <span class="text-lg">📚</span>
-                                    <span class="font-medium">السنة الخامسة</span>
-                                </div>
-                                <span class="year-arrow transition-transform" id="arrow-5">◀</span>
-                            </button>
-                            <div class="year-content hidden mr-8 mt-2 space-y-1" id="year-5">
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(5, 1)">
-                                    📖 الفصل الأول
-                                </button>
-                                <button class="semester-btn w-full text-right px-4 py-2 rounded text-sm hover:bg-purple-50" 
-                                        onclick="showSemester(5, 2)">
-                                    📖 الفصل الثاني
-                                </button>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="flex-1 p-6 bg-gray-50">
-                <!-- Welcome Section (Default) -->
-                <div id="welcomeSection" class="text-center py-16">
-                    <div class="max-w-2xl mx-auto">
-                        <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                            <span class="text-white text-4xl">🎓</span>
-                        </div>
-                        <h2 class="text-3xl font-bold text-gray-900 mb-4">مرحباً بك في المنصة الأكاديمية</h2>
-                        <p class="text-lg text-gray-600 mb-8">اختر السنة والفصل الدراسي من القائمة الجانبية للبدء</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100">
-                                <div class="text-3xl mb-3">📑</div>
-                                <h3 class="font-semibold text-gray-900 mb-2">السلايدات</h3>
-                                <p class="text-sm text-gray-600">عروض تقديمية شاملة</p>
-                            </div>
-                            <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100">
-                                <div class="text-3xl mb-3">🎙️</div>
-                                <h3 class="font-semibold text-gray-900 mb-2">التسجيلات</h3>
-                                <p class="text-sm text-gray-600">محاضرات صوتية ومرئية</p>
-                            </div>
-                            <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100">
-                                <div class="text-3xl mb-3">📝</div>
-                                <h3 class="font-semibold text-gray-900 mb-2">الملخصات</h3>
-                                <p class="text-sm text-gray-600">مراجعات سريعة ومفيدة</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Semester Content (Hidden initially) -->
-                <div id="semesterContent" class="hidden">
-                    <!-- Breadcrumb -->
-                    <nav class="flex mb-6" aria-label="Breadcrumb">
-                        <ol class="inline-flex items-center space-x-1 md:space-x-3 space-x-reverse">
-                            <li class="inline-flex items-center">
-                                <span class="text-gray-500">🏠</span>
-                                <span class="mr-2 text-sm font-medium text-gray-500">الرئيسية</span>
-                            </li>
-                            <li>
-                                <div class="flex items-center">
-                                    <span class="text-gray-400">◀</span>
-                                    <span class="mr-2 text-sm font-medium text-gray-700" id="currentYear">السنة الأولى</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="flex items-center">
-                                    <span class="text-gray-400">◀</span>
-                                    <span class="mr-2 text-sm font-medium text-purple-600" id="currentSemester">الفصل الأول</span>
-                                </div>
-                            </li>
-                        </ol>
-                    </nav>
-
-                    <!-- Add Subject Button (Admin Only) -->
-                    <div class="mb-6">
-                        <button id="addSubjectBtn" class="hidden px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-md flex items-center space-x-2 space-x-reverse">
-                            <span>➕</span>
-                            <span>إضافة مادة جديدة</span>
-                        </button>
-                    </div>
-
-                    <!-- Subjects Grid -->
-                    <div id="subjectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Sample subjects for demonstration -->
-                        <div class="material-card rounded-xl p-6 cursor-pointer" onclick="showSampleSubject()">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-                                    <span class="text-white text-xl">📚</span>
-                                </div>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">علم التشريح</h3>
-                            <p class="text-gray-600 text-sm mb-4">دراسة تركيب الجسم والأعضاء</p>
-                            <div class="flex justify-between text-xs text-gray-500">
-                                <span>📑 12 سلايد</span>
-                                <span>🎙️ 8 تسجيل</span>
-                                <span>📝 5 ملخص</span>
-                            </div>
                         </div>
                         
-                        <div class="material-card rounded-xl p-6 cursor-pointer" onclick="showSampleSubject()">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-                                    <span class="text-white text-xl">📚</span>
-                                </div>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">علم وظائف الأعضاء</h3>
-                            <p class="text-gray-600 text-sm mb-4">دراسة وظائف أعضاء الجسم</p>
-                            <div class="flex justify-between text-xs text-gray-500">
-                                <span>📑 15 سلايد</span>
-                                <span>🎙️ 10 تسجيل</span>
-                                <span>📝 7 ملخص</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Subject Materials (Hidden initially) -->
-                <div id="subjectMaterials" class="hidden">
-                    <!-- Back Button -->
-                    <button id="backToSubjects" class="mb-4 px-4 py-2 text-purple-600 hover:text-purple-800 flex items-center space-x-2 space-x-reverse">
-                        <span>↩️</span>
-                        <span>العودة للمواد</span>
-                    </button>
-
-                    <!-- Subject Header -->
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2" id="subjectTitle">علم التشريح</h2>
-                        <p class="text-gray-600" id="subjectInfo">السنة الأولى - الفصل الأول</p>
-                    </div>
-
-                    <!-- Material Types Tabs -->
-                    <div class="bg-white rounded-lg shadow-md mb-6 border border-gray-100">
-                        <div class="border-b border-gray-200">
-                            <nav class="flex space-x-8 space-x-reverse px-6">
-                                <button class="material-tab py-4 px-2 border-b-2 border-purple-500 text-purple-600 font-medium flex items-center space-x-2 space-x-reverse active" 
-                                        data-type="slides" onclick="switchMaterialTab('slides')">
-                                    <span>📑</span>
-                                    <span>السلايدات</span>
-                                </button>
-                                <button class="material-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium flex items-center space-x-2 space-x-reverse" 
-                                        data-type="recordings" onclick="switchMaterialTab('recordings')">
-                                    <span>🎙️</span>
-                                    <span>التسجيلات</span>
-                                </button>
-                                <button class="material-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium flex items-center space-x-2 space-x-reverse" 
-                                        data-type="summaries" onclick="switchMaterialTab('summaries')">
-                                    <span>📝</span>
-                                    <span>الملخصات</span>
-                                </button>
-                            </nav>
-                        </div>
-
-                        <!-- Exam Type Tabs -->
-                        <div class="px-6 py-4 bg-gray-50">
-                            <div class="flex space-x-4 space-x-reverse">
-                                <button class="exam-tab px-4 py-2 bg-purple-600 text-white rounded-lg font-medium active" 
-                                        data-exam="mid" onclick="switchExamTab('mid')">
-                                    📚 الميد
-                                </button>
-                                <button class="exam-tab px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium" 
-                                        data-exam="final" onclick="switchExamTab('final')">
-                                    📖 الفاينال
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Upload Area (Admin Only) -->
-                    <div id="uploadSection" class="hidden bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">رفع ملف جديد</h3>
-                        <div class="file-upload-area rounded-lg p-8 text-center cursor-pointer" id="uploadArea">
-                            <input type="file" id="fileInput" class="hidden" multiple accept=".pdf,.mp3,.mp4,.doc,.docx,.ppt,.pptx">
-                            <div class="text-4xl mb-4">📁</div>
-                            <p class="text-lg font-medium text-gray-700 mb-2">اسحب الملفات هنا أو اضغط للاختيار</p>
-                            <p class="text-sm text-gray-500">يدعم: PDF, MP3, MP4, DOC, PPT أو رابط URL</p>
+                        <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100 card-hover">
+                            <div class="text-3xl mb-3">💬</div>
+                            <h3 class="font-semibold text-gray-900 mb-2">الدردشة</h3>
+                            <p class="text-sm text-gray-600 mb-4">تواصل مع زملائك في الدراسة</p>
+                            <button onclick="switchMainTab('chat')" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                ابدأ المحادثة
+                            </button>
                         </div>
                         
-                        <!-- URL Input -->
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">أو أدخل رابط URL</label>
-                            <div class="flex space-x-2 space-x-reverse">
-                                <input type="url" id="urlInput" placeholder="https://example.com/file" 
-                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                <button id="addUrlBtn" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                                    إضافة
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Materials List -->
-                    <div class="bg-white rounded-lg shadow-md border border-gray-100">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900" id="materialsTitle">السلايدات - الميد</h3>
-                        </div>
-                        <div class="p-6">
-                            <div id="materialsList" class="space-y-4">
-                                <!-- Sample materials -->
-                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                    <div class="flex items-center space-x-3 space-x-reverse flex-1">
-                                        <span class="text-2xl">📄</span>
-                                        <div class="flex-1">
-                                            <h4 class="font-medium text-gray-900">مقدمة في علم التشريح</h4>
-                                            <p class="text-sm text-gray-500">2.5 MB • 15 يناير 2024</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-2 space-x-reverse">
-                                        <button class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">📑</button>
-                                        <button class="p-2 text-gray-400 hover:text-red-500 transition-colors">🤍</button>
-                                        <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">📥 تحميل</button>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="bg-white rounded-lg p-6 shadow-md border border-gray-100 card-hover">
+                            <div class="text-3xl mb-3">📝</div>
+                            <h3 class="font-semibold text-gray-900 mb-2">المنشورات</h3>
+                            <p class="text-sm text-gray-600 mb-4">اطلع على آخر الأخبار والإعلانات</p>
+                            <button onclick="switchMainTab('posts')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                عرض المنشورات
+                            </button>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
 
         <!-- Posts Section -->
         <div id="postsSection" class="hidden p-6 bg-gray-50 min-h-screen">
             <div class="max-w-4xl mx-auto">
-                <!-- Posts Header -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="showUserPostModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
-                                ✍️ كتابة منشور
-                            </button>
-                            <button id="addPostBtn" class="hidden px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                                ➕ إضافة منشور إداري
-                            </button>
-                        </div>
-                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
                 </div>
-
-                <!-- Posts List -->
-                <div id="postsList" class="space-y-6">
-                    <!-- Posts will be loaded dynamically -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Exams Section -->
-        <div id="examsSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <div class="max-w-6xl mx-auto">
-                <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900">📅 جدول الامتحانات</h2>
-                        <button id="addExamBtn" class="hidden px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                            ➕ إضافة امتحان
-                        </button>
-                    </div>
-                    
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📅</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد امتحانات مجدولة</h3>
-                        <p class="text-gray-600">سيتم عرض جدول الامتحانات هنا</p>
-                    </div>
+                
+                <div class="text-center py-16">
+                    <div class="text-6xl mb-4">📝</div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
+                    <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
                 </div>
             </div>
         </div>
@@ -765,29 +406,6 @@
         <!-- Chat Section -->
         <div id="chatSection" class="hidden p-6 bg-gray-50 min-h-screen">
             <div class="max-w-4xl mx-auto">
-                <!-- Admin Chat Management (Admin Only) -->
-                <div id="adminChatManagement" class="hidden bg-white rounded-lg shadow-md border border-gray-100 mb-6 p-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-gray-900 flex items-center">
-                            <span class="mr-2">👨‍💼</span>
-                            إدارة الدردشة
-                        </h3>
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="clearAllMessages()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                                🗑️ مسح الكل
-                            </button>
-                            <button onclick="exportChatHistory()" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                📊 تصدير المحادثات
-                            </button>
-                        </div>
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        <span>إجمالي الرسائل: <strong id="totalChatMessages">0</strong></span>
-                        <span class="mx-2">•</span>
-                        <span>المستخدمين النشطين: <strong id="activeChatUsers">0</strong></span>
-                    </div>
-                </div>
-
                 <div class="bg-white rounded-lg shadow-md border border-gray-100 h-96 flex flex-col">
                     <!-- Chat Header -->
                     <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
@@ -827,235 +445,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Admin Section -->
-        <div id="adminSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <div class="max-w-7xl mx-auto">
-                <!-- Admin Header -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">👨‍💼 لوحة تحكم المدير</h2>
-                    <p class="text-gray-600">إدارة شاملة للمنصة الأكاديمية</p>
-                </div>
-
-                <!-- Admin Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                <span class="text-2xl">👥</span>
-                            </div>
-                            <div class="mr-4">
-                                <p class="text-sm text-gray-600">إجمالي المستخدمين</p>
-                                <p class="text-2xl font-bold text-gray-900" id="totalUsers">0</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                <span class="text-2xl">📚</span>
-                            </div>
-                            <div class="mr-4">
-                                <p class="text-sm text-gray-600">المواد الدراسية</p>
-                                <p class="text-2xl font-bold text-gray-900" id="totalSubjects">0</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                                <span class="text-2xl">📄</span>
-                            </div>
-                            <div class="mr-4">
-                                <p class="text-sm text-gray-600">الملفات المرفوعة</p>
-                                <p class="text-2xl font-bold text-gray-900" id="totalFiles">0</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <span class="text-2xl">💬</span>
-                            </div>
-                            <div class="mr-4">
-                                <p class="text-sm text-gray-600">رسائل الدردشة</p>
-                                <p class="text-2xl font-bold text-gray-900" id="totalMessages">0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Admin Tabs -->
-                <div class="bg-white rounded-lg shadow-md mb-6 border border-gray-100">
-                    <div class="border-b border-gray-200">
-                        <nav class="flex space-x-8 space-x-reverse px-6">
-                            <button class="admin-tab py-4 px-2 border-b-2 border-purple-500 text-purple-600 font-medium active" 
-                                    data-admin-tab="users" onclick="switchAdminTab('users')">
-                                👥 إدارة المستخدمين
-                            </button>
-                            <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium" 
-                                    data-admin-tab="content" onclick="switchAdminTab('content')">
-                                📚 إدارة المحتوى
-                            </button>
-                            <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium" 
-                                    data-admin-tab="posts" onclick="switchAdminTab('posts')">
-                                📝 إدارة المنشورات
-                            </button>
-                            <button class="admin-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium" 
-                                    data-admin-tab="settings" onclick="switchAdminTab('settings')">
-                                ⚙️ الإعدادات
-                            </button>
-                        </nav>
-                    </div>
-                </div>
-
-                <!-- Users Management -->
-                <div id="adminUsersTab" class="admin-tab-content">
-                    <div class="bg-white rounded-lg shadow-md border border-gray-100">
-                        <div class="p-6 border-b border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-semibold text-gray-900">👥 قائمة المستخدمين</h3>
-                                <div class="flex space-x-2 space-x-reverse">
-                                    <input type="text" id="userSearchInput" placeholder="البحث عن مستخدم..." 
-                                           class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                    <button onclick="exportUsers()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                        📊 تصدير
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المستخدم</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">السنة</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ التسجيل</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">آخر دخول</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTableBody" class="bg-white divide-y divide-gray-200">
-                                    <!-- Users will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Content Management -->
-                <div id="adminContentTab" class="admin-tab-content hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Subjects Management -->
-                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">📚 إدارة المواد</h3>
-                            <div class="space-y-4">
-                                <button onclick="showAddSubjectModal()" class="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                                    ➕ إضافة مادة جديدة
-                                </button>
-                                <button onclick="manageSubjects()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                                    ✏️ تعديل المواد الموجودة
-                                </button>
-                                <button onclick="bulkUpload()" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
-                                    📁 رفع ملفات متعددة
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Files Management -->
-                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">📄 إدارة الملفات</h3>
-                            <div class="space-y-4">
-                                <button onclick="viewAllFiles()" class="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
-                                    👁️ عرض جميع الملفات
-                                </button>
-                                <button onclick="organizeFiles()" class="w-full px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium">
-                                    🗂️ تنظيم الملفات
-                                </button>
-                                <button onclick="cleanupFiles()" class="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
-                                    🗑️ تنظيف الملفات
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activity -->
-                    <div class="bg-white rounded-lg shadow-md p-6 mt-6 border border-gray-100">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 النشاط الأخير</h3>
-                        <div id="recentActivity" class="space-y-3">
-                            <!-- Activity items will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Posts Management -->
-                <div id="adminPostsTab" class="admin-tab-content hidden">
-                    <div class="bg-white rounded-lg shadow-md border border-gray-100">
-                        <div class="p-6 border-b border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-lg font-semibold text-gray-900">📝 إدارة المنشورات</h3>
-                                <button onclick="showAddPostModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                                    ➕ إضافة منشور جديد
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-6">
-                            <div id="adminPostsList" class="space-y-4">
-                                <!-- Posts will be populated here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div id="adminSettingsTab" class="admin-tab-content hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Platform Settings -->
-                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">⚙️ إعدادات المنصة</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">اسم المنصة</label>
-                                    <input type="text" id="platformName" value="المنصة الأكاديمية" 
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">وصف المنصة</label>
-                                    <textarea id="platformDescription" rows="3" 
-                                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">لجنة الطب والجراحة البيطرية</textarea>
-                                </div>
-                                <button onclick="savePlatformSettings()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                                    💾 حفظ الإعدادات
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Backup & Export -->
-                        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">💾 النسخ الاحتياطي</h3>
-                            <div class="space-y-4">
-                                <button onclick="createBackup()" class="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
-                                    📦 إنشاء نسخة احتياطية
-                                </button>
-                                <button onclick="exportAllData()" class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                                    📊 تصدير جميع البيانات
-                                </button>
-                                <button onclick="importData()" class="w-full px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium">
-                                    📥 استيراد البيانات
-                                </button>
-                                <button onclick="resetPlatform()" class="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
-                                    🔄 إعادة تعيين المنصة
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Login Modal -->
@@ -1083,16 +472,6 @@
                         <input type="password" id="loginPassword" required
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                placeholder="أدخل كلمة المرور">
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center">
-                            <input type="checkbox" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                            <span class="mr-2 text-sm text-gray-600">تذكرني</span>
-                        </label>
-                        <button type="button" class="text-sm text-purple-600 hover:text-purple-500">
-                            نسيت كلمة المرور؟
-                        </button>
                     </div>
 
                     <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
@@ -1220,52 +599,27 @@
     <script>
         // Application State
         let currentUser = null;
-        let currentYear = null;
-        let currentSemester = null;
-        let currentSubject = null;
-        let currentMaterialType = 'slides';
-        let currentExamType = 'mid';
-        let currentMainTab = 'academic';
+        let currentMainTab = 'home';
         let isOnline = false;
+        let syncInterval = null;
         
         // JSONBin.io Configuration
         const JSONBIN_CONFIG = {
             apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
-            binId: localStorage.getItem('jsonbin_id') || null,
+            binId: '676b8c8ead19ca34f8d5b7b8',
             baseUrl: 'https://api.jsonbin.io/v3'
         };
         
         // Data structure
         let academicData = {
-            subjects: {},
-            materials: {},
-            posts: [],
             users: [],
-            activities: [],
-            notifications: [],
-            exams: [],
-            userProgress: {},
-            bookmarks: {},
-            favorites: {},
-            announcements: [
-                {
-                    id: '1',
-                    title: 'تحديث مواد السنة الثالثة',
-                    description: 'تم إضافة محاضرات جديدة',
-                    createdAt: new Date().toISOString()
-                },
-                {
-                    id: '2',
-                    title: 'موعد الامتحانات',
-                    description: 'جدول الامتحانات النهائية',
-                    createdAt: new Date().toISOString()
-                }
-            ],
-            settings: {
-                logo: null
-            },
+            posts: [],
             chatMessages: [],
             onlineUsers: {},
+            settings: {
+                name: 'المنصة الأكاديمية',
+                description: 'لجنة الطب والجراحة البيطرية'
+            },
             lastUpdated: new Date().toISOString()
         };
 
@@ -1281,321 +635,18 @@
             checkLoginStatus();
             updateConnectionStatus('connecting');
             connectToCloud();
-            setupFileUpload();
-        }
-
-        // File upload setup
-        function setupFileUpload() {
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const urlInput = document.getElementById('urlInput');
-            const addUrlBtn = document.getElementById('addUrlBtn');
-
-            // File input change
-            fileInput.addEventListener('change', handleFileSelect);
-
-            // Upload area click
-            uploadArea.addEventListener('click', () => {
-                if (currentUser && currentUser.isAdmin) {
-                    fileInput.click();
-                }
-            });
-
-            // Drag and drop
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                if (currentUser && currentUser.isAdmin) {
-                    const files = Array.from(e.dataTransfer.files);
-                    handleFiles(files);
-                }
-            });
-
-            // URL add button
-            addUrlBtn.addEventListener('click', handleUrlAdd);
-            urlInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    handleUrlAdd();
-                }
-            });
-        }
-
-        function handleFileSelect(event) {
-            const files = Array.from(event.target.files);
-            handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-
-            if (!currentSubject) {
-                alert('يرجى اختيار مادة دراسية أولاً');
-                return;
-            }
-
-            files.forEach(file => {
-                const material = {
-                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                    name: file.name,
-                    type: file.type || getFileTypeFromName(file.name),
-                    size: formatFileSize(file.size),
-                    uploadDate: new Date().toISOString(),
-                    uploadedBy: currentUser.id,
-                    subjectId: currentSubject.id,
-                    materialType: currentMaterialType,
-                    examType: currentExamType
-                };
-
-                // For demo purposes, we'll store file info without actual file data
-                // In a real app, you'd upload to a file server
-                addMaterialToSubject(material);
-            });
-
-            // Clear file input
-            document.getElementById('fileInput').value = '';
-            alert(`تم رفع ${files.length} ملف بنجاح!`);
-        }
-
-        function handleUrlAdd() {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-
-            if (!currentSubject) {
-                alert('يرجى اختيار مادة دراسية أولاً');
-                return;
-            }
-
-            const urlInput = document.getElementById('urlInput');
-            const url = urlInput.value.trim();
-
-            if (!url) {
-                alert('يرجى إدخال رابط صحيح');
-                return;
-            }
-
-            if (!isValidUrl(url)) {
-                alert('الرابط غير صحيح. يرجى إدخال رابط يبدأ بـ http:// أو https://');
-                return;
-            }
-
-            const fileName = prompt('اسم الملف:') || getFileNameFromUrl(url);
-            
-            const material = {
-                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                name: fileName,
-                url: url,
-                type: 'url',
-                size: 'رابط خارجي',
-                uploadDate: new Date().toISOString(),
-                uploadedBy: currentUser.id,
-                subjectId: currentSubject.id,
-                materialType: currentMaterialType,
-                examType: currentExamType
-            };
-
-            addMaterialToSubject(material);
-            urlInput.value = '';
-            alert('تم إضافة الرابط بنجاح!');
-        }
-
-        function addMaterialToSubject(material) {
-            if (!academicData.materials[currentSubject.id]) {
-                academicData.materials[currentSubject.id] = {
-                    slides: { mid: [], final: [] },
-                    recordings: { mid: [], final: [] },
-                    summaries: { mid: [], final: [] }
-                };
-            }
-
-            academicData.materials[currentSubject.id][currentMaterialType][currentExamType].push(material);
-            
-            saveDataToLocalStorage();
-            if (isOnline) saveDataToCloud();
-            
-            // Refresh the materials list
-            loadSubjectMaterials();
-            
-            // Update subject card counts
-            refreshSubjectsGrid();
-        }
-
-        function getFileTypeFromName(fileName) {
-            const extension = fileName.split('.').pop()?.toLowerCase();
-            const types = {
-                pdf: 'application/pdf',
-                doc: 'application/msword',
-                docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                ppt: 'application/vnd.ms-powerpoint',
-                pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                mp3: 'audio/mpeg',
-                mp4: 'video/mp4',
-                avi: 'video/avi',
-                mov: 'video/quicktime',
-                jpg: 'image/jpeg',
-                jpeg: 'image/jpeg',
-                png: 'image/png',
-                gif: 'image/gif'
-            };
-            return types[extension] || 'application/octet-stream';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function isValidUrl(string) {
-            try {
-                new URL(string);
-                return string.startsWith('http://') || string.startsWith('https://');
-            } catch (_) {
-                return false;
-            }
-        }
-
-        function getFileNameFromUrl(url) {
-            try {
-                const urlObj = new URL(url);
-                const pathname = urlObj.pathname;
-                const fileName = pathname.split('/').pop();
-                return fileName || 'رابط خارجي';
-            } catch (_) {
-                return 'رابط خارجي';
-            }
-        }
-
-        // Material management functions
-        function downloadMaterial(materialId) {
-            const material = findMaterialById(materialId);
-            if (!material) {
-                alert('الملف غير موجود');
-                return;
-            }
-
-            if (material.url) {
-                // Open URL in new tab
-                window.open(material.url, '_blank');
-            } else {
-                // For demo purposes, show download message
-                alert(`تحميل الملف: ${material.name}\n\nملاحظة: في النسخة التجريبية، لا يمكن تحميل الملفات الفعلية.`);
-            }
-        }
-
-        function deleteMaterial(materialId) {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-
-            if (confirm('هل أنت متأكد من حذف هذا الملف؟')) {
-                // Find and remove material
-                const materials = academicData.materials[currentSubject.id][currentMaterialType][currentExamType];
-                const index = materials.findIndex(m => m.id === materialId);
-                
-                if (index !== -1) {
-                    materials.splice(index, 1);
-                    saveDataToLocalStorage();
-                    if (isOnline) saveDataToCloud();
-                    
-                    loadSubjectMaterials();
-                    refreshSubjectsGrid();
-                    alert('تم حذف الملف بنجاح');
-                }
-            }
-        }
-
-        function toggleBookmark(materialId) {
-            if (!currentUser) return;
-            
-            if (!academicData.bookmarks[currentUser.id]) {
-                academicData.bookmarks[currentUser.id] = [];
-            }
-            
-            const bookmarks = academicData.bookmarks[currentUser.id];
-            const index = bookmarks.indexOf(materialId);
-            
-            if (index === -1) {
-                bookmarks.push(materialId);
-                alert('تم إضافة الملف للمفضلة');
-            } else {
-                bookmarks.splice(index, 1);
-                alert('تم إزالة الملف من المفضلة');
-            }
-            
-            saveDataToLocalStorage();
-            if (isOnline) saveDataToCloud();
-        }
-
-        function toggleFavorite(materialId) {
-            if (!currentUser) return;
-            
-            if (!academicData.favorites[currentUser.id]) {
-                academicData.favorites[currentUser.id] = [];
-            }
-            
-            const favorites = academicData.favorites[currentUser.id];
-            const index = favorites.indexOf(materialId);
-            
-            if (index === -1) {
-                favorites.push(materialId);
-                alert('تم إضافة الملف للمحفوظات');
-            } else {
-                favorites.splice(index, 1);
-                alert('تم إزالة الملف من المحفوظات');
-            }
-            
-            saveDataToLocalStorage();
-            if (isOnline) saveDataToCloud();
-        }
-
-        function findMaterialById(materialId) {
-            for (const subjectId in academicData.materials) {
-                const subjectMaterials = academicData.materials[subjectId];
-                for (const type in subjectMaterials) {
-                    for (const exam in subjectMaterials[type]) {
-                        const material = subjectMaterials[type][exam].find(m => m.id === materialId);
-                        if (material) return material;
-                    }
-                }
-            }
-            return null;
         }
 
         // Cloud connection functions
         async function connectToCloud() {
             try {
                 updateConnectionStatus('connecting');
-                
-                if (JSONBIN_CONFIG.binId) {
-                    // Try to load existing data
-                    await loadDataFromCloud();
-                } else {
-                    // Create new bin with initial data
-                    await createCloudBin();
-                }
-                
+                await loadDataFromCloud();
                 updateConnectionStatus('online');
                 isOnline = true;
                 
-                // Start periodic sync
-                setInterval(syncWithCloud, 30000); // Sync every 30 seconds
+                if (syncInterval) clearInterval(syncInterval);
+                syncInterval = setInterval(syncWithCloud, 10000);
                 
             } catch (error) {
                 console.error('فشل الاتصال بالسحابة:', error);
@@ -1604,30 +655,9 @@
             }
         }
 
-        async function createCloudBin() {
-            const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_CONFIG.apiKey,
-                    'X-Bin-Name': 'Academic Platform Data',
-                    'X-Bin-Private': 'false'
-                },
-                body: JSON.stringify(academicData)
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            JSONBIN_CONFIG.binId = result.metadata.id;
-            localStorage.setItem('jsonbin_id', JSONBIN_CONFIG.binId);
-            
-            console.log('تم إنشاء قاعدة البيانات السحابية بنجاح');
-        }
-
         async function loadDataFromCloud() {
+            showSyncIndicator();
+            
             const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
                 headers: {
                     'X-Master-Key': JSONBIN_CONFIG.apiKey
@@ -1638,24 +668,38 @@
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const cloudData = await response.json();
+            const result = await response.json();
+            const cloudData = result.record;
             
-            // Merge cloud data with local data
-            academicData = { ...academicData, ...cloudData.record };
-            saveDataToLocalStorage();
-            
-            console.log('تم تحميل البيانات من السحابة');
-            
-            // Update UI if chat messages exist
-            if (academicData.chatMessages && academicData.chatMessages.length > 0) {
-                loadChatMessages();
+            if (cloudData) {
+                academicData = {
+                    ...academicData,
+                    ...cloudData,
+                    users: cloudData.users || [],
+                    posts: cloudData.posts || [],
+                    chatMessages: cloudData.chatMessages || [],
+                    onlineUsers: cloudData.onlineUsers || {},
+                    settings: { ...academicData.settings, ...(cloudData.settings || {}) }
+                };
+                
+                saveDataToLocalStorage();
+                
+                if (academicData.chatMessages && academicData.chatMessages.length > 0) {
+                    loadChatMessages();
+                }
+                
+                console.log('تم تحميل البيانات من السحابة بنجاح');
             }
+            
+            hideSyncIndicator();
         }
 
         async function saveDataToCloud() {
-            if (!isOnline || !JSONBIN_CONFIG.binId) return;
+            if (!isOnline) return;
             
             try {
+                showSyncIndicator();
+                
                 academicData.lastUpdated = new Date().toISOString();
                 
                 const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}`, {
@@ -1671,10 +715,12 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                console.log('تم حفظ البيانات في السحابة');
+                console.log('تم حفظ البيانات في السحابة بنجاح');
+                hideSyncIndicator();
                 
             } catch (error) {
                 console.error('خطأ في حفظ البيانات في السحابة:', error);
+                hideSyncIndicator();
             }
         }
 
@@ -1682,24 +728,9 @@
             if (!isOnline) return;
             
             try {
-                // Save current data to cloud
-                await saveDataToCloud();
-                
-                // Load latest data from cloud
-                await loadDataFromCloud();
-                
-                // Update online users count
                 updateOnlineUsersCount();
-                
-                // Refresh admin data if admin is logged in and viewing users
-                if (currentUser && currentUser.isAdmin && currentMainTab === 'admin') {
-                    const activeAdminTab = document.querySelector('.admin-tab.border-purple-500');
-                    if (activeAdminTab && activeAdminTab.dataset.adminTab === 'users') {
-                        loadUsersTable();
-                        updateAdminStats();
-                    }
-                }
-                
+                await saveDataToCloud();
+                await loadDataFromCloud();
             } catch (error) {
                 console.error('خطأ في المزامنة:', error);
                 updateConnectionStatus('offline');
@@ -1707,8 +738,26 @@
             }
         }
 
+        function showSyncIndicator() {
+            const indicator = document.getElementById('syncIndicator');
+            if (indicator) {
+                indicator.classList.add('show');
+            }
+        }
+
+        function hideSyncIndicator() {
+            const indicator = document.getElementById('syncIndicator');
+            if (indicator) {
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 500);
+            }
+        }
+
         function updateConnectionStatus(status) {
             const statusElement = document.getElementById('connectionStatus');
+            if (!statusElement) return;
+            
             statusElement.className = `connection-status ${status}`;
             
             switch(status) {
@@ -1753,27 +802,105 @@
                     lastSeen: new Date().toISOString()
                 };
                 
-                // Remove users who haven't been seen in 5 minutes
-                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+                const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
                 Object.keys(academicData.onlineUsers).forEach(userId => {
                     const lastSeen = new Date(academicData.onlineUsers[userId].lastSeen);
-                    if (lastSeen < fiveMinutesAgo) {
+                    if (lastSeen < twoMinutesAgo) {
                         delete academicData.onlineUsers[userId];
                     }
                 });
                 
                 const onlineCount = Object.keys(academicData.onlineUsers).length;
-                document.getElementById('onlineUsersCount').textContent = onlineCount;
+                const onlineElements = ['onlineUsersCount', 'onlineChatUsers'];
+                onlineElements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = onlineCount;
+                    }
+                });
             }
         }
 
         function loadChatMessages() {
             const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
             messagesContainer.innerHTML = '';
+            
+            if (academicData.chatMessages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-2">💬</div>
+                        <p>ابدأ محادثة جديدة!</p>
+                    </div>
+                `;
+                return;
+            }
             
             academicData.chatMessages.forEach(message => {
                 displayChatMessage(message);
             });
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function displayChatMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (!messagesContainer) return;
+            
+            const isCurrentUser = currentUser && message.userId === currentUser.id;
+            const messageTime = new Date(message.timestamp).toLocaleTimeString('ar-SA', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`;
+            
+            messageElement.innerHTML = `
+                <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    isCurrentUser 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-200 text-gray-900'
+                }">
+                    ${!isCurrentUser ? `<div class="text-xs font-semibold mb-1">${message.userName}</div>` : ''}
+                    <div class="text-sm">${message.text}</div>
+                    <div class="text-xs opacity-75 mt-1">${messageTime}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            if (!chatInput || !currentUser) return;
+            
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+            
+            const message = {
+                id: Date.now().toString(),
+                userId: currentUser.id,
+                userName: currentUser.name,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.chatMessages.push(message);
+            displayChatMessage(message);
+            
+            chatInput.value = '';
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                saveDataToCloud();
+            }
         }
 
         // Check if user is already logged in
@@ -1792,54 +919,78 @@
 
         // Setup event listeners
         function setupEventListeners() {
-            // Login form
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
             
-            // Register form
-            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegister);
+            }
             
-            // User menu
-            document.getElementById('userMenuBtn').addEventListener('click', function(e) {
-                e.stopPropagation();
-                document.getElementById('userDropdown').classList.toggle('hidden');
-            });
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            if (userMenuBtn) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdown = document.getElementById('userDropdown');
+                    if (dropdown) {
+                        dropdown.classList.toggle('hidden');
+                    }
+                });
+            }
             
-            // Close dropdown when clicking outside
             document.addEventListener('click', function() {
-                document.getElementById('userDropdown').classList.add('hidden');
+                const dropdown = document.getElementById('userDropdown');
+                if (dropdown) {
+                    dropdown.classList.add('hidden');
+                }
             });
             
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-            
-            // Back to subjects
-            document.getElementById('backToSubjects').addEventListener('click', function() {
-                showSemesterContent();
-            });
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
         }
 
         // Modal functions
         function showLoginModal() {
             closeModal('registerModal');
-            document.getElementById('loginModal').classList.remove('hidden');
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
         }
 
         function showRegisterModal() {
             closeModal('loginModal');
-            document.getElementById('registerModal').classList.remove('hidden');
+            const modal = document.getElementById('registerModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         }
 
         function showWelcomePopup(userName) {
-            document.getElementById('welcomeUserName').textContent = userName;
-            document.getElementById('welcomePopup').classList.remove('hidden');
+            const nameElement = document.getElementById('welcomeUserName');
+            const popup = document.getElementById('welcomePopup');
+            if (nameElement && popup) {
+                nameElement.textContent = userName;
+                popup.classList.remove('hidden');
+            }
         }
 
         function closeWelcomePopup() {
-            document.getElementById('welcomePopup').classList.add('hidden');
+            const popup = document.getElementById('welcomePopup');
+            if (popup) {
+                popup.classList.add('hidden');
+            }
         }
 
         // Authentication functions
@@ -1850,7 +1001,6 @@
             const password = document.getElementById('loginPassword').value;
             
             if (username && password) {
-                // Check if admin
                 const isAdmin = username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password;
                 
                 if (isAdmin) {
@@ -1864,7 +1014,6 @@
                         loginTime: new Date().toISOString()
                     };
                 } else {
-                    // Find existing user
                     const existingUser = academicData.users.find(u => u.username === username);
                     if (!existingUser) {
                         alert('اسم المستخدم غير موجود. يرجى إنشاء حساب جديد.');
@@ -1876,7 +1025,6 @@
                         lastLogin: new Date().toISOString()
                     };
                     
-                    // Update user's last login
                     const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
                     if (userIndex !== -1) {
                         academicData.users[userIndex].lastLogin = currentUser.lastLogin;
@@ -1905,7 +1053,6 @@
             const password = document.getElementById('registerPassword').value;
             
             if (name && username && year && password) {
-                // Check if username already exists
                 if (academicData.users.find(u => u.username === username)) {
                     alert('اسم المستخدم موجود بالفعل. يرجى اختيار اسم آخر.');
                     return;
@@ -1923,13 +1070,7 @@
                     status: 'متاح'
                 };
                 
-                // Add to users list
                 academicData.users.push(currentUser);
-                
-                // Initialize user progress, bookmarks, and favorites
-                academicData.userProgress[currentUser.id] = {};
-                academicData.bookmarks[currentUser.id] = [];
-                academicData.favorites[currentUser.id] = [];
                 
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 saveDataToLocalStorage();
@@ -1946,7 +1087,6 @@
 
         function handleLogout() {
             if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                // Remove from online users
                 if (currentUser && academicData.onlineUsers[currentUser.id]) {
                     delete academicData.onlineUsers[currentUser.id];
                     if (isOnline) {
@@ -1954,114 +1094,94 @@
                     }
                 }
                 
+                if (syncInterval) {
+                    clearInterval(syncInterval);
+                    syncInterval = null;
+                }
+                
                 currentUser = null;
                 localStorage.removeItem('currentUser');
                 
-                document.getElementById('homePage').classList.remove('hidden');
-                document.getElementById('mainPlatform').classList.add('hidden');
+                const homePage = document.getElementById('homePage');
+                const mainPlatform = document.getElementById('mainPlatform');
                 
-                // Reset forms
-                document.getElementById('loginForm').reset();
-                document.getElementById('registerForm').reset();
+                if (homePage && mainPlatform) {
+                    homePage.classList.remove('hidden');
+                    mainPlatform.classList.add('hidden');
+                }
+                
+                const loginForm = document.getElementById('loginForm');
+                const registerForm = document.getElementById('registerForm');
+                if (loginForm) loginForm.reset();
+                if (registerForm) registerForm.reset();
             }
         }
 
         function showMainPlatform() {
-            document.getElementById('homePage').classList.add('hidden');
-            document.getElementById('mainPlatform').classList.remove('hidden');
+            const homePage = document.getElementById('homePage');
+            const mainPlatform = document.getElementById('mainPlatform');
             
-            // Update user info
-            document.getElementById('userName').textContent = currentUser.name;
-            document.getElementById('userFullName').textContent = currentUser.name;
-            document.getElementById('userYear').textContent = currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام';
-            document.getElementById('userAvatar').textContent = currentUser.avatar;
-            
-            // Show admin features if admin
-            if (currentUser.isAdmin) {
-                document.getElementById('adminTab').classList.remove('hidden');
-                document.getElementById('logoSettingsBtn').classList.remove('hidden');
-                document.getElementById('addSubjectBtn').classList.remove('hidden');
-                document.getElementById('addExamBtn').classList.remove('hidden');
-                document.getElementById('uploadSection').classList.remove('hidden');
-                document.getElementById('editAnnouncementsBtn').classList.remove('hidden');
-                document.getElementById('addPostBtn').classList.remove('hidden');
-                document.getElementById('adminChatManagement').classList.remove('hidden');
-                
-                // Load admin data immediately
-                setTimeout(() => {
-                    updateAdminStats();
-                    loadUsersTable();
-                    updateChatStats();
-                }, 500);
+            if (homePage && mainPlatform) {
+                homePage.classList.add('hidden');
+                mainPlatform.classList.remove('hidden');
             }
             
-            // Load user profile picture
-            if (currentUser.profilePicture) {
-                document.getElementById('userProfilePic').src = currentUser.profilePicture;
-                document.getElementById('userProfilePic').classList.remove('hidden');
-                document.getElementById('userAvatar').classList.add('hidden');
-            }
+            const userElements = {
+                userName: currentUser.name,
+                userFullName: currentUser.name,
+                userYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
+                userAvatar: currentUser.avatar
+            };
             
-            // Update online users
+            Object.entries(userElements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+            
             updateOnlineUsersCount();
             
-            // Load chat messages if they exist
             if (academicData.chatMessages && academicData.chatMessages.length > 0) {
                 loadChatMessages();
             }
-            
-            // Load all posts
-            loadAllPosts();
-            
-            // Update sidebar announcements
-            updateSidebarAnnouncements();
         }
 
-        // Academic year functions
-        function toggleYear(yearNum) {
-            const yearContent = document.getElementById(`year-${yearNum}`);
-            const arrow = document.getElementById(`arrow-${yearNum}`);
+        function switchMainTab(tabName) {
+            currentMainTab = tabName;
             
-            // Close other years
-            for (let i = 1; i <= 5; i++) {
-                if (i !== yearNum) {
-                    document.getElementById(`year-${i}`).classList.add('hidden');
-                    document.getElementById(`arrow-${i}`).style.transform = 'rotate(0deg)';
+            const sections = ['postsSection', 'chatSection'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.classList.add('hidden');
+                }
+            });
+            
+            const mainContent = document.querySelector('#mainPlatform main');
+            if (mainContent) {
+                mainContent.classList.add('hidden');
+            }
+            
+            if (tabName === 'posts') {
+                const postsSection = document.getElementById('postsSection');
+                if (postsSection) {
+                    postsSection.classList.remove('hidden');
+                }
+            } else if (tabName === 'chat') {
+                const chatSection = document.getElementById('chatSection');
+                if (chatSection) {
+                    chatSection.classList.remove('hidden');
+                }
+                loadChatMessages();
+            } else {
+                if (mainContent) {
+                    mainContent.classList.remove('hidden');
                 }
             }
-            
-            // Toggle current year
-            yearContent.classList.toggle('hidden');
-            if (yearContent.classList.contains('hidden')) {
-                arrow.style.transform = 'rotate(0deg)';
-            } else {
-                arrow.style.transform = 'rotate(-90deg)';
-            }
         }
 
-        function showSemester(year, semester) {
-            currentYear = year;
-            currentSemester = semester;
-            
-            // Update breadcrumb
-            document.getElementById('currentYear').textContent = `السنة ${getYearName(year)}`;
-            document.getElementById('currentSemester').textContent = `الفصل ${semester === 1 ? 'الأول' : 'الثاني'}`;
-            
-            // Show semester content
-            document.getElementById('welcomeSection').classList.add('hidden');
-            document.getElementById('semesterContent').classList.remove('hidden');
-            document.getElementById('subjectMaterials').classList.add('hidden');
-            
-            // Load subjects for this semester
-            refreshSubjectsGrid();
-        }
-
-        function showSemesterContent() {
-            document.getElementById('subjectMaterials').classList.add('hidden');
-            document.getElementById('semesterContent').classList.remove('hidden');
-        }
-
-        function getYearName(yearNum) {
+        function getYearName(year) {
             const yearNames = {
                 1: 'الأولى',
                 2: 'الثانية', 
@@ -2069,1071 +1189,11 @@
                 4: 'الرابعة',
                 5: 'الخامسة'
             };
-            return yearNames[yearNum] || yearNum;
+            return yearNames[year] || 'غير محدد';
         }
 
-        // Sample function to show subject materials
-        function showSampleSubject() {
-            document.getElementById('semesterContent').classList.add('hidden');
-            document.getElementById('subjectMaterials').classList.remove('hidden');
-        }
-
-        // Material tab switching
-        function switchMaterialTab(type) {
-            currentMaterialType = type;
-            
-            // Update tab appearance
-            document.querySelectorAll('.material-tab').forEach(tab => {
-                tab.classList.remove('border-purple-500', 'text-purple-600', 'active');
-                tab.classList.add('border-transparent', 'text-gray-500');
-            });
-            
-            const activeTab = document.querySelector(`[data-type="${type}"]`);
-            if (activeTab) {
-                activeTab.classList.remove('border-transparent', 'text-gray-500');
-                activeTab.classList.add('border-purple-500', 'text-purple-600', 'active');
-            }
-            
-            // Reload materials for new type
-            if (currentSubject) {
-                loadSubjectMaterials();
-            }
-        }
-
-        function switchExamTab(examType) {
-            currentExamType = examType;
-            
-            // Update tab appearance
-            document.querySelectorAll('.exam-tab').forEach(tab => {
-                tab.classList.remove('bg-purple-600', 'text-white', 'active');
-                tab.classList.add('bg-gray-200', 'text-gray-700');
-            });
-            
-            const activeTab = document.querySelector(`[data-exam="${examType}"]`);
-            if (activeTab) {
-                activeTab.classList.remove('bg-gray-200', 'text-gray-700');
-                activeTab.classList.add('bg-purple-600', 'text-white', 'active');
-            }
-            
-            // Reload materials for new exam type
-            if (currentSubject) {
-                loadSubjectMaterials();
-            }
-        }
-
-        // Main tab switching
-        function switchMainTab(tabName) {
-            currentMainTab = tabName;
-            
-            // Hide all sections
-            document.getElementById('academicSection').classList.add('hidden');
-            document.getElementById('postsSection').classList.add('hidden');
-            document.getElementById('examsSection').classList.add('hidden');
-            document.getElementById('chatSection').classList.add('hidden');
-            document.getElementById('adminSection').classList.add('hidden');
-            
-            // Show selected section
-            document.getElementById(tabName + 'Section').classList.remove('hidden');
-            
-            // Update tab appearance
-            document.querySelectorAll('.main-tab').forEach(tab => {
-                tab.classList.remove('text-purple-600', 'border-purple-600');
-                tab.classList.add('text-gray-600');
-            });
-            
-            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-gray-600');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('text-purple-600', 'border-purple-600');
-        }
-
-        // Chat functions
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message && currentUser) {
-                const messageData = {
-                    id: Date.now().toString(),
-                    content: message,
-                    userId: currentUser.id,
-                    userName: currentUser.name,
-                    userAvatar: currentUser.avatar,
-                    timestamp: new Date().toISOString(),
-                    isAdmin: currentUser.isAdmin || false
-                };
-
-                academicData.chatMessages.push(messageData);
-                displayChatMessage(messageData);
-                saveDataToLocalStorage();
-                
-                if (isOnline) {
-                    saveDataToCloud();
-                }
-                
-                // Update chat stats
-                updateChatStats();
-                
-                input.value = '';
-            }
-        }
-
-        function clearAllMessages() {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-            
-            if (confirm('هل أنت متأكد من حذف جميع رسائل الدردشة؟')) {
-                academicData.chatMessages = [];
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                
-                // Clear chat display
-                const messagesContainer = document.getElementById('chatMessages');
-                messagesContainer.innerHTML = `
-                    <div class="text-center text-gray-500 py-8">
-                        <div class="text-4xl mb-2">💬</div>
-                        <p>ابدأ محادثة جديدة!</p>
-                    </div>
-                `;
-                
-                updateChatStats();
-                alert('تم حذف جميع الرسائل بنجاح');
-            }
-        }
-
-        function exportChatHistory() {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-            
-            const chatData = academicData.chatMessages.map(msg => ({
-                التاريخ: new Date(msg.timestamp).toLocaleString('ar-SA'),
-                المستخدم: msg.userName,
-                الرسالة: msg.content,
-                نوع_المستخدم: msg.isAdmin ? 'مدير' : 'طالب'
-            }));
-            
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "التاريخ,المستخدم,الرسالة,نوع المستخدم\n"
-                + chatData.map(row => 
-                    `"${row.التاريخ}","${row.المستخدم}","${row.الرسالة}","${row.نوع_المستخدم}"`
-                ).join("\n");
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `chat_history_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            alert('تم تصدير سجل المحادثات بنجاح!');
-        }
-
-        function updateChatStats() {
-            document.getElementById('totalChatMessages').textContent = academicData.chatMessages.length;
-            
-            // Count unique active users in chat
-            const uniqueUsers = new Set(academicData.chatMessages.map(msg => msg.userId));
-            document.getElementById('activeChatUsers').textContent = uniqueUsers.size;
-            
-            // Update online chat users count
-            const onlineCount = Object.keys(academicData.onlineUsers).length;
-            document.getElementById('onlineChatUsers').textContent = onlineCount;
-        }
-
-        function displayChatMessage(messageData) {
-            const messagesContainer = document.getElementById('chatMessages');
-            
-            // Clear empty state if it exists
-            if (messagesContainer.querySelector('.text-center')) {
-                messagesContainer.innerHTML = '';
-            }
-            
-            const messageDiv = document.createElement('div');
-            const isCurrentUser = messageData.userId === currentUser?.id;
-            messageDiv.className = `flex items-start space-x-3 space-x-reverse ${isCurrentUser ? 'justify-end' : ''}`;
-            
-            const time = new Date(messageData.timestamp).toLocaleTimeString('ar-SA', {
-                hour: '2-digit', 
-                minute: '2-digit'
-            });
-
-            if (isCurrentUser) {
-                messageDiv.innerHTML = `
-                    <div class="bg-purple-600 text-white rounded-lg p-3 max-w-xs">
-                        <div class="text-sm font-medium">${messageData.userName}</div>
-                        <div class="text-sm">${messageData.content}</div>
-                        <div class="text-xs opacity-75 mt-1">${time}</div>
-                    </div>
-                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                        <span>${messageData.userAvatar}</span>
-                    </div>
-                `;
-            } else {
-                messageDiv.innerHTML = `
-                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold">
-                        <span>${messageData.userAvatar}</span>
-                    </div>
-                    <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
-                        <div class="text-sm font-medium text-gray-900">${messageData.userName}</div>
-                        <div class="text-sm text-gray-700">${messageData.content}</div>
-                        <div class="text-xs text-gray-500 mt-1">${time}</div>
-                    </div>
-                `;
-            }
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // Admin tab switching
-        function switchAdminTab(tabName) {
-            // Hide all admin tab contents
-            document.querySelectorAll('.admin-tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            
-            // Show selected tab
-            document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.remove('hidden');
-            
-            // Update tab appearance
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.remove('border-purple-500', 'text-purple-600');
-                tab.classList.add('border-transparent', 'text-gray-500');
-            });
-            
-            document.querySelector(`[data-admin-tab="${tabName}"]`).classList.remove('border-transparent', 'text-gray-500');
-            document.querySelector(`[data-admin-tab="${tabName}"]`).classList.add('border-purple-500', 'text-purple-600');
-            
-            // Load tab-specific data
-            if (tabName === 'users') {
-                setTimeout(() => {
-                    loadUsersTable();
-                    updateAdminStats();
-                }, 100);
-            } else if (tabName === 'content') {
-                loadRecentActivity();
-            } else if (tabName === 'posts') {
-                loadAdminPosts();
-            }
-        }
-
-        // Admin functions
-        function loadUsersTable() {
-            const tbody = document.getElementById('usersTableBody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            console.log('عدد المستخدمين:', academicData.users.length);
-            
-            if (academicData.users.length === 0) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                        <div class="text-4xl mb-2">👥</div>
-                        <p>لا يوجد مستخدمين مسجلين حتى الآن</p>
-                    </td>
-                `;
-                tbody.appendChild(row);
-                return;
-            }
-            
-            academicData.users.forEach(user => {
-                const row = document.createElement('tr');
-                const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('ar-SA') : 'لم يسجل دخول';
-                const registrationDate = new Date(user.registrationDate).toLocaleDateString('ar-SA');
-                const isOnline = academicData.onlineUsers[user.id] ? 'متصل' : 'غير متصل';
-                
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                                ${user.avatar}
-                            </div>
-                            <div class="mr-3">
-                                <div class="text-sm font-medium text-gray-900">${user.name}</div>
-                                <div class="text-sm text-gray-500">@${user.username}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${user.year ? `السنة ${getYearName(user.year)}` : '-'}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${registrationDate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${lastLogin}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${isOnline === 'متصل' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                            ${isOnline}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="editUser('${user.id}')" class="text-indigo-600 hover:text-indigo-900 ml-2">تعديل</button>
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-900">حذف</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function updateAdminStats() {
-            document.getElementById('totalUsers').textContent = academicData.users.length;
-            document.getElementById('totalSubjects').textContent = Object.keys(academicData.subjects).length;
-            document.getElementById('totalFiles').textContent = Object.keys(academicData.materials).length;
-            document.getElementById('totalMessages').textContent = academicData.chatMessages.length;
-        }
-
-        function loadRecentActivity() {
-            const container = document.getElementById('recentActivity');
-            container.innerHTML = '';
-            
-            // Sample activity data
-            const activities = [
-                { type: 'user', message: 'مستخدم جديد انضم للمنصة', time: 'منذ 5 دقائق', icon: '👥' },
-                { type: 'file', message: 'تم رفع ملف جديد في مادة التشريح', time: 'منذ 15 دقيقة', icon: '📄' },
-                { type: 'chat', message: 'رسالة جديدة في الدردشة العامة', time: 'منذ 30 دقيقة', icon: '💬' }
-            ];
-            
-            activities.forEach(activity => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center space-x-3 space-x-reverse p-3 bg-gray-50 rounded-lg';
-                div.innerHTML = `
-                    <span class="text-2xl">${activity.icon}</span>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-900">${activity.message}</p>
-                        <p class="text-xs text-gray-500">${activity.time}</p>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function loadAdminPosts() {
-            const container = document.getElementById('adminPostsList');
-            container.innerHTML = '';
-            
-            academicData.posts.forEach(post => {
-                const div = document.createElement('div');
-                div.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200';
-                div.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <h4 class="font-medium text-gray-900">${post.title || 'منشور بدون عنوان'}</h4>
-                        <div class="flex space-x-2 space-x-reverse">
-                            <button onclick="editPost('${post.id}')" class="text-blue-600 hover:text-blue-800 text-sm">تعديل</button>
-                            <button onclick="deletePost('${post.id}')" class="text-red-600 hover:text-red-800 text-sm">حذف</button>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2">${post.content}</p>
-                    <p class="text-xs text-gray-500">تاريخ النشر: ${new Date(post.createdAt).toLocaleDateString('ar-SA')}</p>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // Admin action functions
-        function showAddSubjectModal() {
-            if (!currentUser || !currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-
-            if (!currentYear || !currentSemester) {
-                alert('يرجى اختيار السنة والفصل الدراسي أولاً من القائمة الجانبية');
-                return;
-            }
-
-            const subjectName = prompt('اسم المادة:');
-            if (!subjectName) return;
-
-            const subjectDescription = prompt('وصف المادة (اختياري):') || '';
-            
-            if (subjectName) {
-                const subjectId = Date.now().toString();
-                const key = `${currentYear}-${currentSemester}`;
-                
-                if (!academicData.subjects[key]) {
-                    academicData.subjects[key] = [];
-                }
-                
-                const newSubject = {
-                    id: subjectId,
-                    name: subjectName,
-                    description: subjectDescription,
-                    year: currentYear,
-                    semester: currentSemester,
-                    createdAt: new Date().toISOString(),
-                    materials: {
-                        slides: { mid: [], final: [] },
-                        recordings: { mid: [], final: [] },
-                        summaries: { mid: [], final: [] }
-                    }
-                };
-                
-                academicData.subjects[key].push(newSubject);
-                
-                // Initialize materials for this subject
-                if (!academicData.materials[subjectId]) {
-                    academicData.materials[subjectId] = {
-                        slides: { mid: [], final: [] },
-                        recordings: { mid: [], final: [] },
-                        summaries: { mid: [], final: [] }
-                    };
-                }
-                
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                
-                alert('تم إضافة المادة بنجاح!');
-                updateAdminStats();
-                refreshSubjectsGrid();
-            }
-        }
-
-        function refreshSubjectsGrid() {
-            if (!currentYear || !currentSemester) return;
-            
-            const grid = document.getElementById('subjectsGrid');
-            const key = `${currentYear}-${currentSemester}`;
-            const subjects = academicData.subjects[key] || [];
-            
-            // Clear existing subjects except sample ones
-            const sampleSubjects = grid.querySelectorAll('.material-card[onclick="showSampleSubject()"]');
-            grid.innerHTML = '';
-            
-            // Re-add sample subjects
-            sampleSubjects.forEach(sample => {
-                grid.appendChild(sample.cloneNode(true));
-            });
-            
-            // Add real subjects
-            subjects.forEach(subject => {
-                const subjectCard = document.createElement('div');
-                subjectCard.className = 'material-card rounded-xl p-6 cursor-pointer';
-                subjectCard.onclick = () => showSubjectMaterials(subject);
-                
-                const materialsCount = {
-                    slides: (academicData.materials[subject.id]?.slides?.mid?.length || 0) + (academicData.materials[subject.id]?.slides?.final?.length || 0),
-                    recordings: (academicData.materials[subject.id]?.recordings?.mid?.length || 0) + (academicData.materials[subject.id]?.recordings?.final?.length || 0),
-                    summaries: (academicData.materials[subject.id]?.summaries?.mid?.length || 0) + (academicData.materials[subject.id]?.summaries?.final?.length || 0)
-                };
-                
-                subjectCard.innerHTML = `
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-                            <span class="text-white text-xl">📚</span>
-                        </div>
-                        ${currentUser && currentUser.isAdmin ? `
-                        <button onclick="event.stopPropagation(); deleteSubject('${subject.id}')" class="text-red-500 hover:text-red-700 text-sm">
-                            🗑️ حذف
-                        </button>
-                        ` : ''}
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">${subject.name}</h3>
-                    <p class="text-gray-600 text-sm mb-4">${subject.description || 'مادة دراسية'}</p>
-                    <div class="flex justify-between text-xs text-gray-500">
-                        <span>📑 ${materialsCount.slides} سلايد</span>
-                        <span>🎙️ ${materialsCount.recordings} تسجيل</span>
-                        <span>📝 ${materialsCount.summaries} ملخص</span>
-                    </div>
-                `;
-                
-                grid.appendChild(subjectCard);
-            });
-        }
-
-        function showSubjectMaterials(subject) {
-            currentSubject = subject;
-            
-            document.getElementById('semesterContent').classList.add('hidden');
-            document.getElementById('subjectMaterials').classList.remove('hidden');
-            
-            // Update subject info
-            document.getElementById('subjectTitle').textContent = subject.name;
-            document.getElementById('subjectInfo').textContent = `السنة ${getYearName(subject.year)} - الفصل ${subject.semester === 1 ? 'الأول' : 'الثاني'}`;
-            
-            // Load materials
-            loadSubjectMaterials();
-        }
-
-        function loadSubjectMaterials() {
-            if (!currentSubject) return;
-            
-            const materialsList = document.getElementById('materialsList');
-            const materialsTitle = document.getElementById('materialsTitle');
-            
-            // Update title
-            const typeNames = {
-                slides: 'السلايدات',
-                recordings: 'التسجيلات', 
-                summaries: 'الملخصات'
-            };
-            const examNames = { mid: 'الميد', final: 'الفاينال' };
-            materialsTitle.textContent = `${typeNames[currentMaterialType]} - ${examNames[currentExamType]}`;
-            
-            // Get materials for current subject, type, and exam
-            const materials = academicData.materials[currentSubject.id]?.[currentMaterialType]?.[currentExamType] || [];
-            
-            materialsList.innerHTML = '';
-            
-            if (materials.length === 0) {
-                materialsList.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <div class="text-4xl mb-2">📁</div>
-                        <p>لا توجد مواد متاحة حالياً</p>
-                        ${currentUser && currentUser.isAdmin ? '<p class="text-sm mt-2">استخدم قسم الرفع أعلاه لإضافة مواد جديدة</p>' : ''}
-                    </div>
-                `;
-                return;
-            }
-            
-            materials.forEach(material => {
-                const materialDiv = document.createElement('div');
-                materialDiv.className = 'flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50';
-                
-                const fileIcon = getFileIcon(material.type || material.name);
-                const fileSize = material.size || 'غير محدد';
-                const uploadDate = new Date(material.uploadDate).toLocaleDateString('ar-SA');
-                
-                materialDiv.innerHTML = `
-                    <div class="flex items-center space-x-3 space-x-reverse flex-1">
-                        <span class="text-2xl">${fileIcon}</span>
-                        <div class="flex-1">
-                            <h4 class="font-medium text-gray-900">${material.name}</h4>
-                            <p class="text-sm text-gray-500">${fileSize} • ${uploadDate}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2 space-x-reverse">
-                        <button onclick="toggleBookmark('${material.id}')" class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">
-                            📑
-                        </button>
-                        <button onclick="toggleFavorite('${material.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                            🤍
-                        </button>
-                        ${currentUser && currentUser.isAdmin ? `
-                        <button onclick="deleteMaterial('${material.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                            🗑️
-                        </button>
-                        ` : ''}
-                        <button onclick="downloadMaterial('${material.id}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                            ${material.url ? '🔗 فتح' : '📥 تحميل'}
-                        </button>
-                    </div>
-                `;
-                
-                materialsList.appendChild(materialDiv);
-            });
-        }
-
-        function getFileIcon(fileName) {
-            const extension = fileName.split('.').pop()?.toLowerCase();
-            const icons = {
-                pdf: '📄',
-                doc: '📝',
-                docx: '📝',
-                ppt: '📊',
-                pptx: '📊',
-                mp3: '🎵',
-                mp4: '🎥',
-                avi: '🎥',
-                mov: '🎥',
-                jpg: '🖼️',
-                jpeg: '🖼️',
-                png: '🖼️',
-                gif: '🖼️'
-            };
-            return icons[extension] || '📄';
-        }
-
-        function deleteSubject(subjectId) {
-            if (!currentUser || !currentUser.isAdmin) return;
-            
-            if (confirm('هل أنت متأكد من حذف هذه المادة؟ سيتم حذف جميع الملفات المرتبطة بها.')) {
-                const key = `${currentYear}-${currentSemester}`;
-                if (academicData.subjects[key]) {
-                    academicData.subjects[key] = academicData.subjects[key].filter(s => s.id !== subjectId);
-                }
-                
-                // Delete associated materials
-                delete academicData.materials[subjectId];
-                
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                
-                refreshSubjectsGrid();
-                updateAdminStats();
-            }
-        }
-
-        function showAddPostModal() {
-            const title = prompt('عنوان المنشور الإداري:');
-            const content = prompt('محتوى المنشور:');
-            
-            if (title && content) {
-                const post = {
-                    id: Date.now().toString(),
-                    title: title,
-                    content: content,
-                    authorId: currentUser.id,
-                    authorName: currentUser.name,
-                    authorAvatar: currentUser.avatar,
-                    createdAt: new Date().toISOString(),
-                    likes: [],
-                    comments: [],
-                    isAdmin: true,
-                    type: 'admin'
-                };
-                
-                academicData.posts.unshift(post);
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                
-                alert('تم إضافة المنشور الإداري بنجاح!');
-                loadAdminPosts();
-                loadAllPosts();
-            }
-        }
-
-        function showUserPostModal() {
-            if (!currentUser) {
-                alert('يرجى تسجيل الدخول أولاً');
-                return;
-            }
-            
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50';
-            modal.innerHTML = `
-                <div class="flex items-center justify-center min-h-screen p-4">
-                    <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-xl font-bold text-gray-900">✍️ كتابة منشور جديد</h2>
-                            <button onclick="closeUserPostModal()" class="text-gray-400 hover:text-gray-600">
-                                <span class="text-xl">✕</span>
-                            </button>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">عنوان المنشور (اختياري)</label>
-                                <input type="text" id="userPostTitle" placeholder="اكتب عنوان المنشور..." 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">محتوى المنشور</label>
-                                <textarea id="userPostContent" placeholder="شارك أفكارك مع زملائك..." rows="4"
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></textarea>
-                            </div>
-                            
-                            <div class="flex items-center space-x-2 space-x-reverse">
-                                <input type="checkbox" id="allowComments" checked class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                                <label for="allowComments" class="text-sm text-gray-700">السماح بالتعليقات</label>
-                            </div>
-                            
-                            <div class="flex space-x-3 space-x-reverse pt-4">
-                                <button onclick="submitUserPost()" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                                    📝 نشر المنشور
-                                </button>
-                                <button onclick="closeUserPostModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
-                                    إلغاء
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
-
-        function submitUserPost() {
-            const title = document.getElementById('userPostTitle').value.trim();
-            const content = document.getElementById('userPostContent').value.trim();
-            const allowComments = document.getElementById('allowComments').checked;
-            
-            if (!content) {
-                alert('يرجى كتابة محتوى المنشور');
-                return;
-            }
-            
-            const post = {
-                id: Date.now().toString(),
-                title: title || null,
-                content: content,
-                authorId: currentUser.id,
-                authorName: currentUser.name,
-                authorAvatar: currentUser.avatar,
-                authorYear: currentUser.year,
-                createdAt: new Date().toISOString(),
-                likes: [],
-                comments: [],
-                allowComments: allowComments,
-                isAdmin: false,
-                type: 'user'
-            };
-            
-            academicData.posts.unshift(post);
-            saveDataToLocalStorage();
-            if (isOnline) saveDataToCloud();
-            
-            closeUserPostModal();
-            loadAllPosts();
-            
-            alert('تم نشر المنشور بنجاح! 🎉');
-        }
-
-        function closeUserPostModal() {
-            const modal = document.querySelector('.popup-overlay');
-            if (modal) {
-                document.body.removeChild(modal);
-            }
-        }
-
-        function loadAllPosts() {
-            const container = document.getElementById('postsList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (academicData.posts.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📝</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حتى الآن</h3>
-                        <p class="text-gray-600 mb-4">كن أول من يشارك منشوراً!</p>
-                        <button onclick="showUserPostModal()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                            ✍️ اكتب منشور
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            academicData.posts.forEach(post => {
-                const postDiv = document.createElement('div');
-                postDiv.className = 'bg-white rounded-lg shadow-md p-6 border border-gray-100';
-                
-                const timeAgo = getTimeAgo(post.createdAt);
-                const likesCount = post.likes ? post.likes.length : 0;
-                const commentsCount = post.comments ? post.comments.length : 0;
-                const isLiked = post.likes && currentUser ? post.likes.includes(currentUser.id) : false;
-                
-                postDiv.innerHTML = `
-                    <div class="flex items-start space-x-4 space-x-reverse">
-                        <div class="w-12 h-12 ${post.isAdmin ? 'bg-purple-600' : 'bg-blue-600'} rounded-full flex items-center justify-center text-white font-semibold">
-                            ${post.authorAvatar}
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-2">
-                                <div>
-                                    <h3 class="font-semibold text-gray-900 flex items-center">
-                                        ${post.authorName}
-                                        ${post.isAdmin ? '<span class="mr-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">إدارة</span>' : ''}
-                                        ${post.authorYear && !post.isAdmin ? `<span class="mr-2 text-sm text-gray-500">• السنة ${getYearName(post.authorYear)}</span>` : ''}
-                                    </h3>
-                                    ${post.title ? `<h4 class="font-medium text-gray-800 mt-1">${post.title}</h4>` : ''}
-                                </div>
-                                <div class="flex items-center space-x-2 space-x-reverse">
-                                    <span class="text-sm text-gray-500">${timeAgo}</span>
-                                    ${currentUser && (currentUser.isAdmin || currentUser.id === post.authorId) ? `
-                                    <button onclick="deletePost('${post.id}')" class="text-red-500 hover:text-red-700 text-sm">
-                                        🗑️
-                                    </button>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            <p class="text-gray-700 mb-4 whitespace-pre-wrap">${post.content}</p>
-                            <div class="flex items-center space-x-6 space-x-reverse text-sm text-gray-500">
-                                <button onclick="togglePostLike('${post.id}')" class="flex items-center space-x-1 space-x-reverse hover:text-purple-600 transition-colors ${isLiked ? 'text-purple-600' : ''}">
-                                    <span>${isLiked ? '❤️' : '🤍'}</span>
-                                    <span>${likesCount}</span>
-                                </button>
-                                ${post.allowComments !== false ? `
-                                <button onclick="showPostComments('${post.id}')" class="flex items-center space-x-1 space-x-reverse hover:text-purple-600 transition-colors">
-                                    <span>💬</span>
-                                    <span>${commentsCount}</span>
-                                </button>
-                                ` : ''}
-                                <button onclick="sharePost('${post.id}')" class="flex items-center space-x-1 space-x-reverse hover:text-purple-600 transition-colors">
-                                    <span>📤</span>
-                                    <span>مشاركة</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(postDiv);
-            });
-        }
-
-        function getTimeAgo(timestamp) {
-            const now = new Date();
-            const postTime = new Date(timestamp);
-            const diffInMinutes = Math.floor((now - postTime) / (1000 * 60));
-            
-            if (diffInMinutes < 1) return 'الآن';
-            if (diffInMinutes < 60) return `منذ ${diffInMinutes} دقيقة`;
-            
-            const diffInHours = Math.floor(diffInMinutes / 60);
-            if (diffInHours < 24) return `منذ ${diffInHours} ساعة`;
-            
-            const diffInDays = Math.floor(diffInHours / 24);
-            if (diffInDays < 7) return `منذ ${diffInDays} يوم`;
-            
-            return postTime.toLocaleDateString('ar-SA');
-        }
-
-        function togglePostLike(postId) {
-            if (!currentUser) {
-                alert('يرجى تسجيل الدخول أولاً');
-                return;
-            }
-            
-            const post = academicData.posts.find(p => p.id === postId);
-            if (!post) return;
-            
-            if (!post.likes) post.likes = [];
-            
-            const userIndex = post.likes.indexOf(currentUser.id);
-            if (userIndex === -1) {
-                post.likes.push(currentUser.id);
-            } else {
-                post.likes.splice(userIndex, 1);
-            }
-            
-            saveDataToLocalStorage();
-            if (isOnline) saveDataToCloud();
-            
-            loadAllPosts();
-        }
-
-        function showPostComments(postId) {
-            alert('سيتم إضافة نظام التعليقات قريباً');
-        }
-
-        function sharePost(postId) {
-            const post = academicData.posts.find(p => p.id === postId);
-            if (!post) return;
-            
-            const shareText = `${post.title ? post.title + '\n\n' : ''}${post.content}\n\n- ${post.authorName}`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: post.title || 'منشور من المنصة الأكاديمية',
-                    text: shareText
-                });
-            } else {
-                // Fallback: copy to clipboard
-                navigator.clipboard.writeText(shareText).then(() => {
-                    alert('تم نسخ المنشور للحافظة!');
-                }).catch(() => {
-                    alert('لا يمكن مشاركة المنشور في هذا المتصفح');
-                });
-            }
-        }
-
-        function editUser(userId) {
-            const user = academicData.users.find(u => u.id === userId);
-            if (user) {
-                const newName = prompt('الاسم الجديد:', user.name);
-                const newYear = prompt('السنة الجديدة (1-5):', user.year);
-                
-                if (newName) {
-                    user.name = newName;
-                    user.avatar = newName.charAt(0).toUpperCase();
-                }
-                if (newYear) {
-                    user.year = parseInt(newYear);
-                }
-                
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                loadUsersTable();
-            }
-        }
-
-        function deleteUser(userId) {
-            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-                academicData.users = academicData.users.filter(u => u.id !== userId);
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                loadUsersTable();
-                updateAdminStats();
-            }
-        }
-
-        function editPost(postId) {
-            const post = academicData.posts.find(p => p.id === postId);
-            if (post) {
-                const newTitle = prompt('العنوان الجديد:', post.title);
-                const newContent = prompt('المحتوى الجديد:', post.content);
-                
-                if (newTitle) post.title = newTitle;
-                if (newContent) post.content = newContent;
-                
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                loadAdminPosts();
-            }
-        }
-
-        function deletePost(postId) {
-            if (confirm('هل أنت متأكد من حذف هذا المنشور؟')) {
-                academicData.posts = academicData.posts.filter(p => p.id !== postId);
-                saveDataToLocalStorage();
-                if (isOnline) saveDataToCloud();
-                loadAdminPosts();
-            }
-        }
-
-        function exportUsers() {
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "الاسم,اسم المستخدم,السنة,تاريخ التسجيل,آخر دخول\n"
-                + academicData.users.map(user => 
-                    `${user.name},${user.username},${user.year || ''},${user.registrationDate},${user.lastLogin || ''}`
-                ).join("\n");
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "users_export.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function createBackup() {
-            const backup = {
-                data: academicData,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            
-            const dataStr = JSON.stringify(backup, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            URL.revokeObjectURL(url);
-            alert('تم إنشاء النسخة الاحتياطية بنجاح!');
-        }
-
-        function exportAllData() {
-            createBackup(); // Same as backup for now
-        }
-
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const importedData = JSON.parse(e.target.result);
-                            if (confirm('هل أنت متأكد من استيراد البيانات؟ سيتم استبدال البيانات الحالية.')) {
-                                academicData = importedData.data || importedData;
-                                saveDataToLocalStorage();
-                                if (isOnline) saveDataToCloud();
-                                alert('تم استيراد البيانات بنجاح!');
-                                location.reload();
-                            }
-                        } catch (error) {
-                            alert('خطأ في قراءة الملف. تأكد من صحة تنسيق الملف.');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            input.click();
-        }
-
-        function resetPlatform() {
-            if (confirm('هل أنت متأكد من إعادة تعيين المنصة؟ سيتم حذف جميع البيانات!')) {
-                if (confirm('تأكيد أخير: سيتم حذف جميع المستخدمين والملفات والمحادثات!')) {
-                    localStorage.clear();
-                    location.reload();
-                }
-            }
-        }
-
-        function savePlatformSettings() {
-            const name = document.getElementById('platformName').value;
-            const description = document.getElementById('platformDescription').value;
-            
-            // Update platform settings
-            academicData.settings = academicData.settings || {};
-            academicData.settings.name = name;
-            academicData.settings.description = description;
-            
-            saveDataToLocalStorage();
-            if (isOnline) saveDataToCloud();
-            
-            alert('تم حفظ الإعدادات بنجاح!');
-        }
-
-        // Other admin functions
-        function manageSubjects() {
-            alert('سيتم إضافة إدارة المواد المتقدمة قريباً');
-        }
-
-        function bulkUpload() {
-            alert('سيتم إضافة الرفع المتعدد قريباً');
-        }
-
-        function viewAllFiles() {
-            alert('سيتم إضافة عرض جميع الملفات قريباً');
-        }
-
-        function organizeFiles() {
-            alert('سيتم إضافة تنظيم الملفات قريباً');
-        }
-
-        function cleanupFiles() {
-            alert('سيتم إضافة تنظيف الملفات قريباً');
-        }
-
-        // User functions (non-admin)
-        function showNotifications() {
-            alert('سيتم إضافة نظام الإشعارات قريباً');
-        }
-
-        function showUserSettings() {
-            alert('سيتم إضافة إعدادات المستخدم قريباً');
-        }
-
-        function showProfilePictureModal() {
-            alert('سيتم إضافة تغيير الصورة الشخصية قريباً');
-        }
-
-        function showLogoSettings() {
-            if (!currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-            alert('سيتم إضافة تعديل الشعار قريباً');
-        }
-
-        function editAnnouncements() {
-            if (!currentUser.isAdmin) {
-                alert('هذه الميزة متاحة للمدير فقط');
-                return;
-            }
-            alert('سيتم إضافة تعديل الإعلانات قريباً');
-        }
-
-        // Initialize the app when the page loads
+        // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97873bb1c0c632ae',t:'MTc1Njc1NTU2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9787519cb2af32ae',t:'MTc1Njc1NjQ1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

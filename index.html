@@ -208,7 +208,7 @@
 </head>
 <body class="bg-gray-50">
     <!-- Connection Status -->
-    <div id="connectionStatus" class="connection-status connecting">
+    <div id="connectionStatus" class="connection-status connecting" onclick="testCloudConnection()">
         🔄 جاري الاتصال...
     </div>
 
@@ -1310,17 +1310,12 @@
         let socket = null;
         let socketConnected = false;
         
-        // Cloud Storage Configuration - Multiple providers for redundancy
-        const CLOUD_PROVIDERS = [
-            {
-                name: 'JSONBin',
-                config: {
-                    apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
-                    binId: '676b8c8ead19ca34f8d5b7b8',
-                    baseUrl: 'https://api.jsonbin.io/v3'
-                }
-            }
-        ];
+        // Cloud Storage Configuration - JSONBin.io
+        const CLOUD_CONFIG = {
+            apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
+            binId: '676b8c8ead19ca34f8d5b7b8',
+            baseUrl: 'https://api.jsonbin.io/v3'
+        };
         
         let currentProvider = 0;
         
@@ -1365,6 +1360,31 @@
             
             // Set active year tab
             switchYear(1);
+        }
+
+        // Test cloud connection manually
+        async function testCloudConnection() {
+            console.log('🔍 اختبار الاتصال يدوياً...');
+            showNotification('جاري اختبار الاتصال بالسحابة...', 'info');
+            
+            try {
+                updateConnectionStatus('connecting');
+                await testConnection();
+                await loadDataFromCloud();
+                updateConnectionStatus('online');
+                isOnline = true;
+                showNotification('✅ الاتصال بالسحابة يعمل بشكل صحيح!', 'success');
+                
+                // بدء المزامنة الدورية
+                if (syncInterval) clearInterval(syncInterval);
+                syncInterval = setInterval(syncWithCloud, 30000);
+                
+            } catch (error) {
+                console.error('❌ فشل اختبار الاتصال:', error);
+                updateConnectionStatus('offline');
+                isOnline = false;
+                showNotification('❌ فشل الاتصال بالسحابة - الوضع المحلي فعال', 'error');
+            }
         }
 
         // Socket.io initialization and event handlers
@@ -1504,68 +1524,81 @@
                     console.error(`❌ فشلت المحاولة ${attempt + 1}:`, error);
                     
                     if (attempt < MAX_RETRY_ATTEMPTS - 1) {
-                        currentProvider = (currentProvider + 1) % CLOUD_PROVIDERS.length;
-                        console.log(`🔄 التبديل إلى مزود آخر: ${CLOUD_PROVIDERS[currentProvider].name}`);
+                        console.log(`🔄 إعادة المحاولة خلال ${2 * (attempt + 1)} ثانية...`);
                         await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
                     }
                 }
             }
             
-            console.log('❌ فشل الاتصال بجميع المزودين، التبديل للوضع المحلي');
+            console.log('❌ فشل الاتصال بالسحابة، التبديل للوضع المحلي');
             updateConnectionStatus('offline');
             isOnline = false;
             showNotification('تم التبديل للوضع المحلي - البيانات محفوظة محلياً', 'warning');
+            
+            // إعادة المحاولة كل دقيقة
             setTimeout(connectToCloudWithRetry, 60000);
         }
 
         async function connectToCloud() {
-            const provider = CLOUD_PROVIDERS[currentProvider];
-            console.log(`🔄 محاولة الاتصال بـ ${provider.name}...`);
-            
+            console.log('🔄 محاولة الاتصال بـ JSONBin.io...');
             updateConnectionStatus('connecting');
             
-            if (provider.name === 'JSONBin') {
-                await connectToJSONBin(provider.config);
-            } else {
-                throw new Error(`مزود غير مدعوم: ${provider.name}`);
-            }
+            // اختبار الاتصال أولاً
+            await testConnection();
+            
+            // تحميل البيانات من السحابة
+            await loadDataFromCloud();
             
             updateConnectionStatus('online');
             isOnline = true;
             connectionRetryCount = 0;
             
             console.log('✅ تم الاتصال بالسحابة بنجاح');
-            showNotification('تم الاتصال بالسحابة بنجاح', 'success');
+            showNotification('تم الاتصال بالسحابة بنجاح 🌐', 'success');
             
+            // بدء المزامنة الدورية
             if (syncInterval) clearInterval(syncInterval);
             syncInterval = setInterval(syncWithCloud, 30000);
         }
 
-        async function connectToJSONBin(config) {
-            try {
-                await loadDataFromJSONBin(config);
-            } catch (error) {
-                console.log('🔄 محاولة إنشاء/تحديث البيانات...');
-                await saveDataToJSONBin(config);
+        async function testConnection() {
+            console.log('🔍 اختبار الاتصال بـ JSONBin.io...');
+            
+            const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}/latest`, {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': CLOUD_CONFIG.apiKey,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
             }
+            
+            console.log('✅ اختبار الاتصال نجح');
+            return response;
         }
 
-        async function loadDataFromJSONBin(config) {
+        async function loadDataFromCloud() {
+            console.log('📥 تحميل البيانات من JSONBin.io...');
             showSyncIndicator();
             
             try {
-                const response = await fetch(`${config.baseUrl}/b/${config.binId}/latest`, {
+                const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}/latest`, {
+                    method: 'GET',
                     headers: {
-                        'X-Master-Key': config.apiKey,
-                        'X-Bin-Meta': 'false'
+                        'X-Master-Key': CLOUD_CONFIG.apiKey,
+                        'Content-Type': 'application/json'
                     }
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
 
                 const cloudData = await response.json();
+                console.log('📊 البيانات المستلمة من السحابة:', cloudData);
                 
                 if (cloudData && typeof cloudData === 'object') {
                     const mergedData = mergeData(academicData, cloudData);
@@ -1575,46 +1608,58 @@
                         lastSyncTime = academicData.lastUpdated;
                         saveDataToLocalStorage();
                         updateUIAfterDataLoad();
-                        console.log('📥 تم تحميل البيانات من السحابة');
+                        console.log('✅ تم دمج البيانات من السحابة');
+                        showNotification('تم تحديث البيانات من السحابة', 'success');
+                    } else {
+                        console.log('ℹ️ البيانات محدثة بالفعل');
                     }
                 }
                 
             } catch (error) {
-                console.error('خطأ في تحميل البيانات من JSONBin:', error);
+                console.error('❌ خطأ في تحميل البيانات:', error);
                 throw error;
             } finally {
                 hideSyncIndicator();
             }
         }
 
-        async function saveDataToJSONBin(config) {
-            if (!isOnline) return false;
+        async function saveDataToCloud() {
+            if (!isOnline) {
+                console.log('⚠️ غير متصل - حفظ محلي فقط');
+                return false;
+            }
+            
+            console.log('📤 حفظ البيانات في JSONBin.io...');
+            showSyncIndicator();
             
             try {
-                showSyncIndicator();
-                
                 academicData.lastUpdated = new Date().toISOString();
                 lastSyncTime = academicData.lastUpdated;
                 
-                const response = await fetch(`${config.baseUrl}/b/${config.binId}`, {
+                console.log('📊 البيانات المرسلة للسحابة:', academicData);
+                
+                const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Master-Key': config.apiKey,
-                        'X-Bin-Meta': 'false'
+                        'X-Master-Key': CLOUD_CONFIG.apiKey
                     },
                     body: JSON.stringify(academicData)
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
                 }
                 
-                console.log('📤 تم حفظ البيانات في JSONBin');
+                const result = await response.json();
+                console.log('✅ تم حفظ البيانات في السحابة:', result);
+                showNotification('تم حفظ البيانات في السحابة', 'success');
                 return true;
                 
             } catch (error) {
-                console.error('خطأ في حفظ البيانات في JSONBin:', error);
+                console.error('❌ خطأ في حفظ البيانات:', error);
+                showNotification('خطأ في حفظ البيانات - محفوظة محلياً', 'warning');
                 throw error;
             } finally {
                 hideSyncIndicator();
@@ -1666,22 +1711,29 @@
         }
 
         async function syncWithCloud() {
-            if (!isOnline || !currentUser) return;
+            if (!isOnline || !currentUser) {
+                console.log('⚠️ تخطي المزامنة - غير متصل أو لا يوجد مستخدم');
+                return;
+            }
             
             try {
+                console.log('🔄 بدء المزامنة مع السحابة...');
                 updateOnlineUsersCount();
                 
-                const provider = CLOUD_PROVIDERS[currentProvider];
+                // حفظ البيانات المحلية أولاً
+                await saveDataToCloud();
                 
-                if (provider.name === 'JSONBin') {
-                    await saveDataToJSONBin(provider.config);
-                    await loadDataFromJSONBin(provider.config);
-                }
+                // ثم تحميل أي تحديثات من السحابة
+                await loadDataFromCloud();
+                
+                console.log('✅ تمت المزامنة بنجاح');
                 
             } catch (error) {
-                console.error('خطأ في المزامنة:', error);
+                console.error('❌ خطأ في المزامنة:', error);
                 updateConnectionStatus('offline');
                 isOnline = false;
+                
+                // إعادة المحاولة بعد 30 ثانية
                 setTimeout(connectToCloudWithRetry, 30000);
             }
         }
@@ -1730,13 +1782,16 @@
             
             switch(status) {
                 case 'online':
-                    statusElement.innerHTML = '🟢 متصل بالسحابة';
+                    statusElement.innerHTML = '🟢 متصل بالسحابة (انقر للاختبار)';
+                    statusElement.title = 'متصل بـ JSONBin.io - انقر لاختبار الاتصال';
                     break;
                 case 'offline':
-                    statusElement.innerHTML = '🔴 وضع محلي';
+                    statusElement.innerHTML = '🔴 وضع محلي (انقر للاتصال)';
+                    statusElement.title = 'غير متصل بالسحابة - انقر لإعادة المحاولة';
                     break;
                 case 'connecting':
                     statusElement.innerHTML = '🔄 جاري الاتصال...';
+                    statusElement.title = 'جاري الاتصال بـ JSONBin.io...';
                     break;
             }
         }
@@ -1971,10 +2026,7 @@
             saveDataToLocalStorage();
             
             if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
+                saveDataToCloud().catch(console.error);
             }
             
             showLoggedInState();
@@ -2037,10 +2089,7 @@
             saveDataToLocalStorage();
             
             if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
+                saveDataToCloud().catch(console.error);
             }
             
             showLoggedInState();
@@ -2312,10 +2361,7 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
+                saveDataToCloud().catch(console.error);
             }
         }
 
@@ -2385,10 +2431,7 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
+                saveDataToCloud().catch(console.error);
             }
             
             if (currentTab === 'posts') {
@@ -2484,10 +2527,7 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
+                saveDataToCloud().catch(console.error);
             }
             
             if (currentTab === 'materials' && currentYear === parseInt(year)) {
@@ -2943,10 +2983,7 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                const provider = CLOUD_PROVIDERS[currentProvider];
-                if (provider.name === 'JSONBin') {
-                    saveDataToJSONBin(provider.config).catch(console.error);
-                }
+                saveDataToCloud().catch(console.error);
             }
             
             if (currentTab === 'exams') {
@@ -3541,5 +3578,5 @@
             }
         }, 60000);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978796e1c1cd32ae',t:'MTc1Njc1OTI5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97879b33e23732ae',t:'MTc1Njc1OTQ3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

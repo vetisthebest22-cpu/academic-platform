@@ -6,6 +6,8 @@
     <title>المنصة الأكاديمية - لجنة الطب والجراحة البيطرية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Socket.io للمزامنة المباشرة -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
@@ -280,6 +282,16 @@
                         <span>الدردشة</span>
                     </button>
                     
+                    <button onclick="switchTab('exams')" id="examsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">📝</span>
+                        <span>الامتحانات</span>
+                    </button>
+                    
+                    <button onclick="switchTab('tools')" id="toolsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
+                        <span class="text-xl">🛠️</span>
+                        <span>الأدوات</span>
+                    </button>
+                    
                     <button onclick="switchTab('profile')" id="profileTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
                         <span class="text-xl">👤</span>
                         <span>الملف الشخصي</span>
@@ -287,7 +299,7 @@
 
                     <div id="adminNav" class="hidden">
                         <button onclick="switchTab('admin')" id="adminTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
-                            <span class="text-xl">🛠️</span>
+                            <span class="text-xl">⚙️</span>
                             <span>لوحة التحكم</span>
                         </button>
                     </div>
@@ -413,9 +425,14 @@
                             <h2 class="text-2xl font-bold text-gray-900">📚 المواد الدراسية</h2>
                             <p class="text-gray-600 mt-1">جميع المصادر الأكاديمية منظمة حسب السنة والفصل</p>
                         </div>
-                        <div id="adminMaterialsBtn" class="hidden">
-                            <button onclick="showAddMaterialModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                                ➕ إضافة مادة
+                        <div class="flex space-x-2 space-x-reverse">
+                            <div id="adminMaterialsBtn" class="hidden">
+                                <button onclick="showAddMaterialModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                    ➕ إضافة مادة
+                                </button>
+                            </div>
+                            <button onclick="showUploadModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                📤 رفع ملف
                             </button>
                         </div>
                     </div>
@@ -423,22 +440,42 @@
 
                 <!-- Year Tabs -->
                 <div class="bg-white border-b border-gray-200">
-                    <div class="flex space-x-1 space-x-reverse p-4">
-                        <button onclick="switchYear(1)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="1">
+                    <div class="flex space-x-1 space-x-reverse p-4 overflow-x-auto">
+                        <button onclick="switchYear(1)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="1">
                             السنة الأولى
                         </button>
-                        <button onclick="switchYear(2)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="2">
+                        <button onclick="switchYear(2)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="2">
                             السنة الثانية
                         </button>
-                        <button onclick="switchYear(3)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="3">
+                        <button onclick="switchYear(3)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="3">
                             السنة الثالثة
                         </button>
-                        <button onclick="switchYear(4)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="4">
+                        <button onclick="switchYear(4)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="4">
                             السنة الرابعة
                         </button>
-                        <button onclick="switchYear(5)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors" data-year="5">
+                        <button onclick="switchYear(5)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="5">
                             السنة الخامسة
                         </button>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="bg-white border-b border-gray-200 p-4">
+                    <div class="flex space-x-4 space-x-reverse">
+                        <div class="flex-1">
+                            <input type="text" id="materialSearch" placeholder="البحث في المواد..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                   oninput="filterMaterials()">
+                        </div>
+                        <select id="materialTypeFilter" onchange="filterMaterials()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="">جميع الأنواع</option>
+                            <option value="slides">سلايدات</option>
+                            <option value="recordings">تسجيلات</option>
+                            <option value="summaries">ملخصات</option>
+                            <option value="books">كتب</option>
+                            <option value="exams">امتحانات</option>
+                        </select>
                     </div>
                 </div>
 
@@ -518,6 +555,194 @@
                         <button onclick="sendMessage()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
                             📤 إرسال
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exams Section -->
+            <div id="examsSection" class="hidden flex-1 flex flex-col">
+                <!-- Header -->
+                <div class="bg-white shadow-sm border-b border-gray-200 p-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">📝 الامتحانات والاختبارات</h2>
+                            <p class="text-gray-600 mt-1">امتحانات سابقة ونماذج اختبارات</p>
+                        </div>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button onclick="showCreateExamModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                ➕ إنشاء اختبار
+                            </button>
+                            <button onclick="showExamStatsModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                📊 الإحصائيات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Categories -->
+                <div class="bg-white border-b border-gray-200">
+                    <div class="flex space-x-1 space-x-reverse p-4 overflow-x-auto">
+                        <button onclick="switchExamCategory('midterm')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="midterm">
+                            امتحانات نصفية
+                        </button>
+                        <button onclick="switchExamCategory('final')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="final">
+                            امتحانات نهائية
+                        </button>
+                        <button onclick="switchExamCategory('quiz')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="quiz">
+                            اختبارات قصيرة
+                        </button>
+                        <button onclick="switchExamCategory('practice')" class="exam-category-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-category="practice">
+                            تمارين تفاعلية
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Exams Content -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div id="examsContent">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Sample Exam Cards -->
+                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-gray-900">امتحان التشريح - نصفي</h3>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">متاح</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">امتحان نصفي في مادة التشريح للسنة الأولى</p>
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                    <span>⏱️ 60 دقيقة</span>
+                                    <span>❓ 30 سؤال</span>
+                                </div>
+                                <button onclick="startExam('anatomy-midterm')" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                    🚀 بدء الامتحان
+                                </button>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-gray-900">اختبار الفسيولوجيا</h3>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">تفاعلي</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">اختبار تفاعلي في علم وظائف الأعضاء</p>
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                    <span>⏱️ 45 دقيقة</span>
+                                    <span>❓ 25 سؤال</span>
+                                </div>
+                                <button onclick="startExam('physiology-quiz')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    🎯 بدء الاختبار
+                                </button>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-gray-900">مراجعة شاملة</h3>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">مراجعة</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">مراجعة شاملة لجميع المواد</p>
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                    <span>⏱️ 90 دقيقة</span>
+                                    <span>❓ 50 سؤال</span>
+                                </div>
+                                <button onclick="startExam('comprehensive-review')" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                    📚 بدء المراجعة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Section -->
+            <div id="toolsSection" class="hidden flex-1 overflow-y-auto p-6 bg-gradient-to-br from-blue-50 to-purple-50">
+                <div class="max-w-6xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">🛠️ الأدوات الأكاديمية</h2>
+                        <p class="text-gray-600">مجموعة من الأدوات المفيدة للدراسة والتعلم</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- GPA Calculator -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">🎯</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-900">حاسبة المعدل</h3>
+                                <p class="text-sm text-gray-600">احسب معدلك التراكمي والفصلي</p>
+                            </div>
+                            <button onclick="showGPACalculator()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                📊 فتح الحاسبة
+                            </button>
+                        </div>
+
+                        <!-- Study Timer -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">⏰</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-900">مؤقت الدراسة</h3>
+                                <p class="text-sm text-gray-600">تقنية البومودورو للدراسة الفعالة</p>
+                            </div>
+                            <button onclick="showStudyTimer()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                ⏱️ بدء المؤقت
+                            </button>
+                        </div>
+
+                        <!-- Note Maker -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">📝</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-900">صانع الملاحظات</h3>
+                                <p class="text-sm text-gray-600">إنشاء وتنظيم ملاحظاتك</p>
+                            </div>
+                            <button onclick="showNoteMaker()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                ✍️ إنشاء ملاحظة
+                            </button>
+                        </div>
+
+                        <!-- Schedule Planner -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">📅</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-900">منظم الجدول</h3>
+                                <p class="text-sm text-gray-600">خطط جدولك الدراسي</p>
+                            </div>
+                            <button onclick="showSchedulePlanner()" class="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                                📋 تنظيم الجدول
+                            </button>
+                        </div>
+
+                        <!-- PDF Tools -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">📄</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-900">أدوات PDF</h3>
+                                <p class="text-sm text-gray-600">دمج وتقسيم ملفات PDF</p>
+                            </div>
+                            <button onclick="showPDFTools()" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                🔧 أدوات PDF
+                            </button>
+                        </div>
+
+                        <!-- Quick Quiz -->
+                        <div class="bg-white rounded-lg shadow-lg p-6 card-hover">
+                            <div class="text-center mb-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">🧠</span>
+                                </div>
+                                <h3 class="font-semibold text-gray-900">اختبار سريع</h3>
+                                <p class="text-sm text-gray-600">إنشاء اختبارات سريعة</p>
+                            </div>
+                            <button onclick="showQuickQuiz()" class="w-full px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+                                🎲 اختبار سريع
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -722,6 +947,192 @@
                 </form>
 
                 <button onclick="closeModal('addMaterialModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">📤</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">رفع ملف جديد</h2>
+                    <p class="text-gray-600">اختر الملف وحدد تفاصيله</p>
+                </div>
+
+                <form id="uploadForm" class="space-y-4">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center file-upload-area" 
+                         ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx" onchange="handleFileSelect(event)">
+                        <div class="text-4xl mb-2">📁</div>
+                        <p class="text-gray-600 mb-2">اسحب الملف هنا أو انقر للاختيار</p>
+                        <button type="button" onclick="document.getElementById('fileInput').click()" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            اختيار ملف
+                        </button>
+                        <p class="text-xs text-gray-500 mt-2">PDF, DOC, DOCX, PPT, PPTX</p>
+                    </div>
+
+                    <div id="fileInfo" class="hidden bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <span class="text-2xl">📄</span>
+                            <div class="flex-1">
+                                <div class="font-medium" id="fileName">اسم الملف</div>
+                                <div class="text-sm text-gray-500" id="fileSize">حجم الملف</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">عنوان المحتوى</label>
+                        <input type="text" id="uploadTitle" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="أدخل عنوان المحتوى">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
+                            <select id="uploadYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">اختر السنة</option>
+                                <option value="1">السنة الأولى</option>
+                                <option value="2">السنة الثانية</option>
+                                <option value="3">السنة الثالثة</option>
+                                <option value="4">السنة الرابعة</option>
+                                <option value="5">السنة الخامسة</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">نوع المحتوى</label>
+                            <select id="uploadType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">اختر النوع</option>
+                                <option value="slides">سلايدات</option>
+                                <option value="recordings">تسجيلات</option>
+                                <option value="summaries">ملخصات</option>
+                                <option value="books">كتب</option>
+                                <option value="exams">امتحانات</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف المحتوى</label>
+                        <textarea id="uploadDescription" rows="3"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="وصف مختصر للمحتوى..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200 font-medium">
+                        📤 رفع الملف
+                    </button>
+                </form>
+
+                <button onclick="closeModal('uploadModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GPA Calculator Modal -->
+    <div id="gpaModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 welcome-popup max-h-[90vh] overflow-y-auto">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">🎯</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">حاسبة المعدل التراكمي</h2>
+                    <p class="text-gray-600">احسب معدلك التراكمي والفصلي بدقة</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-green-50 rounded-lg p-4">
+                        <h3 class="font-semibold text-green-800 mb-2">المعدل الحالي</h3>
+                        <div class="text-3xl font-bold text-green-600" id="currentGPA">0.00</div>
+                        <div class="text-sm text-green-600" id="gpaGrade">غير محدد</div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-gray-900">المواد الدراسية</h3>
+                            <button onclick="addSubjectRow()" class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">
+                                ➕ إضافة مادة
+                            </button>
+                        </div>
+                        
+                        <div id="subjectsContainer" class="space-y-3">
+                            <!-- Subject rows will be added here -->
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2 space-x-reverse">
+                        <button onclick="calculateGPA()" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                            📊 حساب المعدل
+                        </button>
+                        <button onclick="clearGPA()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            🗑️ مسح
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="closeModal('gpaModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Study Timer Modal -->
+    <div id="timerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 welcome-popup">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">⏰</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">مؤقت الدراسة</h2>
+                    <p class="text-gray-600">تقنية البومودورو للدراسة الفعالة</p>
+                </div>
+
+                <div class="text-center mb-6">
+                    <div class="text-6xl font-bold text-blue-600 mb-4" id="timerDisplay">25:00</div>
+                    <div class="text-lg text-gray-600" id="timerStatus">جاهز للبدء</div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setTimer(25)" class="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors text-sm">
+                            25 دقيقة
+                        </button>
+                        <button onclick="setTimer(15)" class="px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors text-sm">
+                            15 دقيقة
+                        </button>
+                        <button onclick="setTimer(5)" class="px-3 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors text-sm">
+                            5 دقائق
+                        </button>
+                    </div>
+
+                    <div class="flex space-x-2 space-x-reverse">
+                        <button onclick="startTimer()" id="startTimerBtn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                            ▶️ بدء
+                        </button>
+                        <button onclick="pauseTimer()" id="pauseTimerBtn" class="flex-1 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors hidden">
+                            ⏸️ إيقاف
+                        </button>
+                        <button onclick="resetTimer()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            🔄 إعادة
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="closeModal('timerModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
                     <span class="text-xl">✕</span>
                 </button>
             </div>
@@ -1264,7 +1675,7 @@
             currentTab = tabName;
             
             // Hide all sections
-            const sections = ['welcomeSection', 'loginSection', 'registerSection', 'materialsSection', 'postsSection', 'chatSection', 'profileSection', 'adminSection'];
+            const sections = ['welcomeSection', 'loginSection', 'registerSection', 'materialsSection', 'postsSection', 'chatSection', 'examsSection', 'toolsSection', 'profileSection', 'adminSection'];
             sections.forEach(sectionId => {
                 const section = document.getElementById(sectionId);
                 if (section) {
@@ -1299,6 +1710,12 @@
                     break;
                 case 'materials':
                     loadMaterials(currentYear);
+                    break;
+                case 'exams':
+                    loadExams();
+                    break;
+                case 'tools':
+                    // Tools section is static, no loading needed
                     break;
                 case 'profile':
                     loadProfile();
@@ -2098,6 +2515,342 @@
             return labels[type] || 'مواد';
         }
 
+        // File upload functions
+        let selectedFile = null;
+
+        function showUploadModal() {
+            const modal = document.getElementById('uploadModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+            event.target.classList.remove('dragover');
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.target.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.target.classList.remove('dragover');
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+        }
+
+        function handleFileSelection(file) {
+            selectedFile = file;
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            
+            if (fileInfo && fileName && fileSize) {
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.classList.remove('hidden');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Filter materials function
+        function filterMaterials() {
+            const searchTerm = document.getElementById('materialSearch')?.value.toLowerCase() || '';
+            const typeFilter = document.getElementById('materialTypeFilter')?.value || '';
+            
+            // This would filter the displayed materials based on search and type
+            // For now, just reload materials for the current year
+            loadMaterials(currentYear);
+        }
+
+        // Exam functions
+        function loadExams() {
+            // Load exam data - for now showing static content
+            console.log('Loading exams...');
+        }
+
+        function switchExamCategory(category) {
+            // Update exam category tabs
+            document.querySelectorAll('.exam-category-tab').forEach(tab => {
+                tab.classList.remove('bg-green-600', 'text-white');
+                tab.classList.add('text-gray-700', 'hover:bg-gray-100');
+            });
+            
+            const activeTab = document.querySelector(`[data-category="${category}"]`);
+            if (activeTab) {
+                activeTab.classList.add('bg-green-600', 'text-white');
+                activeTab.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            }
+            
+            // Load exams for this category
+            console.log(`Loading exams for category: ${category}`);
+        }
+
+        function startExam(examId) {
+            showNotification(`بدء الامتحان: ${examId}`, 'info');
+            // Here you would implement the exam interface
+        }
+
+        function showCreateExamModal() {
+            showNotification('إنشاء الامتحانات متاح للمدراء قريباً', 'info');
+        }
+
+        function showExamStatsModal() {
+            showNotification('إحصائيات الامتحانات ستتوفر قريباً', 'info');
+        }
+
+        // Tools functions
+        function showGPACalculator() {
+            const modal = document.getElementById('gpaModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                initializeGPACalculator();
+            }
+        }
+
+        function showStudyTimer() {
+            const modal = document.getElementById('timerModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                resetTimer();
+            }
+        }
+
+        function showNoteMaker() {
+            showNotification('صانع الملاحظات سيتوفر قريباً', 'info');
+        }
+
+        function showSchedulePlanner() {
+            showNotification('منظم الجدول سيتوفر قريباً', 'info');
+        }
+
+        function showPDFTools() {
+            showNotification('أدوات PDF ستتوفر قريباً', 'info');
+        }
+
+        function showQuickQuiz() {
+            showNotification('الاختبار السريع سيتوفر قريباً', 'info');
+        }
+
+        // GPA Calculator functions
+        let subjectCount = 0;
+
+        function initializeGPACalculator() {
+            const container = document.getElementById('subjectsContainer');
+            if (container) {
+                container.innerHTML = '';
+                subjectCount = 0;
+                addSubjectRow();
+                addSubjectRow();
+                addSubjectRow();
+            }
+        }
+
+        function addSubjectRow() {
+            subjectCount++;
+            const container = document.getElementById('subjectsContainer');
+            if (!container) return;
+
+            const row = document.createElement('div');
+            row.className = 'grid grid-cols-4 gap-3 items-center';
+            row.innerHTML = `
+                <input type="text" placeholder="اسم المادة" 
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500">
+                <input type="number" placeholder="الساعات" min="1" max="6" 
+                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500">
+                <select class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500">
+                    <option value="">الدرجة</option>
+                    <option value="4.0">A+ (4.0)</option>
+                    <option value="3.7">A (3.7)</option>
+                    <option value="3.3">B+ (3.3)</option>
+                    <option value="3.0">B (3.0)</option>
+                    <option value="2.7">C+ (2.7)</option>
+                    <option value="2.0">C (2.0)</option>
+                    <option value="1.0">D (1.0)</option>
+                    <option value="0.0">F (0.0)</option>
+                </select>
+                <button onclick="removeSubjectRow(this)" class="px-2 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">
+                    🗑️
+                </button>
+            `;
+            container.appendChild(row);
+        }
+
+        function removeSubjectRow(button) {
+            if (subjectCount > 1) {
+                button.parentElement.remove();
+                subjectCount--;
+            }
+        }
+
+        function calculateGPA() {
+            const container = document.getElementById('subjectsContainer');
+            if (!container) return;
+
+            const rows = container.children;
+            let totalPoints = 0;
+            let totalHours = 0;
+            let validSubjects = 0;
+
+            for (let row of rows) {
+                const inputs = row.querySelectorAll('input, select');
+                const hours = parseFloat(inputs[1].value) || 0;
+                const grade = parseFloat(inputs[2].value);
+
+                if (hours > 0 && !isNaN(grade)) {
+                    totalPoints += grade * hours;
+                    totalHours += hours;
+                    validSubjects++;
+                }
+            }
+
+            if (totalHours > 0) {
+                const gpa = totalPoints / totalHours;
+                const gpaElement = document.getElementById('currentGPA');
+                const gradeElement = document.getElementById('gpaGrade');
+                
+                if (gpaElement && gradeElement) {
+                    gpaElement.textContent = gpa.toFixed(2);
+                    gradeElement.textContent = getGPAGrade(gpa);
+                }
+                
+                showNotification(`تم حساب المعدل: ${gpa.toFixed(2)}`, 'success');
+            } else {
+                showNotification('يرجى إدخال بيانات صحيحة للمواد', 'error');
+            }
+        }
+
+        function getGPAGrade(gpa) {
+            if (gpa >= 3.7) return 'ممتاز';
+            if (gpa >= 3.3) return 'جيد جداً مرتفع';
+            if (gpa >= 3.0) return 'جيد جداً';
+            if (gpa >= 2.7) return 'جيد مرتفع';
+            if (gpa >= 2.0) return 'جيد';
+            if (gpa >= 1.0) return 'مقبول';
+            return 'راسب';
+        }
+
+        function clearGPA() {
+            const container = document.getElementById('subjectsContainer');
+            const gpaElement = document.getElementById('currentGPA');
+            const gradeElement = document.getElementById('gpaGrade');
+            
+            if (container) {
+                container.innerHTML = '';
+                subjectCount = 0;
+                addSubjectRow();
+            }
+            
+            if (gpaElement) gpaElement.textContent = '0.00';
+            if (gradeElement) gradeElement.textContent = 'غير محدد';
+        }
+
+        // Study Timer functions
+        let timerInterval = null;
+        let timerMinutes = 25;
+        let timerSeconds = 0;
+        let isTimerRunning = false;
+
+        function setTimer(minutes) {
+            timerMinutes = minutes;
+            timerSeconds = 0;
+            updateTimerDisplay();
+            
+            const statusElement = document.getElementById('timerStatus');
+            if (statusElement) {
+                statusElement.textContent = `${minutes} دقيقة - جاهز للبدء`;
+            }
+        }
+
+        function startTimer() {
+            if (isTimerRunning) return;
+            
+            isTimerRunning = true;
+            const startBtn = document.getElementById('startTimerBtn');
+            const pauseBtn = document.getElementById('pauseTimerBtn');
+            const statusElement = document.getElementById('timerStatus');
+            
+            if (startBtn) startBtn.classList.add('hidden');
+            if (pauseBtn) pauseBtn.classList.remove('hidden');
+            if (statusElement) statusElement.textContent = 'جاري العد التنازلي...';
+            
+            timerInterval = setInterval(() => {
+                if (timerSeconds > 0) {
+                    timerSeconds--;
+                } else if (timerMinutes > 0) {
+                    timerMinutes--;
+                    timerSeconds = 59;
+                } else {
+                    // Timer finished
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    showNotification('انتهى وقت الدراسة! 🎉', 'success');
+                    resetTimerButtons();
+                    if (statusElement) statusElement.textContent = 'انتهى الوقت!';
+                    return;
+                }
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (!isTimerRunning) return;
+            
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            resetTimerButtons();
+            
+            const statusElement = document.getElementById('timerStatus');
+            if (statusElement) statusElement.textContent = 'متوقف مؤقتاً';
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerMinutes = 25;
+            timerSeconds = 0;
+            updateTimerDisplay();
+            resetTimerButtons();
+            
+            const statusElement = document.getElementById('timerStatus');
+            if (statusElement) statusElement.textContent = 'جاهز للبدء';
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timerDisplay');
+            if (display) {
+                const mins = timerMinutes.toString().padStart(2, '0');
+                const secs = timerSeconds.toString().padStart(2, '0');
+                display.textContent = `${mins}:${secs}`;
+            }
+        }
+
+        function resetTimerButtons() {
+            const startBtn = document.getElementById('startTimerBtn');
+            const pauseBtn = document.getElementById('pauseTimerBtn');
+            
+            if (startBtn) startBtn.classList.remove('hidden');
+            if (pauseBtn) pauseBtn.classList.add('hidden');
+        }
+
         // وظائف إضافية للمدير
         function showAddSubjectModal() {
             showAddMaterialModal();
@@ -2108,6 +2861,15 @@
         }
 
         function setupAdminEventListeners() {
+            // Upload form
+            const uploadForm = document.getElementById('uploadForm');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleFileUpload();
+                });
+            }
+
             // زر إضافة مادة جديدة
             const addSubjectBtn = document.getElementById("addSubjectBtn");
             if (addSubjectBtn) {
@@ -2134,26 +2896,34 @@
                     showNotification("الميزة فعالة الآن أو ستتوفر قريبًا!", 'info');
                 });
             });
+        }
 
-            // مشكلة اختيار المادة عند رفع الملفات
-            const fileInput = document.getElementById("fileInput");
-            if (fileInput) {
-                fileInput.addEventListener("click", function() {
-                    const materialSelected = !!document.getElementById("subjectTitle")?.textContent;
-                    if (!materialSelected) {
-                        showNotification("يرجى اختيار المادة أولاً", 'warning');
-                        return false;
-                    }
-                });
+        function handleFileUpload() {
+            if (!selectedFile) {
+                showNotification('يرجى اختيار ملف أولاً', 'error');
+                return;
             }
 
-            // إخفاء رسالة التحذير عند اختيار المادة
-            document.querySelectorAll(".material-card").forEach(card => {
-                card.addEventListener("click", () => {
-                    const warning = document.getElementById("selectMaterialWarning");
-                    if (warning) warning.style.display = "none";
-                });
-            });
+            const title = document.getElementById('uploadTitle').value.trim();
+            const year = document.getElementById('uploadYear').value;
+            const type = document.getElementById('uploadType').value;
+            const description = document.getElementById('uploadDescription').value.trim();
+
+            if (!title || !year || !type) {
+                showNotification('يرجى إدخال جميع البيانات المطلوبة', 'error');
+                return;
+            }
+
+            // Simulate file upload (in real app, you'd upload to server)
+            const fileURL = URL.createObjectURL(selectedFile);
+            
+            if (addMaterial(title, year, type, fileURL, description)) {
+                closeModal('uploadModal');
+                document.getElementById('uploadForm').reset();
+                document.getElementById('fileInfo').classList.add('hidden');
+                selectedFile = null;
+                showNotification('تم رفع الملف بنجاح!', 'success');
+            }
         }
 
         // Initialize app when page loads
@@ -2193,5 +2963,5 @@
             }
         }, 60000);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97878034738632ae',t:'MTc1Njc1ODM2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97878bbb238832ae',t:'MTc1Njc1ODgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

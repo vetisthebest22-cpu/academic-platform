@@ -1293,35 +1293,36 @@
 
         // Initialize Firebase
         function initializeFirebase() {
+            // إخفاء شاشة التحميل فوراً وبدء التطبيق
+            setTimeout(() => {
+                hideLoadingOverlay();
+                updateConnectionStatus('offline');
+                loadDataFromLocalStorage();
+                initializeApp();
+            }, 1000);
+
             try {
-                // تهيئة Firebase الحقيقي
+                // محاولة تهيئة Firebase في الخلفية
                 firebase.initializeApp(firebaseConfig);
                 database = firebase.database();
                 storage = firebase.storage();
                 
-                // اختبار الاتصال
+                // اختبار الاتصال في الخلفية
                 database.ref('.info/connected').on('value', function(snapshot) {
                     if (snapshot.val() === true) {
                         isFirebaseConnected = true;
                         updateConnectionStatus('online');
-                        hideLoadingOverlay();
+                        // تحميل البيانات من Firebase في الخلفية
                         loadDataFromFirebase();
                     } else {
                         isFirebaseConnected = false;
                         updateConnectionStatus('offline');
-                        // استخدام localStorage كبديل
-                        loadDataFromLocalStorage();
-                        initializeApp();
                     }
                 });
                 
             } catch (error) {
                 console.error('Firebase initialization failed:', error);
                 updateConnectionStatus('offline');
-                hideLoadingOverlay();
-                // Fallback to localStorage
-                loadDataFromLocalStorage();
-                initializeApp();
             }
         }
 
@@ -1371,31 +1372,25 @@
 
         function loadDataFromFirebase() {
             if (!isFirebaseConnected) {
-                loadDataFromLocalStorage();
                 return;
             }
 
             try {
-                // تحميل البيانات من Firebase الحقيقي
+                // تحميل البيانات من Firebase في الخلفية دون انتظار
                 database.ref().once('value').then((snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         academicData = { ...academicData, ...data };
                         console.log('تم تحميل البيانات من Firebase بنجاح');
-                    } else {
-                        console.log('لا توجد بيانات في Firebase، استخدام البيانات الافتراضية');
+                        // حفظ البيانات محلياً للمرة القادمة
+                        saveDataToLocalStorage();
                     }
-                    initializeApp();
                 }).catch((error) => {
                     console.error('فشل في تحميل البيانات من Firebase:', error);
-                    loadDataFromLocalStorage();
-                    initializeApp();
                 });
                 
             } catch (error) {
                 console.error('Firebase load failed:', error);
-                loadDataFromLocalStorage();
-                initializeApp();
             }
         }
 
@@ -2172,10 +2167,5 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 space-x-reverse">
-                    <button onclick="toggleBookmark('${material.id}')" 
-                            class="px-3 py-1 text-sm ${isBookmarked ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-yellow-200">
-                        ${isBookmarked ? '🔖 محفوظ' : '🔖 حفظ'}
-                    </button>
-                    <button onclick="toggleFavorite('${material.id}')" 
-                            class="px-3 py-1 text-sm ${isFavorite ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'} rounded hover:bg-red-200">
-                        ${isFavorite ? '❤️ مفضل' : '❤<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786e1a8253e32ae',t:'MTc1Njc1MTg3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>{var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786906a546d32ae',t:'MTc1Njc0ODU0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+                    <button onclick="toggleBookmark('${material.id}')"
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786ee1cd01532ae',t:'MTc1Njc1MjM4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

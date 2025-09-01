@@ -176,14 +176,6 @@
         🔄 جاري الاتصال...
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg p-8 text-center">
-            <div class="loading-spinner mx-auto mb-4"></div>
-            <p class="text-gray-700">جاري تحميل البيانات...</p>
-        </div>
-    </div>
-
     <!-- Login/Home Page -->
     <div id="homePage" class="min-h-screen">
         <!-- Header -->
@@ -327,7 +319,7 @@
                         <!-- Online Users Count -->
                         <div class="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
                             <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                            <span id="onlineUsersCount">0</span>
+                            <span id="onlineUsersCount">1</span>
                             <span>متصل</span>
                         </div>
 
@@ -397,7 +389,14 @@
                             </button>
                         </div>
                         <div class="space-y-2" id="sidebarAnnouncements">
-                            <!-- Announcements will be loaded here -->
+                            <div class="text-xs text-purple-700 bg-white rounded p-2 border border-purple-200">
+                                <div class="font-medium">تحديث مواد السنة الثالثة</div>
+                                <div class="text-purple-600 mt-1">تم إضافة محاضرات جديدة</div>
+                            </div>
+                            <div class="text-xs text-purple-700 bg-white rounded p-2 border border-purple-200">
+                                <div class="font-medium">موعد الامتحانات</div>
+                                <div class="text-purple-600 mt-1">جدول الامتحانات النهائية</div>
+                            </div>
                         </div>
                     </div>
 
@@ -582,7 +581,36 @@
 
                     <!-- Subjects Grid -->
                     <div id="subjectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Subjects will be populated here -->
+                        <!-- Sample subjects for demonstration -->
+                        <div class="material-card rounded-xl p-6 cursor-pointer" onclick="showSampleSubject()">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-xl">📚</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">علم التشريح</h3>
+                            <p class="text-gray-600 text-sm mb-4">دراسة تركيب الجسم والأعضاء</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>📑 12 سلايد</span>
+                                <span>🎙️ 8 تسجيل</span>
+                                <span>📝 5 ملخص</span>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card rounded-xl p-6 cursor-pointer" onclick="showSampleSubject()">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-xl">📚</span>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">علم وظائف الأعضاء</h3>
+                            <p class="text-gray-600 text-sm mb-4">دراسة وظائف أعضاء الجسم</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span>📑 15 سلايد</span>
+                                <span>🎙️ 10 تسجيل</span>
+                                <span>📝 7 ملخص</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -596,7 +624,7 @@
 
                     <!-- Subject Header -->
                     <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-2" id="subjectTitle">اسم المادة</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2" id="subjectTitle">علم التشريح</h2>
                         <p class="text-gray-600" id="subjectInfo">السنة الأولى - الفصل الأول</p>
                     </div>
 
@@ -604,7 +632,7 @@
                     <div class="bg-white rounded-lg shadow-md mb-6 border border-gray-100">
                         <div class="border-b border-gray-200">
                             <nav class="flex space-x-8 space-x-reverse px-6">
-                                <button class="material-tab py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium flex items-center space-x-2 space-x-reverse active" 
+                                <button class="material-tab py-4 px-2 border-b-2 border-purple-500 text-purple-600 font-medium flex items-center space-x-2 space-x-reverse active" 
                                         data-type="slides" onclick="switchMaterialTab('slides')">
                                     <span>📑</span>
                                     <span>السلايدات</span>
@@ -667,11 +695,21 @@
                         </div>
                         <div class="p-6">
                             <div id="materialsList" class="space-y-4">
-                                <!-- Materials will be populated here -->
-                            </div>
-                            <div id="emptyState" class="text-center py-8 text-gray-500">
-                                <div class="text-4xl mb-4">📂</div>
-                                <p>لا توجد ملفات بعد. ابدأ برفع أول ملف!</p>
+                                <!-- Sample materials -->
+                                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                    <div class="flex items-center space-x-3 space-x-reverse flex-1">
+                                        <span class="text-2xl">📄</span>
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-gray-900">مقدمة في علم التشريح</h4>
+                                            <p class="text-sm text-gray-500">2.5 MB • 15 يناير 2024</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <button class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">📑</button>
+                                        <button class="p-2 text-gray-400 hover:text-red-500 transition-colors">🤍</button>
+                                        <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">📥 تحميل</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -682,105 +720,10 @@
         <!-- Posts Section -->
         <div id="postsSection" class="hidden p-6 bg-gray-50 min-h-screen">
             <div class="max-w-4xl mx-auto">
-                <!-- Create Post Button -->
-                <div class="mb-6">
-                    <button id="createPostBtn" class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-md flex items-center justify-center space-x-2 space-x-reverse" onclick="showCreatePost()">
-                        <span>✏️</span>
-                        <span>إنشاء منشور جديد</span>
-                    </button>
-                </div>
-
-                <!-- Create Post Form -->
-                <div id="createPostSection" class="hidden bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">إنشاء منشور جديد</h3>
-                    
-                    <!-- Post Type Selection -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المنشور</label>
-                        <div class="flex space-x-4 space-x-reverse">
-                            <button class="post-type-btn px-4 py-2 bg-purple-600 text-white rounded-lg font-medium active" data-type="normal" onclick="selectPostType('normal')">
-                                📝 منشور عادي
-                            </button>
-                            <button class="post-type-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium" data-type="poll" onclick="selectPostType('poll')">
-                                📊 استطلاع رأي
-                            </button>
-                            <button class="post-type-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium" data-type="announcement" onclick="selectPostType('announcement')">
-                                📢 إعلان رسمي
-                            </button>
-                        </div>
-                    </div>
-
-                    <form id="createPostForm" class="space-y-4">
-                        <!-- Post Content -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">محتوى المنشور</label>
-                            <textarea id="postContent" rows="4" required
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"
-                                      placeholder="اكتب محتوى المنشور هنا..."></textarea>
-                        </div>
-
-                        <!-- Poll Options (Hidden by default) -->
-                        <div id="pollOptions" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">خيارات الاستطلاع</label>
-                            <div id="pollChoices" class="space-y-2">
-                                <input type="text" class="poll-choice w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="الخيار الأول">
-                                <input type="text" class="poll-choice w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="الخيار الثاني">
-                            </div>
-                            <button type="button" onclick="addPollChoice()" class="mt-2 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200">
-                                ➕ إضافة خيار
-                            </button>
-                        </div>
-
-                        <!-- Target Year -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">استهداف السنة</label>
-                            <select id="targetYear" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                <option value="all">جميع السنوات</option>
-                                <option value="1">السنة الأولى</option>
-                                <option value="2">السنة الثانية</option>
-                                <option value="3">السنة الثالثة</option>
-                                <option value="4">السنة الرابعة</option>
-                                <option value="5">السنة الخامسة</option>
-                            </select>
-                        </div>
-
-                        <!-- Priority -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">الأولوية</label>
-                            <select id="postPriority" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                                <option value="normal">عادي</option>
-                                <option value="important">مهم</option>
-                                <option value="urgent">عاجل</option>
-                            </select>
-                        </div>
-
-                        <!-- Images -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">الصور (اختياري)</label>
-                            <input type="file" id="postImages" multiple accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                        </div>
-
-                        <div class="flex space-x-3 space-x-reverse">
-                            <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-medium">
-                                📝 نشر المنشور
-                            </button>
-                            <button type="button" onclick="cancelCreatePost()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 font-medium">
-                                إلغاء
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Posts Feed -->
-                <div id="postsFeed" class="space-y-6">
-                    <!-- Posts will be populated here -->
-                </div>
-
-                <!-- Empty State -->
-                <div id="postsEmptyState" class="text-center py-16">
+                <div class="text-center py-16">
                     <div class="text-6xl mb-4">📝</div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات بعد</h3>
-                    <p class="text-gray-600">ابدأ بإنشاء أول منشور!</p>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">قسم المنشورات</h3>
+                    <p class="text-gray-600">سيتم إضافة المنشورات والإعلانات هنا</p>
                 </div>
             </div>
         </div>
@@ -791,34 +734,15 @@
                 <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-2xl font-bold text-gray-900">📅 جدول الامتحانات</h2>
-                        <button id="addExamBtn" class="hidden px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium" onclick="showAddExamModal()">
+                        <button id="addExamBtn" class="hidden px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
                             ➕ إضافة امتحان
                         </button>
                     </div>
                     
-                    <!-- Year Filter -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اختر السنة الدراسية</label>
-                        <select id="examYearFilter" onchange="filterExams()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <option value="all">جميع السنوات</option>
-                            <option value="1">السنة الأولى</option>
-                            <option value="2">السنة الثانية</option>
-                            <option value="3">السنة الثالثة</option>
-                            <option value="4">السنة الرابعة</option>
-                            <option value="5">السنة الخامسة</option>
-                        </select>
-                    </div>
-
-                    <!-- Exams Calendar -->
-                    <div id="examsCalendar" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Exams will be populated here -->
-                    </div>
-
-                    <!-- Empty State -->
-                    <div id="examsEmptyState" class="text-center py-16 hidden">
+                    <div class="text-center py-16">
                         <div class="text-6xl mb-4">📅</div>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد امتحانات مجدولة</h3>
-                        <p class="text-gray-600">ابدأ بإضافة أول امتحان!</p>
+                        <p class="text-gray-600">سيتم عرض جدول الامتحانات هنا</p>
                     </div>
                 </div>
             </div>
@@ -839,7 +763,10 @@
 
                     <!-- Chat Messages -->
                     <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-4">
-                        <!-- Messages will be loaded here -->
+                        <div class="text-center text-gray-500 py-8">
+                            <div class="text-4xl mb-2">💬</div>
+                            <p>ابدأ محادثة جديدة!</p>
+                        </div>
                     </div>
 
                     <!-- Chat Input -->
@@ -859,7 +786,11 @@
 
         <!-- Admin Section -->
         <div id="adminSection" class="hidden p-6 bg-gray-50 min-h-screen">
-            <!-- Admin Dashboard will be added here -->
+            <div class="text-center py-16">
+                <div class="text-6xl mb-4">👨‍💼</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">لوحة تحكم المدير</h3>
+                <p class="text-gray-600">إدارة المنصة والمستخدمين</p>
+            </div>
         </div>
     </div>
 
@@ -1022,212 +953,7 @@
         </div>
     </div>
 
-    <!-- Add Subject Modal -->
-    <div id="addSubjectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">إضافة مادة جديدة</h3>
-                
-                <form id="addSubjectForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
-                        <input type="text" id="subjectName" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                               placeholder="مثال: علم التشريح">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف المادة (اختياري)</label>
-                        <textarea id="subjectDescription" rows="3"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"
-                                  placeholder="وصف مختصر عن المادة..."></textarea>
-                    </div>
-                    
-                    <div class="flex space-x-3 space-x-reverse">
-                        <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-medium">
-                            ➕ إضافة المادة
-                        </button>
-                        <button type="button" onclick="closeModal('addSubjectModal')" 
-                                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 font-medium">
-                            إلغاء
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Logo Settings Modal -->
-    <div id="logoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">🖼️ تعديل شعار المنصة</h3>
-                
-                <div class="space-y-4">
-                    <div class="text-center">
-                        <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <img id="logoPreview" src="" alt="" class="w-full h-full rounded-full object-cover hidden">
-                            <span id="logoPreviewDefault" class="text-white text-2xl">🏥</span>
-                        </div>
-                        <p class="text-sm text-gray-600">الشعار الحالي</p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">رفع شعار جديد</label>
-                        <input type="file" id="logoInput" accept="image/*" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                        <p class="text-xs text-gray-500 mt-1">يفضل الصور المربعة بحجم 200x200 بكسل أو أكبر</p>
-                    </div>
-                    
-                    <div class="flex space-x-3 space-x-reverse">
-                        <button onclick="updateLogo()" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-medium">
-                            💾 حفظ الشعار
-                        </button>
-                        <button onclick="resetLogo()" class="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
-                            🔄 إعادة تعيين
-                        </button>
-                        <button onclick="closeModal('logoModal')" class="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
-                            إلغاء
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Announcements Modal -->
-    <div id="editAnnouncementsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">📢 تعديل الإعلانات الأكاديمية</h3>
-                
-                <div class="space-y-4 mb-6">
-                    <div id="announcementsList">
-                        <!-- Announcements will be loaded here -->
-                    </div>
-                    
-                    <button onclick="addNewAnnouncement()" class="w-full py-2 px-4 border-2 border-dashed border-purple-300 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors">
-                        ➕ إضافة إعلان جديد
-                    </button>
-                </div>
-                
-                <div class="flex space-x-3 space-x-reverse">
-                    <button onclick="saveAnnouncements()" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-medium">
-                        💾 حفظ التغييرات
-                    </button>
-                    <button onclick="closeModal('editAnnouncementsModal')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 font-medium">
-                        إلغاء
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Picture Modal -->
-    <div id="profilePictureModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">📷 تغيير الصورة الشخصية</h3>
-                
-                <div class="space-y-4">
-                    <div class="text-center">
-                        <div class="w-24 h-24 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg overflow-hidden">
-                            <img id="profilePreview" src="" alt="" class="w-full h-full object-cover hidden">
-                            <span id="profilePreviewDefault" class="text-white text-2xl">👤</span>
-                        </div>
-                        <p class="text-sm text-gray-600">الصورة الحالية</p>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">رفع صورة جديدة</label>
-                        <input type="file" id="profilePictureInput" accept="image/*" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                        <p class="text-xs text-gray-500 mt-1">يفضل الصور المربعة بحجم 200x200 بكسل أو أكبر</p>
-                    </div>
-                    
-                    <div class="flex space-x-3 space-x-reverse">
-                        <button onclick="updateProfilePicture()" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-medium">
-                            💾 حفظ الصورة
-                        </button>
-                        <button onclick="removeProfilePicture()" class="px-4 py-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium">
-                            🗑️ إزالة
-                        </button>
-                        <button onclick="closeModal('profilePictureModal')" class="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium">
-                            إلغاء
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Exam Modal -->
-    <div id="addExamModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">📅 إضافة امتحان جديد</h3>
-                
-                <form id="addExamForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
-                        <input type="text" id="examSubject" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                               placeholder="مثال: علم التشريح">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
-                        <select id="examYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                            <option value="">اختر السنة</option>
-                            <option value="1">السنة الأولى</option>
-                            <option value="2">السنة الثانية</option>
-                            <option value="3">السنة الثالثة</option>
-                            <option value="4">السنة الرابعة</option>
-                            <option value="5">السنة الخامسة</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ الامتحان</label>
-                        <input type="date" id="examDate" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">وقت الامتحان</label>
-                        <input type="time" id="examTime" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">مكان الامتحان</label>
-                        <input type="text" id="examLocation" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                               placeholder="مثال: قاعة المحاضرات الكبرى">
-                    </div>
-                    
-                    <div class="flex space-x-3 space-x-reverse">
-                        <button type="submit" class="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 font-medium">
-                            ➕ إضافة الامتحان
-                        </button>
-                        <button type="button" onclick="closeModal('addExamModal')" 
-                                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 font-medium">
-                            إلغاء
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // JSONBin.io Configuration - بديل مجاني لـ Firebase
-        const JSONBIN_CONFIG = {
-            binId: '67a0b8c8e41b4d34e4651234', // سيتم إنشاؤه تلقائياً
-            apiKey: '$2a$10$YourAPIKeyHere', // مفتاح API مجاني من JSONBin.io
-            baseUrl: 'https://api.jsonbin.io/v3'
-        };
-
         // Application State
         let currentUser = null;
         let currentYear = null;
@@ -1236,9 +962,14 @@
         let currentMaterialType = 'slides';
         let currentExamType = 'mid';
         let currentMainTab = 'academic';
-        let currentPostType = 'normal';
-        let onlineUsers = new Set();
         let isOnline = false;
+        
+        // JSONBin.io Configuration
+        const JSONBIN_CONFIG = {
+            apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
+            binId: localStorage.getItem('jsonbin_id') || null,
+            baseUrl: 'https://api.jsonbin.io/v3'
+        };
         
         // Data structure
         let academicData = {
@@ -1282,58 +1013,89 @@
 
         // Initialize the application
         function initializeApp() {
-            // إخفاء شاشة التحميل فوراً
-            setTimeout(() => {
-                hideLoadingOverlay();
-                updateConnectionStatus('connecting');
-                loadDataFromCloud();
-            }, 1000);
-
             setupEventListeners();
             checkLoginStatus();
-            
-            // محاولة الاتصال بـ JSONBin
+            updateConnectionStatus('connecting');
             connectToCloud();
         }
 
-        function hideLoadingOverlay() {
-            document.getElementById('loadingOverlay').classList.add('hidden');
-        }
-
-        // Cloud Database Functions using JSONBin.io
+        // Cloud connection functions
         async function connectToCloud() {
             try {
-                // اختبار الاتصال
-                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.apiKey,
-                        'X-Bin-Meta': 'false'
-                    }
-                });
-
-                if (response.ok) {
-                    isOnline = true;
-                    updateConnectionStatus('online');
-                    console.log('متصل بقاعدة البيانات السحابية');
+                updateConnectionStatus('connecting');
+                
+                if (JSONBIN_CONFIG.binId) {
+                    // Try to load existing data
+                    await loadDataFromCloud();
                 } else {
-                    throw new Error('فشل الاتصال');
+                    // Create new bin with initial data
+                    await createCloudBin();
                 }
+                
+                updateConnectionStatus('online');
+                isOnline = true;
+                
+                // Start periodic sync
+                setInterval(syncWithCloud, 30000); // Sync every 30 seconds
+                
             } catch (error) {
-                console.error('فشل الاتصال بقاعدة البيانات:', error);
-                isOnline = false;
+                console.error('فشل الاتصال بالسحابة:', error);
                 updateConnectionStatus('offline');
-                // استخدام البيانات المحلية
                 loadDataFromLocalStorage();
             }
         }
 
-        async function saveDataToCloud() {
-            if (!isOnline) {
-                saveDataToLocalStorage();
-                return;
+        async function createCloudBin() {
+            const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_CONFIG.apiKey,
+                    'X-Bin-Name': 'Academic Platform Data',
+                    'X-Bin-Private': 'false'
+                },
+                body: JSON.stringify(academicData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
+            const result = await response.json();
+            JSONBIN_CONFIG.binId = result.metadata.id;
+            localStorage.setItem('jsonbin_id', JSONBIN_CONFIG.binId);
+            
+            console.log('تم إنشاء قاعدة البيانات السحابية بنجاح');
+        }
+
+        async function loadDataFromCloud() {
+            const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
+                headers: {
+                    'X-Master-Key': JSONBIN_CONFIG.apiKey
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const cloudData = await response.json();
+            
+            // Merge cloud data with local data
+            academicData = { ...academicData, ...cloudData.record };
+            saveDataToLocalStorage();
+            
+            console.log('تم تحميل البيانات من السحابة');
+            
+            // Update UI if chat messages exist
+            if (academicData.chatMessages && academicData.chatMessages.length > 0) {
+                loadChatMessages();
+            }
+        }
+
+        async function saveDataToCloud() {
+            if (!isOnline || !JSONBIN_CONFIG.binId) return;
+            
             try {
                 academicData.lastUpdated = new Date().toISOString();
                 
@@ -1346,52 +1108,37 @@
                     body: JSON.stringify(academicData)
                 });
 
-                if (response.ok) {
-                    console.log('تم حفظ البيانات في السحابة بنجاح');
-                    // حفظ نسخة محلية أيضاً
-                    saveDataToLocalStorage();
-                } else {
-                    throw new Error('فشل في حفظ البيانات');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
+                console.log('تم حفظ البيانات في السحابة');
+                
             } catch (error) {
-                console.error('خطأ في حفظ البيانات:', error);
-                // حفظ محلي كبديل
-                saveDataToLocalStorage();
+                console.error('خطأ في حفظ البيانات في السحابة:', error);
             }
         }
 
-        async function loadDataFromCloud() {
-            if (!isOnline) {
-                loadDataFromLocalStorage();
-                return;
-            }
-
+        async function syncWithCloud() {
+            if (!isOnline) return;
+            
             try {
-                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.apiKey,
-                        'X-Bin-Meta': 'false'
-                    }
-                });
-
-                if (response.ok) {
-                    const cloudData = await response.json();
-                    academicData = { ...academicData, ...cloudData };
-                    console.log('تم تحميل البيانات من السحابة بنجاح');
-                    // حفظ نسخة محلية
-                    saveDataToLocalStorage();
-                } else {
-                    throw new Error('فشل في تحميل البيانات');
-                }
+                // Save current data to cloud
+                await saveDataToCloud();
+                
+                // Load latest data from cloud
+                await loadDataFromCloud();
+                
+                // Update online users count
+                updateOnlineUsersCount();
+                
             } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
-                // استخدام البيانات المحلية
-                loadDataFromLocalStorage();
+                console.error('خطأ في المزامنة:', error);
+                updateConnectionStatus('offline');
+                isOnline = false;
             }
         }
 
-        // Connection status management
         function updateConnectionStatus(status) {
             const statusElement = document.getElementById('connectionStatus');
             statusElement.className = `connection-status ${status}`;
@@ -1409,7 +1156,6 @@
             }
         }
 
-        // Fallback to localStorage
         function saveDataToLocalStorage() {
             try {
                 localStorage.setItem('academicData', JSON.stringify(academicData));
@@ -1432,27 +1178,35 @@
             }
         }
 
-        // Auto-sync every 30 seconds when online
-        setInterval(() => {
-            if (isOnline && currentUser) {
-                loadDataFromCloud();
+        function updateOnlineUsersCount() {
+            if (currentUser) {
+                academicData.onlineUsers[currentUser.id] = {
+                    name: currentUser.name,
+                    lastSeen: new Date().toISOString()
+                };
+                
+                // Remove users who haven't been seen in 5 minutes
+                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+                Object.keys(academicData.onlineUsers).forEach(userId => {
+                    const lastSeen = new Date(academicData.onlineUsers[userId].lastSeen);
+                    if (lastSeen < fiveMinutesAgo) {
+                        delete academicData.onlineUsers[userId];
+                    }
+                });
+                
+                const onlineCount = Object.keys(academicData.onlineUsers).length;
+                document.getElementById('onlineUsersCount').textContent = onlineCount;
             }
-        }, 30000);
+        }
 
-        // Sync when user comes back online
-        window.addEventListener('online', () => {
-            updateConnectionStatus('connecting');
-            connectToCloud().then(() => {
-                if (isOnline) {
-                    loadDataFromCloud();
-                }
+        function loadChatMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            academicData.chatMessages.forEach(message => {
+                displayChatMessage(message);
             });
-        });
-
-        window.addEventListener('offline', () => {
-            isOnline = false;
-            updateConnectionStatus('offline');
-        });
+        }
 
         // Check if user is already logged in
         function checkLoginStatus() {
@@ -1490,35 +1244,10 @@
             // Logout
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
             
-            // Add subject
-            document.getElementById('addSubjectBtn').addEventListener('click', function() {
-                document.getElementById('addSubjectModal').classList.remove('hidden');
-            });
-            
-            document.getElementById('addSubjectForm').addEventListener('submit', handleAddSubject);
-            
-            // Add exam
-            document.getElementById('addExamForm').addEventListener('submit', handleAddExam);
-            
             // Back to subjects
             document.getElementById('backToSubjects').addEventListener('click', function() {
                 showSemesterContent();
             });
-            
-            // File upload
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', handleDragOver);
-            uploadArea.addEventListener('drop', handleFileDrop);
-            fileInput.addEventListener('change', handleFileSelect);
-            
-            // URL input
-            document.getElementById('addUrlBtn').addEventListener('click', handleAddUrl);
-            
-            // Search
-            document.getElementById('searchInput').addEventListener('input', handleSearch);
         }
 
         // Modal functions
@@ -1586,11 +1315,12 @@
                     }
                 }
                 
-                // Log activity
-                logActivity('login', `تسجيل دخول ${isAdmin ? 'المدير' : 'المستخدم'}: ${username}`);
-                
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                saveDataToCloud();
+                saveDataToLocalStorage();
+                
+                if (isOnline) {
+                    saveDataToCloud();
+                }
                 
                 closeModal('loginModal');
                 showMainPlatform();
@@ -1633,11 +1363,12 @@
                 academicData.bookmarks[currentUser.id] = [];
                 academicData.favorites[currentUser.id] = [];
                 
-                // Log activity
-                logActivity('register', `تسجيل مستخدم جديد: ${username}`);
-                
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                saveDataToCloud();
+                saveDataToLocalStorage();
+                
+                if (isOnline) {
+                    saveDataToCloud();
+                }
                 
                 closeModal('registerModal');
                 showMainPlatform();
@@ -1647,6 +1378,14 @@
 
         function handleLogout() {
             if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                // Remove from online users
+                if (currentUser && academicData.onlineUsers[currentUser.id]) {
+                    delete academicData.onlineUsers[currentUser.id];
+                    if (isOnline) {
+                        saveDataToCloud();
+                    }
+                }
+                
                 currentUser = null;
                 localStorage.removeItem('currentUser');
                 
@@ -1686,14 +1425,13 @@
                 document.getElementById('userAvatar').classList.add('hidden');
             }
             
-            // Load announcements
-            loadAnnouncements();
+            // Update online users
+            updateOnlineUsersCount();
             
-            // Update notification count
-            updateNotificationCount();
-
-            // Load chat messages
-            loadChatMessages();
+            // Load chat messages if they exist
+            if (academicData.chatMessages && academicData.chatMessages.length > 0) {
+                loadChatMessages();
+            }
         }
 
         // Academic year functions
@@ -1730,8 +1468,6 @@
             document.getElementById('welcomeSection').classList.add('hidden');
             document.getElementById('semesterContent').classList.remove('hidden');
             document.getElementById('subjectMaterials').classList.add('hidden');
-            
-            loadSubjects();
         }
 
         function showSemesterContent() {
@@ -1750,157 +1486,13 @@
             return yearNames[yearNum] || yearNum;
         }
 
-        // Subject management
-        function loadSubjects() {
-            const key = `${currentYear}-${currentSemester}`;
-            const subjects = academicData.subjects[key] || [];
-            
-            const grid = document.getElementById('subjectsGrid');
-            grid.innerHTML = '';
-            
-            subjects.forEach(subject => {
-                const subjectCard = createSubjectCard(subject);
-                grid.appendChild(subjectCard);
-            });
-        }
-
-        function createSubjectCard(subject) {
-            const card = document.createElement('div');
-            card.className = 'material-card rounded-xl p-6 cursor-pointer';
-            card.onclick = () => showSubjectMaterials(subject);
-            
-            card.innerHTML = `
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-                        <span class="text-white text-xl">📚</span>
-                    </div>
-                    ${currentUser && currentUser.isAdmin ? `<button onclick="event.stopPropagation(); deleteSubject('${subject.id}')" class="text-red-500 hover:text-red-700 text-sm">🗑️</button>` : ''}
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">${subject.name}</h3>
-                <p class="text-gray-600 text-sm mb-4">${subject.description || 'لا يوجد وصف'}</p>
-                <div class="flex justify-between text-xs text-gray-500">
-                    <span>📑 ${getMaterialCount(subject.id, 'slides')} سلايد</span>
-                    <span>🎙️ ${getMaterialCount(subject.id, 'recordings')} تسجيل</span>
-                    <span>📝 ${getMaterialCount(subject.id, 'summaries')} ملخص</span>
-                </div>
-            `;
-            
-            return card;
-        }
-
-        function handleAddSubject(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('subjectName').value.trim();
-            const description = document.getElementById('subjectDescription').value.trim();
-            
-            if (name) {
-                const key = `${currentYear}-${currentSemester}`;
-                if (!academicData.subjects[key]) {
-                    academicData.subjects[key] = [];
-                }
-                
-                const subject = {
-                    id: Date.now().toString(),
-                    name: name,
-                    description: description,
-                    year: currentYear,
-                    semester: currentSemester
-                };
-                
-                academicData.subjects[key].push(subject);
-                saveDataToCloud();
-                loadSubjects();
-                
-                closeModal('addSubjectModal');
-                document.getElementById('addSubjectForm').reset();
-            }
-        }
-
-        function deleteSubject(subjectId) {
-            if (confirm('هل أنت متأكد من حذف هذه المادة؟')) {
-                const key = `${currentYear}-${currentSemester}`;
-                academicData.subjects[key] = academicData.subjects[key].filter(s => s.id !== subjectId);
-                
-                // Delete associated materials
-                delete academicData.materials[subjectId];
-                
-                saveDataToCloud();
-                loadSubjects();
-            }
-        }
-
-        function handleAddExam(event) {
-            event.preventDefault();
-            
-            const subject = document.getElementById('examSubject').value.trim();
-            const year = document.getElementById('examYear').value;
-            const date = document.getElementById('examDate').value;
-            const time = document.getElementById('examTime').value;
-            const location = document.getElementById('examLocation').value.trim();
-            
-            if (subject && year && date && time && location) {
-                const exam = {
-                    id: Date.now().toString(),
-                    subject: subject,
-                    year: parseInt(year),
-                    date: date,
-                    time: time,
-                    location: location,
-                    createdBy: currentUser.username,
-                    createdAt: new Date().toISOString()
-                };
-                
-                academicData.exams.push(exam);
-                
-                // Send notifications to students of the same year
-                sendExamNotifications(exam);
-                
-                saveDataToCloud();
-                loadExams();
-                
-                closeModal('addExamModal');
-                document.getElementById('addExamForm').reset();
-                
-                logActivity('exam_add', `إضافة امتحان: ${subject} - السنة ${getYearName(year)}`);
-                
-                alert('تم إضافة الامتحان بنجاح وإرسال إشعارات للطلاب!');
-            }
-        }
-
-        function sendExamNotifications(exam) {
-            // Find students of the same year
-            const targetStudents = academicData.users.filter(user => user.year === exam.year);
-            
-            const notification = {
-                id: Date.now().toString(),
-                type: 'exam',
-                title: 'امتحان جديد مجدول',
-                message: `تم جدولة امتحان ${exam.subject} في ${new Date(exam.date).toLocaleDateString('ar-SA')} الساعة ${exam.time}`,
-                targetYear: exam.year,
-                createdAt: new Date().toISOString(),
-                read: false
-            };
-            
-            academicData.notifications.push(notification);
-            
-            // Log notification activity
-            logActivity('notification_exam', `إرسال إشعار امتحان لـ ${targetStudents.length} طالب`);
-        }
-
-        // Material management
-        function showSubjectMaterials(subject) {
-            currentSubject = subject;
-            
+        // Sample function to show subject materials
+        function showSampleSubject() {
             document.getElementById('semesterContent').classList.add('hidden');
             document.getElementById('subjectMaterials').classList.remove('hidden');
-            
-            document.getElementById('subjectTitle').textContent = subject.name;
-            document.getElementById('subjectInfo').textContent = `السنة ${getYearName(subject.year)} - الفصل ${subject.semester === 1 ? 'الأول' : 'الثاني'}`;
-            
-            loadMaterials();
         }
 
+        // Material tab switching
         function switchMaterialTab(type) {
             currentMaterialType = type;
             
@@ -1912,8 +1504,6 @@
             
             document.querySelector(`[data-type="${type}"]`).classList.remove('border-transparent', 'text-gray-500');
             document.querySelector(`[data-type="${type}"]`).classList.add('border-purple-500', 'text-purple-600');
-            
-            loadMaterials();
         }
 
         function switchExamTab(examType) {
@@ -1927,240 +1517,6 @@
             
             document.querySelector(`[data-exam="${examType}"]`).classList.remove('bg-gray-200', 'text-gray-700');
             document.querySelector(`[data-exam="${examType}"]`).classList.add('bg-purple-600', 'text-white');
-            
-            loadMaterials();
-        }
-
-        function loadMaterials() {
-            const materials = getMaterials(currentSubject.id, currentMaterialType, currentExamType);
-            
-            // Update title
-            const typeNames = {
-                slides: 'السلايدات',
-                recordings: 'التسجيلات', 
-                summaries: 'الملخصات'
-            };
-            
-            const examNames = {
-                mid: 'الميد',
-                final: 'الفاينال'
-            };
-            
-            document.getElementById('materialsTitle').textContent = 
-                `${typeNames[currentMaterialType]} - ${examNames[currentExamType]}`;
-            
-            // Load materials list
-            const list = document.getElementById('materialsList');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (materials.length === 0) {
-                list.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-            } else {
-                list.classList.remove('hidden');
-                emptyState.classList.add('hidden');
-                
-                list.innerHTML = '';
-                materials.forEach(material => {
-                    const materialItem = createMaterialItem(material);
-                    list.appendChild(materialItem);
-                });
-            }
-        }
-
-        function createMaterialItem(material) {
-            const item = document.createElement('div');
-            const isBookmarked = isUserBookmarked(material.id);
-            const isFavorite = isUserFavorite(material.id);
-            const progress = getUserProgress(material.id);
-            
-            item.className = 'flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50';
-            
-            const typeIcons = {
-                pdf: '📄',
-                mp3: '🎵',
-                mp4: '🎬',
-                url: '🔗',
-                doc: '📝',
-                ppt: '📊'
-            };
-            
-            const icon = typeIcons[material.type] || '📁';
-            
-            item.innerHTML = `
-                <div class="flex items-center space-x-3 space-x-reverse flex-1">
-                    <span class="text-2xl">${icon}</span>
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-2 space-x-reverse">
-                            <h4 class="font-medium text-gray-900">${material.name}</h4>
-                            ${isBookmarked ? '<span class="text-yellow-500">🔖</span>' : ''}
-                            ${isFavorite ? '<span class="text-red-500">❤️</span>' : ''}
-                        </div>
-                        <p class="text-sm text-gray-500">${material.size || 'رابط خارجي'} • ${material.uploadDate}</p>
-                        ${progress > 0 ? `<div class="mt-2"><div class="w-full bg-gray-200 rounded-full h-2"><div class="bg-purple-600 h-2 rounded-full" style="width: ${progress}%"></div></div><span class="text-xs text-gray-500">التقدم: ${progress}%</span></div>` : ''}
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2 space-x-reverse">
-                    <button onclick="toggleBookmark('${material.id}')" class="p-2 text-gray-400 hover:text-yellow-500 transition-colors" title="إضافة للمفضلة">
-                        ${isBookmarked ? '🔖' : '📑'}
-                    </button>
-                    <button onclick="toggleFavorite('${material.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="إضافة للمحفوظات">
-                        ${isFavorite ? '❤️' : '🤍'}
-                    </button>
-                    <button onclick="openMaterial('${material.url || material.path}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                        ${material.type === 'url' ? '🔗 فتح الرابط' : '📥 تحميل'}
-                    </button>
-                    ${currentUser && currentUser.isAdmin ? `<button onclick="deleteMaterial('${material.id}')" class="p-2 text-red-500 hover:text-red-700 transition-colors" title="حذف">🗑️</button>` : ''}
-                </div>
-            `;
-            
-            return item;
-        }
-
-        // Chat functions
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message && currentUser) {
-                const messageData = {
-                    id: Date.now().toString(),
-                    content: message,
-                    userId: currentUser.id,
-                    userName: currentUser.name,
-                    userAvatar: currentUser.avatar,
-                    userProfilePicture: currentUser.profilePicture,
-                    timestamp: new Date().toISOString()
-                };
-
-                academicData.chatMessages.push(messageData);
-                displayChatMessage(messageData);
-                saveDataToCloud();
-                
-                input.value = '';
-            }
-        }
-
-        function displayChatMessage(messageData) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            
-            const isCurrentUser = messageData.userId === currentUser?.id;
-            messageDiv.className = `flex items-start space-x-3 space-x-reverse ${isCurrentUser ? 'justify-end' : ''}`;
-            
-            const time = new Date(messageData.timestamp).toLocaleTimeString('ar-SA', {
-                hour: '2-digit', 
-                minute: '2-digit'
-            });
-
-            if (isCurrentUser) {
-                messageDiv.innerHTML = `
-                    <div class="bg-purple-600 text-white rounded-lg p-3 max-w-xs">
-                        <div class="text-sm font-medium">${messageData.userName}</div>
-                        <div class="text-sm">${messageData.content}</div>
-                        <div class="text-xs opacity-75 mt-1">${time}</div>
-                    </div>
-                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold overflow-hidden">
-                        ${messageData.userProfilePicture ? 
-                            `<img src="${messageData.userProfilePicture}" alt="" class="w-full h-full object-cover">` : 
-                            `<span>${messageData.userAvatar}</span>`
-                        }
-                    </div>
-                `;
-            } else {
-                messageDiv.innerHTML = `
-                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold overflow-hidden">
-                        ${messageData.userProfilePicture ? 
-                            `<img src="${messageData.userProfilePicture}" alt="" class="w-full h-full object-cover">` : 
-                            `<span>${messageData.userAvatar}</span>`
-                        }
-                    </div>
-                    <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
-                        <div class="text-sm font-medium text-gray-900">${messageData.userName}</div>
-                        <div class="text-sm text-gray-700">${messageData.content}</div>
-                        <div class="text-xs text-gray-500 mt-1">${time}</div>
-                    </div>
-                `;
-            }
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function loadChatMessages() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '';
-            
-            // Load recent messages (last 50)
-            const recentMessages = academicData.chatMessages.slice(-50);
-            recentMessages.forEach(message => {
-                displayChatMessage(message);
-            });
-        }
-
-        // Utility functions
-        function getMaterials(subjectId, type, examType) {
-            const subjectMaterials = academicData.materials[subjectId] || {};
-            const typeMaterials = subjectMaterials[type] || {};
-            return typeMaterials[examType] || [];
-        }
-
-        function getMaterialCount(subjectId, type) {
-            const subjectMaterials = academicData.materials[subjectId] || {};
-            const typeMaterials = subjectMaterials[type] || {};
-            const midCount = (typeMaterials.mid || []).length;
-            const finalCount = (typeMaterials.final || []).length;
-            return midCount + finalCount;
-        }
-
-        function isUserBookmarked(materialId) {
-            if (!currentUser) return false;
-            const userBookmarks = academicData.bookmarks[currentUser.id] || [];
-            return userBookmarks.includes(materialId);
-        }
-
-        function isUserFavorite(materialId) {
-            if (!currentUser) return false;
-            const userFavorites = academicData.favorites[currentUser.id] || [];
-            return userFavorites.includes(materialId);
-        }
-
-        function getUserProgress(materialId) {
-            if (!currentUser) return 0;
-            const userProgress = academicData.userProgress[currentUser.id] || {};
-            return userProgress[materialId] || 0;
-        }
-
-        function logActivity(type, description) {
-            academicData.activities.push({
-                id: Date.now().toString(),
-                type: type,
-                description: description,
-                userId: currentUser?.id,
-                userName: currentUser?.name,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        function loadAnnouncements() {
-            const container = document.getElementById('sidebarAnnouncements');
-            container.innerHTML = '';
-            
-            academicData.announcements.slice(0, 3).forEach(announcement => {
-                const div = document.createElement('div');
-                div.className = 'text-xs text-purple-700 bg-white rounded p-2 border border-purple-200';
-                div.innerHTML = `
-                    <div class="font-medium">${announcement.title}</div>
-                    <div class="text-purple-600 mt-1">${announcement.description}</div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function updateNotificationCount() {
-            const count = academicData.notifications.filter(n => !n.read).length;
-            document.getElementById('notificationCount').textContent = count;
-            document.getElementById('notificationCount').style.display = count > 0 ? 'flex' : 'none';
         }
 
         // Main tab switching
@@ -2178,4 +1534,110 @@
             document.getElementById(tabName + 'Section').classList.remove('hidden');
             
             // Update tab appearance
-            document.quer<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786ff1b813e32ae',t:'MTc1Njc1MzA4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+            document.querySelectorAll('.main-tab').forEach(tab => {
+                tab.classList.remove('text-purple-600', 'border-purple-600');
+                tab.classList.add('text-gray-600');
+            });
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.remove('text-gray-600');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('text-purple-600', 'border-purple-600');
+        }
+
+        // Chat functions
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && currentUser) {
+                const messageData = {
+                    id: Date.now().toString(),
+                    content: message,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    userAvatar: currentUser.avatar,
+                    timestamp: new Date().toISOString()
+                };
+
+                academicData.chatMessages.push(messageData);
+                displayChatMessage(messageData);
+                saveDataToLocalStorage();
+                
+                if (isOnline) {
+                    saveDataToCloud();
+                }
+                
+                input.value = '';
+            }
+        }
+
+        function displayChatMessage(messageData) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Clear empty state if it exists
+            if (messagesContainer.querySelector('.text-center')) {
+                messagesContainer.innerHTML = '';
+            }
+            
+            const messageDiv = document.createElement('div');
+            const isCurrentUser = messageData.userId === currentUser?.id;
+            messageDiv.className = `flex items-start space-x-3 space-x-reverse ${isCurrentUser ? 'justify-end' : ''}`;
+            
+            const time = new Date(messageData.timestamp).toLocaleTimeString('ar-SA', {
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+
+            if (isCurrentUser) {
+                messageDiv.innerHTML = `
+                    <div class="bg-purple-600 text-white rounded-lg p-3 max-w-xs">
+                        <div class="text-sm font-medium">${messageData.userName}</div>
+                        <div class="text-sm">${messageData.content}</div>
+                        <div class="text-xs opacity-75 mt-1">${time}</div>
+                    </div>
+                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        <span>${messageData.userAvatar}</span>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold">
+                        <span>${messageData.userAvatar}</span>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
+                        <div class="text-sm font-medium text-gray-900">${messageData.userName}</div>
+                        <div class="text-sm text-gray-700">${messageData.content}</div>
+                        <div class="text-xs text-gray-500 mt-1">${time}</div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Placeholder functions for features not yet implemented
+        function showNotifications() {
+            alert('سيتم إضافة نظام الإشعارات قريباً');
+        }
+
+        function showUserSettings() {
+            alert('سيتم إضافة إعدادات المستخدم قريباً');
+        }
+
+        function showProfilePictureModal() {
+            alert('سيتم إضافة تغيير الصورة الشخصية قريباً');
+        }
+
+        function showLogoSettings() {
+            alert('سيتم إضافة تعديل الشعار قريباً');
+        }
+
+        function editAnnouncements() {
+            alert('سيتم إضافة تعديل الإعلانات قريباً');
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978712d7f67132ae',t:'MTc1Njc1Mzg4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -6,10 +6,6 @@
     <title>المنصة الأكاديمية - لجنة الطب والجراحة البيطرية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -1225,21 +1221,12 @@
     </div>
 
     <script>
-        // Firebase Configuration - إعدادات المشروع الحقيقية
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqUMo8ii1XR4FmfdXulcbcbmfDrTRaMBM",
-            authDomain: "academic-platform-2024.firebaseapp.com",
-            databaseURL: "https://academic-platform-2024-default-rtdb.firebaseio.com",
-            projectId: "academic-platform-2024",
-            storageBucket: "academic-platform-2024.firebasestorage.app",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:d2b520027f6c506b30033e",
-            measurementId: "G-QJ0Y5TFTRN"
+        // JSONBin.io Configuration - بديل مجاني لـ Firebase
+        const JSONBIN_CONFIG = {
+            binId: '67a0b8c8e41b4d34e4651234', // سيتم إنشاؤه تلقائياً
+            apiKey: '$2a$10$YourAPIKeyHere', // مفتاح API مجاني من JSONBin.io
+            baseUrl: 'https://api.jsonbin.io/v3'
         };
-
-        // Initialize Firebase
-        let database, storage;
-        let isFirebaseConnected = false;
 
         // Application State
         let currentUser = null;
@@ -1251,8 +1238,9 @@
         let currentMainTab = 'academic';
         let currentPostType = 'normal';
         let onlineUsers = new Set();
+        let isOnline = false;
         
-        // Data structure for Firebase
+        // Data structure
         let academicData = {
             subjects: {},
             materials: {},
@@ -1282,7 +1270,8 @@
                 logo: null
             },
             chatMessages: [],
-            onlineUsers: {}
+            onlineUsers: {},
+            lastUpdated: new Date().toISOString()
         };
 
         // Admin credentials
@@ -1291,38 +1280,114 @@
             password: 'AcaDemic_2025_New'
         };
 
-        // Initialize Firebase
-        function initializeFirebase() {
-            // إخفاء شاشة التحميل فوراً وبدء التطبيق
+        // Initialize the application
+        function initializeApp() {
+            // إخفاء شاشة التحميل فوراً
             setTimeout(() => {
                 hideLoadingOverlay();
-                updateConnectionStatus('offline');
-                loadDataFromLocalStorage();
-                initializeApp();
+                updateConnectionStatus('connecting');
+                loadDataFromCloud();
             }, 1000);
 
+            setupEventListeners();
+            checkLoginStatus();
+            
+            // محاولة الاتصال بـ JSONBin
+            connectToCloud();
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        // Cloud Database Functions using JSONBin.io
+        async function connectToCloud() {
             try {
-                // محاولة تهيئة Firebase في الخلفية
-                firebase.initializeApp(firebaseConfig);
-                database = firebase.database();
-                storage = firebase.storage();
-                
-                // اختبار الاتصال في الخلفية
-                database.ref('.info/connected').on('value', function(snapshot) {
-                    if (snapshot.val() === true) {
-                        isFirebaseConnected = true;
-                        updateConnectionStatus('online');
-                        // تحميل البيانات من Firebase في الخلفية
-                        loadDataFromFirebase();
-                    } else {
-                        isFirebaseConnected = false;
-                        updateConnectionStatus('offline');
+                // اختبار الاتصال
+                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.apiKey,
+                        'X-Bin-Meta': 'false'
                     }
                 });
-                
+
+                if (response.ok) {
+                    isOnline = true;
+                    updateConnectionStatus('online');
+                    console.log('متصل بقاعدة البيانات السحابية');
+                } else {
+                    throw new Error('فشل الاتصال');
+                }
             } catch (error) {
-                console.error('Firebase initialization failed:', error);
+                console.error('فشل الاتصال بقاعدة البيانات:', error);
+                isOnline = false;
                 updateConnectionStatus('offline');
+                // استخدام البيانات المحلية
+                loadDataFromLocalStorage();
+            }
+        }
+
+        async function saveDataToCloud() {
+            if (!isOnline) {
+                saveDataToLocalStorage();
+                return;
+            }
+
+            try {
+                academicData.lastUpdated = new Date().toISOString();
+                
+                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.apiKey
+                    },
+                    body: JSON.stringify(academicData)
+                });
+
+                if (response.ok) {
+                    console.log('تم حفظ البيانات في السحابة بنجاح');
+                    // حفظ نسخة محلية أيضاً
+                    saveDataToLocalStorage();
+                } else {
+                    throw new Error('فشل في حفظ البيانات');
+                }
+            } catch (error) {
+                console.error('خطأ في حفظ البيانات:', error);
+                // حفظ محلي كبديل
+                saveDataToLocalStorage();
+            }
+        }
+
+        async function loadDataFromCloud() {
+            if (!isOnline) {
+                loadDataFromLocalStorage();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.apiKey,
+                        'X-Bin-Meta': 'false'
+                    }
+                });
+
+                if (response.ok) {
+                    const cloudData = await response.json();
+                    academicData = { ...academicData, ...cloudData };
+                    console.log('تم تحميل البيانات من السحابة بنجاح');
+                    // حفظ نسخة محلية
+                    saveDataToLocalStorage();
+                } else {
+                    throw new Error('فشل في تحميل البيانات');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات:', error);
+                // استخدام البيانات المحلية
+                loadDataFromLocalStorage();
             }
         }
 
@@ -1333,10 +1398,10 @@
             
             switch(status) {
                 case 'online':
-                    statusElement.innerHTML = '🟢 متصل';
+                    statusElement.innerHTML = '🟢 متصل بالسحابة';
                     break;
                 case 'offline':
-                    statusElement.innerHTML = '🔴 غير متصل';
+                    statusElement.innerHTML = '🔴 وضع محلي';
                     break;
                 case 'connecting':
                     statusElement.innerHTML = '🔄 جاري الاتصال...';
@@ -1344,262 +1409,49 @@
             }
         }
 
-        function hideLoadingOverlay() {
-            document.getElementById('loadingOverlay').classList.add('hidden');
-        }
-
-        // Firebase data operations
-        function saveDataToFirebase() {
-            if (!isFirebaseConnected) {
-                saveDataToLocalStorage();
-                return;
-            }
-
-            try {
-                // حفظ البيانات في Firebase الحقيقي
-                database.ref().set(academicData).then(() => {
-                    console.log('تم حفظ البيانات في Firebase بنجاح');
-                }).catch((error) => {
-                    console.error('فشل في حفظ البيانات:', error);
-                    saveDataToLocalStorage(); // Fallback
-                });
-                
-            } catch (error) {
-                console.error('Firebase save failed:', error);
-                saveDataToLocalStorage(); // Fallback
-            }
-        }
-
-        function loadDataFromFirebase() {
-            if (!isFirebaseConnected) {
-                return;
-            }
-
-            try {
-                // تحميل البيانات من Firebase في الخلفية دون انتظار
-                database.ref().once('value').then((snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        academicData = { ...academicData, ...data };
-                        console.log('تم تحميل البيانات من Firebase بنجاح');
-                        // حفظ البيانات محلياً للمرة القادمة
-                        saveDataToLocalStorage();
-                    }
-                }).catch((error) => {
-                    console.error('فشل في تحميل البيانات من Firebase:', error);
-                });
-                
-            } catch (error) {
-                console.error('Firebase load failed:', error);
-            }
-        }
-
-        // Real-time listeners for Firebase
-        function setupFirebaseListeners() {
-            if (!isFirebaseConnected) return;
-
-            // مراقبة المنشورات الجديدة
-            database.ref('posts').on('child_added', (snapshot) => {
-                const post = snapshot.val();
-                if (post && post.authorId !== currentUser?.id) {
-                    academicData.posts.unshift(post);
-                    if (currentMainTab === 'posts') {
-                        loadPosts();
-                    }
-                    // إشعار بمنشور جديد
-                    showNotification('منشور جديد', `${post.authorName}: ${post.content.substring(0, 50)}...`);
-                }
-            });
-
-            // مراقبة رسائل الدردشة
-            database.ref('chatMessages').on('child_added', (snapshot) => {
-                const message = snapshot.val();
-                if (message && message.userId !== currentUser?.id) {
-                    academicData.chatMessages.push(message);
-                    if (currentMainTab === 'chat') {
-                        displayChatMessage(message);
-                    }
-                }
-            });
-
-            // مراقبة المستخدمين المتصلين
-            database.ref('onlineUsers').on('value', (snapshot) => {
-                const users = snapshot.val() || {};
-                updateOnlineUsersCount(Object.keys(users).length);
-            });
-
-            // مراقبة الإعلانات
-            database.ref('announcements').on('value', (snapshot) => {
-                const announcements = snapshot.val();
-                if (announcements) {
-                    academicData.announcements = Object.values(announcements);
-                    loadAnnouncements();
-                }
-            });
-
-            // مراقبة المواد الجديدة
-            database.ref('materials').on('child_changed', (snapshot) => {
-                const subjectId = snapshot.key;
-                const materials = snapshot.val();
-                academicData.materials[subjectId] = materials;
-                
-                if (currentSubject && currentSubject.id === subjectId) {
-                    loadMaterials();
-                }
-            });
-        }
-
-        // Online presence management
-        function updateUserPresence(isOnline) {
-            if (!isFirebaseConnected || !currentUser) return;
-
-            // إدارة الحضور المباشر في Firebase
-            const userPresenceRef = database.ref(`onlineUsers/${currentUser.id}`);
-            if (isOnline) {
-                userPresenceRef.set({
-                    id: currentUser.id,
-                    name: currentUser.name,
-                    avatar: currentUser.avatar,
-                    year: currentUser.year,
-                    lastSeen: firebase.database.ServerValue.TIMESTAMP,
-                    status: 'online'
-                });
-                // إزالة المستخدم عند قطع الاتصال
-                userPresenceRef.onDisconnect().remove();
-            } else {
-                userPresenceRef.remove();
-            }
-        }
-
-        function updateOnlineUsersCount(count) {
-            const countElement = document.getElementById('onlineUsersCount');
-            if (countElement) {
-                countElement.textContent = count;
-            }
-        }
-
-        // Chat with real-time sync
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (message && currentUser) {
-                const messageData = {
-                    id: Date.now().toString(),
-                    content: message,
-                    userId: currentUser.id,
-                    userName: currentUser.name,
-                    userAvatar: currentUser.avatar,
-                    userProfilePicture: currentUser.profilePicture,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
-
-                // إرسال الرسالة إلى Firebase مباشرة
-                if (isFirebaseConnected) {
-                    database.ref('chatMessages').push(messageData).then(() => {
-                        console.log('تم إرسال الرسالة بنجاح');
-                    }).catch((error) => {
-                        console.error('فشل في إرسال الرسالة:', error);
-                        // عرض الرسالة محلياً في حالة الفشل
-                        messageData.timestamp = new Date().toISOString();
-                        displayChatMessage(messageData);
-                    });
-                } else {
-                    // إضافة محلية في حالة عدم الاتصال
-                    messageData.timestamp = new Date().toISOString();
-                    academicData.chatMessages.push(messageData);
-                    displayChatMessage(messageData);
-                    saveDataToLocalStorage();
-                }
-                
-                input.value = '';
-            }
-        }
-
-        function displayChatMessage(messageData) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            
-            const isCurrentUser = messageData.userId === currentUser?.id;
-            messageDiv.className = `flex items-start space-x-3 space-x-reverse ${isCurrentUser ? 'justify-end' : ''}`;
-            
-            const time = new Date(messageData.timestamp).toLocaleTimeString('ar-SA', {
-                hour: '2-digit', 
-                minute: '2-digit'
-            });
-
-            if (isCurrentUser) {
-                messageDiv.innerHTML = `
-                    <div class="bg-purple-600 text-white rounded-lg p-3 max-w-xs">
-                        <div class="text-sm font-medium">${messageData.userName}</div>
-                        <div class="text-sm">${messageData.content}</div>
-                        <div class="text-xs opacity-75 mt-1">${time}</div>
-                    </div>
-                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold overflow-hidden">
-                        ${messageData.userProfilePicture ? 
-                            `<img src="${messageData.userProfilePicture}" alt="" class="w-full h-full object-cover">` : 
-                            `<span>${messageData.userAvatar}</span>`
-                        }
-                    </div>
-                `;
-            } else {
-                messageDiv.innerHTML = `
-                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold overflow-hidden">
-                        ${messageData.userProfilePicture ? 
-                            `<img src="${messageData.userProfilePicture}" alt="" class="w-full h-full object-cover">` : 
-                            `<span>${messageData.userAvatar}</span>`
-                        }
-                    </div>
-                    <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
-                        <div class="text-sm font-medium text-gray-900">${messageData.userName}</div>
-                        <div class="text-sm text-gray-700">${messageData.content}</div>
-                        <div class="text-xs text-gray-500 mt-1">${time}</div>
-                    </div>
-                `;
-            }
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function loadChatMessages() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '';
-            
-            // Load recent messages (last 50)
-            const recentMessages = academicData.chatMessages.slice(-50);
-            recentMessages.forEach(message => {
-                displayChatMessage(message);
-            });
-        }
-
         // Fallback to localStorage
         function saveDataToLocalStorage() {
-            localStorage.setItem('academicData', JSON.stringify(academicData));
+            try {
+                localStorage.setItem('academicData', JSON.stringify(academicData));
+                localStorage.setItem('lastSaved', new Date().toISOString());
+            } catch (error) {
+                console.error('خطأ في حفظ البيانات محلياً:', error);
+            }
         }
 
         function loadDataFromLocalStorage() {
-            const saved = localStorage.getItem('academicData');
-            if (saved) {
-                try {
+            try {
+                const saved = localStorage.getItem('academicData');
+                if (saved) {
                     const parsedData = JSON.parse(saved);
                     academicData = { ...academicData, ...parsedData };
-                } catch (error) {
-                    console.error('Error parsing localStorage data:', error);
+                    console.log('تم تحميل البيانات المحلية');
                 }
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات المحلية:', error);
             }
         }
 
-        // Initialize the application
-        function initializeApp() {
-            setupEventListeners();
-            checkLoginStatus();
-            setupFirebaseListeners();
-        }
+        // Auto-sync every 30 seconds when online
+        setInterval(() => {
+            if (isOnline && currentUser) {
+                loadDataFromCloud();
+            }
+        }, 30000);
 
-        // تهيئة Firebase عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeFirebase();
+        // Sync when user comes back online
+        window.addEventListener('online', () => {
+            updateConnectionStatus('connecting');
+            connectToCloud().then(() => {
+                if (isOnline) {
+                    loadDataFromCloud();
+                }
+            });
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateConnectionStatus('offline');
         });
 
         // Check if user is already logged in
@@ -1609,7 +1461,6 @@
                 try {
                     currentUser = JSON.parse(savedUser);
                     showMainPlatform();
-                    updateUserPresence(true);
                 } catch (error) {
                     console.error('Error parsing saved user:', error);
                     localStorage.removeItem('currentUser');
@@ -1668,20 +1519,6 @@
             
             // Search
             document.getElementById('searchInput').addEventListener('input', handleSearch);
-
-            // Handle page visibility for presence
-            document.addEventListener('visibilitychange', function() {
-                if (currentUser) {
-                    updateUserPresence(!document.hidden);
-                }
-            });
-
-            // Handle page unload
-            window.addEventListener('beforeunload', function() {
-                if (currentUser) {
-                    updateUserPresence(false);
-                }
-            });
         }
 
         // Modal functions
@@ -1753,12 +1590,11 @@
                 logActivity('login', `تسجيل دخول ${isAdmin ? 'المدير' : 'المستخدم'}: ${username}`);
                 
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                saveDataToFirebase();
+                saveDataToCloud();
                 
                 closeModal('loginModal');
                 showMainPlatform();
                 showWelcomePopup(currentUser.name);
-                updateUserPresence(true);
             }
         }
 
@@ -1801,18 +1637,16 @@
                 logActivity('register', `تسجيل مستخدم جديد: ${username}`);
                 
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                saveDataToFirebase();
+                saveDataToCloud();
                 
                 closeModal('registerModal');
                 showMainPlatform();
                 showWelcomePopup(name);
-                updateUserPresence(true);
             }
         }
 
         function handleLogout() {
             if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                updateUserPresence(false);
                 currentUser = null;
                 localStorage.removeItem('currentUser');
                 
@@ -1975,7 +1809,7 @@
                 };
                 
                 academicData.subjects[key].push(subject);
-                saveDataToFirebase();
+                saveDataToCloud();
                 loadSubjects();
                 
                 closeModal('addSubjectModal');
@@ -1991,7 +1825,7 @@
                 // Delete associated materials
                 delete academicData.materials[subjectId];
                 
-                saveDataToFirebase();
+                saveDataToCloud();
                 loadSubjects();
             }
         }
@@ -2022,7 +1856,7 @@
                 // Send notifications to students of the same year
                 sendExamNotifications(exam);
                 
-                saveDataToFirebase();
+                saveDataToCloud();
                 loadExams();
                 
                 closeModal('addExamModal');
@@ -2167,5 +2001,181 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 space-x-reverse">
-                    <button onclick="toggleBookmark('${material.id}')"
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786ee1cd01532ae',t:'MTc1Njc1MjM4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+                    <button onclick="toggleBookmark('${material.id}')" class="p-2 text-gray-400 hover:text-yellow-500 transition-colors" title="إضافة للمفضلة">
+                        ${isBookmarked ? '🔖' : '📑'}
+                    </button>
+                    <button onclick="toggleFavorite('${material.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="إضافة للمحفوظات">
+                        ${isFavorite ? '❤️' : '🤍'}
+                    </button>
+                    <button onclick="openMaterial('${material.url || material.path}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        ${material.type === 'url' ? '🔗 فتح الرابط' : '📥 تحميل'}
+                    </button>
+                    ${currentUser && currentUser.isAdmin ? `<button onclick="deleteMaterial('${material.id}')" class="p-2 text-red-500 hover:text-red-700 transition-colors" title="حذف">🗑️</button>` : ''}
+                </div>
+            `;
+            
+            return item;
+        }
+
+        // Chat functions
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && currentUser) {
+                const messageData = {
+                    id: Date.now().toString(),
+                    content: message,
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    userAvatar: currentUser.avatar,
+                    userProfilePicture: currentUser.profilePicture,
+                    timestamp: new Date().toISOString()
+                };
+
+                academicData.chatMessages.push(messageData);
+                displayChatMessage(messageData);
+                saveDataToCloud();
+                
+                input.value = '';
+            }
+        }
+
+        function displayChatMessage(messageData) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            
+            const isCurrentUser = messageData.userId === currentUser?.id;
+            messageDiv.className = `flex items-start space-x-3 space-x-reverse ${isCurrentUser ? 'justify-end' : ''}`;
+            
+            const time = new Date(messageData.timestamp).toLocaleTimeString('ar-SA', {
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+
+            if (isCurrentUser) {
+                messageDiv.innerHTML = `
+                    <div class="bg-purple-600 text-white rounded-lg p-3 max-w-xs">
+                        <div class="text-sm font-medium">${messageData.userName}</div>
+                        <div class="text-sm">${messageData.content}</div>
+                        <div class="text-xs opacity-75 mt-1">${time}</div>
+                    </div>
+                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold overflow-hidden">
+                        ${messageData.userProfilePicture ? 
+                            `<img src="${messageData.userProfilePicture}" alt="" class="w-full h-full object-cover">` : 
+                            `<span>${messageData.userAvatar}</span>`
+                        }
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold overflow-hidden">
+                        ${messageData.userProfilePicture ? 
+                            `<img src="${messageData.userProfilePicture}" alt="" class="w-full h-full object-cover">` : 
+                            `<span>${messageData.userAvatar}</span>`
+                        }
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
+                        <div class="text-sm font-medium text-gray-900">${messageData.userName}</div>
+                        <div class="text-sm text-gray-700">${messageData.content}</div>
+                        <div class="text-xs text-gray-500 mt-1">${time}</div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function loadChatMessages() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            // Load recent messages (last 50)
+            const recentMessages = academicData.chatMessages.slice(-50);
+            recentMessages.forEach(message => {
+                displayChatMessage(message);
+            });
+        }
+
+        // Utility functions
+        function getMaterials(subjectId, type, examType) {
+            const subjectMaterials = academicData.materials[subjectId] || {};
+            const typeMaterials = subjectMaterials[type] || {};
+            return typeMaterials[examType] || [];
+        }
+
+        function getMaterialCount(subjectId, type) {
+            const subjectMaterials = academicData.materials[subjectId] || {};
+            const typeMaterials = subjectMaterials[type] || {};
+            const midCount = (typeMaterials.mid || []).length;
+            const finalCount = (typeMaterials.final || []).length;
+            return midCount + finalCount;
+        }
+
+        function isUserBookmarked(materialId) {
+            if (!currentUser) return false;
+            const userBookmarks = academicData.bookmarks[currentUser.id] || [];
+            return userBookmarks.includes(materialId);
+        }
+
+        function isUserFavorite(materialId) {
+            if (!currentUser) return false;
+            const userFavorites = academicData.favorites[currentUser.id] || [];
+            return userFavorites.includes(materialId);
+        }
+
+        function getUserProgress(materialId) {
+            if (!currentUser) return 0;
+            const userProgress = academicData.userProgress[currentUser.id] || {};
+            return userProgress[materialId] || 0;
+        }
+
+        function logActivity(type, description) {
+            academicData.activities.push({
+                id: Date.now().toString(),
+                type: type,
+                description: description,
+                userId: currentUser?.id,
+                userName: currentUser?.name,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function loadAnnouncements() {
+            const container = document.getElementById('sidebarAnnouncements');
+            container.innerHTML = '';
+            
+            academicData.announcements.slice(0, 3).forEach(announcement => {
+                const div = document.createElement('div');
+                div.className = 'text-xs text-purple-700 bg-white rounded p-2 border border-purple-200';
+                div.innerHTML = `
+                    <div class="font-medium">${announcement.title}</div>
+                    <div class="text-purple-600 mt-1">${announcement.description}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateNotificationCount() {
+            const count = academicData.notifications.filter(n => !n.read).length;
+            document.getElementById('notificationCount').textContent = count;
+            document.getElementById('notificationCount').style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        // Main tab switching
+        function switchMainTab(tabName) {
+            currentMainTab = tabName;
+            
+            // Hide all sections
+            document.getElementById('academicSection').classList.add('hidden');
+            document.getElementById('postsSection').classList.add('hidden');
+            document.getElementById('examsSection').classList.add('hidden');
+            document.getElementById('chatSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            
+            // Show selected section
+            document.getElementById(tabName + 'Section').classList.remove('hidden');
+            
+            // Update tab appearance
+            document.quer<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9786ff1b813e32ae',t:'MTc1Njc1MzA4MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

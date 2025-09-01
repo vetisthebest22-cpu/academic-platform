@@ -186,6 +186,66 @@
         .sync-indicator.show {
             opacity: 1;
         }
+
+        .admin-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .admin-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .post-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .post-card:hover {
+            border-left-color: #9333ea;
+            transform: translateX(-5px);
+        }
+
+        .chat-message {
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .material-item {
+            transition: all 0.3s ease;
+        }
+
+        .material-item:hover {
+            background: #f8fafc;
+            border-color: #9333ea;
+        }
+
+        .year-tab {
+            transition: all 0.3s ease;
+        }
+
+        .year-tab.active {
+            background: #9333ea;
+            color: white;
+        }
+
+        .notification-popup {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 300px;
+            animation: notificationSlide 0.5s ease-out;
+        }
+
+        @keyframes notificationSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -198,6 +258,9 @@
     <div id="syncIndicator" class="sync-indicator">
         🔄 جاري المزامنة...
     </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
 
     <!-- Login/Home Page -->
     <div id="homePage" class="min-h-screen">
@@ -306,6 +369,22 @@
                         </div>
                     </div>
                     
+                    <!-- Navigation -->
+                    <nav class="hidden md:flex space-x-6 space-x-reverse">
+                        <button onclick="switchMainTab('home')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
+                            🏠 الرئيسية
+                        </button>
+                        <button onclick="switchMainTab('materials')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
+                            📚 المواد
+                        </button>
+                        <button onclick="switchMainTab('posts')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
+                            📝 المنشورات
+                        </button>
+                        <button onclick="switchMainTab('chat')" class="nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors">
+                            💬 الدردشة
+                        </button>
+                    </nav>
+                    
                     <!-- User Menu -->
                     <div class="flex items-center space-x-4 space-x-reverse">
                         <!-- Online Users Count -->
@@ -332,6 +411,10 @@
                                         <div class="text-sm font-medium text-gray-900" id="userFullName">طالب الطب البيطري</div>
                                         <div class="text-xs text-gray-500" id="userYear">السنة الأولى</div>
                                     </div>
+                                    <button onclick="switchMainTab('profile')" class="w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 space-x-reverse">
+                                        <span>👤</span>
+                                        <span>الملف الشخصي</span>
+                                    </button>
                                     <button id="logoutBtn" class="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 space-x-reverse">
                                         <span>🚪</span>
                                         <span>تسجيل الخروج</span>
@@ -345,7 +428,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="p-6 bg-gray-50 min-h-screen">
+        <main id="homeSection" class="p-6 bg-gray-50 min-h-screen">
             <!-- Welcome Section -->
             <div class="text-center py-16">
                 <div class="max-w-2xl mx-auto">
@@ -361,7 +444,7 @@
                             <div class="text-3xl mb-3">📚</div>
                             <h3 class="font-semibold text-gray-900 mb-2">المواد الدراسية</h3>
                             <p class="text-sm text-gray-600 mb-4">تصفح جميع المواد حسب السنة والفصل</p>
-                            <button class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                            <button onclick="switchMainTab('materials')" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                                 استكشف المواد
                             </button>
                         </div>
@@ -388,17 +471,81 @@
             </div>
         </main>
 
+        <!-- Materials Section -->
+        <div id="materialsSection" class="hidden p-6 bg-gray-50 min-h-screen">
+            <div class="max-w-6xl mx-auto">
+                <!-- Header -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">📚 المواد الدراسية</h2>
+                            <p class="text-gray-600 mt-1">جميع المصادر الأكاديمية منظمة حسب السنة والفصل</p>
+                        </div>
+                        <div id="adminMaterialsBtn" class="hidden">
+                            <button onclick="showAddMaterialModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                ➕ إضافة مادة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Year Tabs -->
+                <div class="bg-white rounded-lg shadow-md mb-6 border border-gray-100">
+                    <div class="flex flex-wrap border-b border-gray-200">
+                        <button onclick="switchYear(1)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="1">
+                            السنة الأولى
+                        </button>
+                        <button onclick="switchYear(2)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="2">
+                            السنة الثانية
+                        </button>
+                        <button onclick="switchYear(3)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="3">
+                            السنة الثالثة
+                        </button>
+                        <button onclick="switchYear(4)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="4">
+                            السنة الرابعة
+                        </button>
+                        <button onclick="switchYear(5)" class="year-tab px-6 py-3 text-sm font-medium text-gray-700 hover:text-purple-600 border-b-2 border-transparent hover:border-purple-600" data-year="5">
+                            السنة الخامسة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Materials Content -->
+                <div id="materialsContent" class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">اختر السنة الدراسية</h3>
+                        <p class="text-gray-600">انقر على إحدى السنوات أعلاه لعرض المواد المتاحة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Posts Section -->
         <div id="postsSection" class="hidden p-6 bg-gray-50 min-h-screen">
             <div class="max-w-4xl mx-auto">
+                <!-- Header -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
-                    <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
+                            <p class="text-gray-600 mt-1">آخر الأخبار والإعلانات المهمة</p>
+                        </div>
+                        <div id="adminPostsBtn" class="hidden">
+                            <button onclick="showAddPostModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                ➕ إضافة منشور
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="text-center py-16">
-                    <div class="text-6xl mb-4">📝</div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
-                    <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
+                <!-- Posts Container -->
+                <div id="postsContainer">
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
+                        <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -441,6 +588,93 @@
                                 📤 إرسال
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection" class="hidden p-6 bg-gray-50 min-h-screen">
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                            <span id="profileAvatar">ط</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900" id="profileName">طالب الطب البيطري</h2>
+                        <p class="text-gray-600" id="profileYear">السنة الأولى</p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="font-semibold text-gray-900 mb-2">معلومات الحساب</h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-600">اسم المستخدم:</span>
+                                    <span class="font-medium" id="profileUsername">username</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">تاريخ التسجيل:</span>
+                                    <span class="font-medium" id="profileRegDate">2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-b border-gray-200 pb-4">
+                            <h3 class="font-semibold text-gray-900 mb-2">الإحصائيات</h3>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="text-center p-3 bg-purple-50 rounded-lg">
+                                    <div class="text-2xl font-bold text-purple-600" id="profileMessages">0</div>
+                                    <div class="text-gray-600">رسالة</div>
+                                </div>
+                                <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                    <div class="text-2xl font-bold text-blue-600" id="profileLogins">1</div>
+                                    <div class="text-gray-600">تسجيل دخول</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="hidden p-6 admin-panel min-h-screen">
+            <div class="max-w-6xl mx-auto">
+                <div class="admin-card rounded-lg shadow-xl p-6 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">🛠️ لوحة التحكم الإدارية</h2>
+                    <p class="text-gray-600">إدارة المنصة والمحتوى</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Users Management -->
+                    <div class="admin-card rounded-lg shadow-lg p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">👥 إدارة المستخدمين</h3>
+                        <div class="text-3xl font-bold text-purple-600 mb-2" id="totalUsers">0</div>
+                        <p class="text-sm text-gray-600 mb-4">إجمالي المستخدمين</p>
+                        <button onclick="showUsersModal()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                            عرض المستخدمين
+                        </button>
+                    </div>
+
+                    <!-- Posts Management -->
+                    <div class="admin-card rounded-lg shadow-lg p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">📝 إدارة المنشورات</h3>
+                        <div class="text-3xl font-bold text-blue-600 mb-2" id="totalPosts">0</div>
+                        <p class="text-sm text-gray-600 mb-4">إجمالي المنشورات</p>
+                        <button onclick="showAddPostModal()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            إضافة منشور
+                        </button>
+                    </div>
+
+                    <!-- Materials Management -->
+                    <div class="admin-card rounded-lg shadow-lg p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">📚 إدارة المواد</h3>
+                        <div class="text-3xl font-bold text-green-600 mb-2" id="totalMaterials">0</div>
+                        <p class="text-sm text-gray-600 mb-4">إجمالي المواد</p>
+                        <button onclick="showAddMaterialModal()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            إضافة مادة
+                        </button>
                     </div>
                 </div>
             </div>
@@ -562,6 +796,125 @@
         </div>
     </div>
 
+    <!-- Add Post Modal -->
+    <div id="addPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">📝</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">إضافة منشور جديد</h2>
+                    <p class="text-gray-600">أضف إعلان أو خبر مهم للطلاب</p>
+                </div>
+
+                <form id="addPostForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">عنوان المنشور</label>
+                        <input type="text" id="postTitle" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="أدخل عنوان المنشور">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">محتوى المنشور</label>
+                        <textarea id="postContent" required rows="4"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="اكتب محتوى المنشور هنا..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المنشور</label>
+                        <select id="postType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">اختر النوع</option>
+                            <option value="announcement">إعلان</option>
+                            <option value="news">خبر</option>
+                            <option value="reminder">تذكير</option>
+                            <option value="update">تحديث</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200 font-medium">
+                        📝 نشر المنشور
+                    </button>
+                </form>
+
+                <button onclick="closeModal('addPostModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Material Modal -->
+    <div id="addMaterialModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">📚</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">إضافة مادة جديدة</h2>
+                    <p class="text-gray-600">أضف مصدر أكاديمي جديد للطلاب</p>
+                </div>
+
+                <form id="addMaterialForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
+                        <input type="text" id="materialName" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="أدخل اسم المادة">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
+                        <select id="materialYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">اختر السنة</option>
+                            <option value="1">السنة الأولى</option>
+                            <option value="2">السنة الثانية</option>
+                            <option value="3">السنة الثالثة</option>
+                            <option value="4">السنة الرابعة</option>
+                            <option value="5">السنة الخامسة</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المحتوى</label>
+                        <select id="materialType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">اختر النوع</option>
+                            <option value="slides">سلايدات</option>
+                            <option value="recordings">تسجيلات</option>
+                            <option value="summaries">ملخصات</option>
+                            <option value="books">كتب</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رابط المحتوى</label>
+                        <input type="url" id="materialLink" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="https://example.com/material">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف المحتوى</label>
+                        <textarea id="materialDescription" rows="3"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  placeholder="وصف مختصر للمحتوى..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 font-medium">
+                        📚 إضافة المادة
+                    </button>
+                </form>
+
+                <button onclick="closeModal('addMaterialModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Welcome Popup -->
     <div id="welcomePopup" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -600,8 +953,10 @@
         // Application State
         let currentUser = null;
         let currentMainTab = 'home';
+        let currentYear = 1;
         let isOnline = false;
         let syncInterval = null;
+        let lastSyncTime = null;
         
         // JSONBin.io Configuration
         const JSONBIN_CONFIG = {
@@ -614,11 +969,13 @@
         let academicData = {
             users: [],
             posts: [],
+            materials: [],
             chatMessages: [],
             onlineUsers: {},
             settings: {
                 name: 'المنصة الأكاديمية',
-                description: 'لجنة الطب والجراحة البيطرية'
+                description: 'لجنة الطب والجراحة البيطرية',
+                version: '2.0.0'
             },
             lastUpdated: new Date().toISOString()
         };
@@ -631,76 +988,104 @@
 
         // Initialize the application
         function initializeApp() {
+            console.log('🚀 تهيئة المنصة الأكاديمية...');
             setupEventListeners();
             checkLoginStatus();
             updateConnectionStatus('connecting');
             connectToCloud();
+            
+            // Set active year tab
+            switchYear(1);
         }
 
         // Cloud connection functions
         async function connectToCloud() {
             try {
+                console.log('🔄 محاولة الاتصال بالسحابة...');
                 updateConnectionStatus('connecting');
                 await loadDataFromCloud();
                 updateConnectionStatus('online');
                 isOnline = true;
                 
+                console.log('✅ تم الاتصال بالسحابة بنجاح');
+                showNotification('تم الاتصال بالسحابة بنجاح', 'success');
+                
+                // Start sync interval
                 if (syncInterval) clearInterval(syncInterval);
-                syncInterval = setInterval(syncWithCloud, 10000);
+                syncInterval = setInterval(syncWithCloud, 15000); // Every 15 seconds
                 
             } catch (error) {
-                console.error('فشل الاتصال بالسحابة:', error);
+                console.error('❌ فشل الاتصال بالسحابة:', error);
                 updateConnectionStatus('offline');
+                isOnline = false;
                 loadDataFromLocalStorage();
+                showNotification('تم التبديل للوضع المحلي', 'warning');
+                
+                // Retry connection every 30 seconds
+                setTimeout(connectToCloud, 30000);
             }
         }
 
         async function loadDataFromCloud() {
             showSyncIndicator();
             
-            const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
-                headers: {
-                    'X-Master-Key': JSONBIN_CONFIG.apiKey
-                }
-            });
+            try {
+                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.apiKey
+                    }
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-            const result = await response.json();
-            const cloudData = result.record;
-            
-            if (cloudData) {
-                academicData = {
-                    ...academicData,
-                    ...cloudData,
-                    users: cloudData.users || [],
-                    posts: cloudData.posts || [],
-                    chatMessages: cloudData.chatMessages || [],
-                    onlineUsers: cloudData.onlineUsers || {},
-                    settings: { ...academicData.settings, ...(cloudData.settings || {}) }
-                };
+                const result = await response.json();
+                const cloudData = result.record;
                 
-                saveDataToLocalStorage();
-                
-                if (academicData.chatMessages && academicData.chatMessages.length > 0) {
-                    loadChatMessages();
+                if (cloudData && cloudData.lastUpdated) {
+                    // Check if cloud data is newer
+                    const cloudTime = new Date(cloudData.lastUpdated);
+                    const localTime = lastSyncTime ? new Date(lastSyncTime) : new Date(0);
+                    
+                    if (cloudTime > localTime) {
+                        academicData = {
+                            ...academicData,
+                            ...cloudData,
+                            users: cloudData.users || [],
+                            posts: cloudData.posts || [],
+                            materials: cloudData.materials || [],
+                            chatMessages: cloudData.chatMessages || [],
+                            onlineUsers: cloudData.onlineUsers || {},
+                            settings: { ...academicData.settings, ...(cloudData.settings || {}) }
+                        };
+                        
+                        lastSyncTime = cloudData.lastUpdated;
+                        saveDataToLocalStorage();
+                        
+                        // Update UI
+                        updateUIAfterDataLoad();
+                        
+                        console.log('📥 تم تحميل البيانات من السحابة');
+                    }
                 }
                 
-                console.log('تم تحميل البيانات من السحابة بنجاح');
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات من السحابة:', error);
+                throw error;
+            } finally {
+                hideSyncIndicator();
             }
-            
-            hideSyncIndicator();
         }
 
         async function saveDataToCloud() {
-            if (!isOnline) return;
+            if (!isOnline) return false;
             
             try {
                 showSyncIndicator();
                 
                 academicData.lastUpdated = new Date().toISOString();
+                lastSyncTime = academicData.lastUpdated;
                 
                 const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}`, {
                     method: 'PUT',
@@ -715,27 +1100,63 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                console.log('تم حفظ البيانات في السحابة بنجاح');
-                hideSyncIndicator();
+                console.log('📤 تم حفظ البيانات في السحابة');
+                return true;
                 
             } catch (error) {
                 console.error('خطأ في حفظ البيانات في السحابة:', error);
+                return false;
+            } finally {
                 hideSyncIndicator();
             }
         }
 
         async function syncWithCloud() {
-            if (!isOnline) return;
+            if (!isOnline || !currentUser) return;
             
             try {
+                // Update online status
                 updateOnlineUsersCount();
+                
+                // Save to cloud
                 await saveDataToCloud();
+                
+                // Load from cloud to get updates from other users
                 await loadDataFromCloud();
+                
             } catch (error) {
                 console.error('خطأ في المزامنة:', error);
                 updateConnectionStatus('offline');
                 isOnline = false;
+                
+                // Try to reconnect
+                setTimeout(connectToCloud, 10000);
             }
+        }
+
+        function updateUIAfterDataLoad() {
+            // Update chat messages
+            if (currentMainTab === 'chat') {
+                loadChatMessages();
+            }
+            
+            // Update posts
+            if (currentMainTab === 'posts') {
+                loadPosts();
+            }
+            
+            // Update materials
+            if (currentMainTab === 'materials') {
+                loadMaterials(currentYear);
+            }
+            
+            // Update admin stats
+            if (currentUser && currentUser.isAdmin) {
+                updateAdminStats();
+            }
+            
+            // Update online users count
+            updateOnlineUsersCount();
         }
 
         function showSyncIndicator() {
@@ -750,7 +1171,7 @@
             if (indicator) {
                 setTimeout(() => {
                     indicator.classList.remove('show');
-                }, 500);
+                }, 1000);
             }
         }
 
@@ -776,7 +1197,8 @@
         function saveDataToLocalStorage() {
             try {
                 localStorage.setItem('academicData', JSON.stringify(academicData));
-                localStorage.setItem('lastSaved', new Date().toISOString());
+                localStorage.setItem('lastSyncTime', lastSyncTime || new Date().toISOString());
+                console.log('💾 تم حفظ البيانات محلياً');
             } catch (error) {
                 console.error('خطأ في حفظ البيانات محلياً:', error);
             }
@@ -785,10 +1207,15 @@
         function loadDataFromLocalStorage() {
             try {
                 const saved = localStorage.getItem('academicData');
+                const savedSyncTime = localStorage.getItem('lastSyncTime');
+                
                 if (saved) {
                     const parsedData = JSON.parse(saved);
                     academicData = { ...academicData, ...parsedData };
-                    console.log('تم تحميل البيانات المحلية');
+                    lastSyncTime = savedSyncTime;
+                    console.log('📁 تم تحميل البيانات المحلية');
+                    
+                    updateUIAfterDataLoad();
                 }
             } catch (error) {
                 console.error('خطأ في تحميل البيانات المحلية:', error);
@@ -797,11 +1224,14 @@
 
         function updateOnlineUsersCount() {
             if (currentUser) {
+                // Add current user to online users
                 academicData.onlineUsers[currentUser.id] = {
                     name: currentUser.name,
+                    avatar: currentUser.avatar,
                     lastSeen: new Date().toISOString()
                 };
                 
+                // Remove users who haven't been seen for more than 2 minutes
                 const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
                 Object.keys(academicData.onlineUsers).forEach(userId => {
                     const lastSeen = new Date(academicData.onlineUsers[userId].lastSeen);
@@ -811,6 +1241,8 @@
                 });
                 
                 const onlineCount = Object.keys(academicData.onlineUsers).length;
+                
+                // Update UI elements
                 const onlineElements = ['onlineUsersCount', 'onlineChatUsers'];
                 onlineElements.forEach(id => {
                     const element = document.getElementById(id);
@@ -821,6 +1253,7 @@
             }
         }
 
+        // Chat functions
         function loadChatMessages() {
             const messagesContainer = document.getElementById('chatMessages');
             if (!messagesContainer) return;
@@ -837,7 +1270,9 @@
                 return;
             }
             
-            academicData.chatMessages.forEach(message => {
+            // Show last 50 messages
+            const recentMessages = academicData.chatMessages.slice(-50);
+            recentMessages.forEach(message => {
                 displayChatMessage(message);
             });
             
@@ -855,7 +1290,7 @@
             });
             
             const messageElement = document.createElement('div');
-            messageElement.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`;
+            messageElement.className = `flex ${isCurrentUser ? 'justify-end' : 'justify-start'} chat-message`;
             
             messageElement.innerHTML = `
                 <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
@@ -863,8 +1298,8 @@
                         ? 'bg-purple-600 text-white' 
                         : 'bg-gray-200 text-gray-900'
                 }">
-                    ${!isCurrentUser ? `<div class="text-xs font-semibold mb-1">${message.userName}</div>` : ''}
-                    <div class="text-sm">${message.text}</div>
+                    ${!isCurrentUser ? `<div class="text-xs font-semibold mb-1 opacity-75">${message.userName}</div>` : ''}
+                    <div class="text-sm">${escapeHtml(message.text)}</div>
                     <div class="text-xs opacity-75 mt-1">${messageTime}</div>
                 </div>
             `;
@@ -897,13 +1332,299 @@
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
             
+            // Update user message count
+            if (currentUser) {
+                const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    academicData.users[userIndex].messageCount = (academicData.users[userIndex].messageCount || 0) + 1;
+                }
+            }
+            
             saveDataToLocalStorage();
             if (isOnline) {
                 saveDataToCloud();
             }
         }
 
-        // Check if user is already logged in
+        // Posts functions
+        function loadPosts() {
+            const postsContainer = document.getElementById('postsContainer');
+            if (!postsContainer) return;
+            
+            if (academicData.posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حالياً</h3>
+                        <p class="text-gray-600">ستظهر المنشورات والإعلانات هنا عند إضافتها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort posts by date (newest first)
+            const sortedPosts = [...academicData.posts].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            
+            postsContainer.innerHTML = sortedPosts.map(post => `
+                <div class="post-card bg-white rounded-lg shadow-md p-6 mb-4 border border-gray-100">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <div class="w-10 h-10 bg-${getPostTypeColor(post.type)}-100 rounded-full flex items-center justify-center">
+                                <span class="text-${getPostTypeColor(post.type)}-600">${getPostTypeIcon(post.type)}</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">${escapeHtml(post.title)}</h3>
+                                <p class="text-sm text-gray-500">${formatDate(post.timestamp)}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-${getPostTypeColor(post.type)}-100 text-${getPostTypeColor(post.type)}-800 text-xs font-medium rounded-full">
+                            ${getPostTypeLabel(post.type)}
+                        </span>
+                    </div>
+                    <div class="text-gray-700 leading-relaxed">
+                        ${escapeHtml(post.content).replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-500">
+                        بواسطة: ${escapeHtml(post.authorName)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addPost(title, content, type) {
+            if (!currentUser || !currentUser.isAdmin) return false;
+            
+            const post = {
+                id: Date.now().toString(),
+                title: title,
+                content: content,
+                type: type,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.posts.unshift(post);
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                saveDataToCloud();
+            }
+            
+            if (currentMainTab === 'posts') {
+                loadPosts();
+            }
+            
+            showNotification('تم إضافة المنشور بنجاح', 'success');
+            return true;
+        }
+
+        // Materials functions
+        function loadMaterials(year) {
+            const materialsContent = document.getElementById('materialsContent');
+            if (!materialsContent) return;
+            
+            const yearMaterials = academicData.materials.filter(m => m.year === year);
+            
+            if (yearMaterials.length === 0) {
+                materialsContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد مواد للسنة ${getYearName(year)}</h3>
+                        <p class="text-gray-600">ستظهر المواد الدراسية هنا عند إضافتها</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group materials by type
+            const groupedMaterials = yearMaterials.reduce((groups, material) => {
+                const type = material.type;
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(material);
+                return groups;
+            }, {});
+            
+            materialsContent.innerHTML = `
+                <div class="space-y-6">
+                    ${Object.entries(groupedMaterials).map(([type, materials]) => `
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                <span class="mr-2">${getMaterialTypeIcon(type)}</span>
+                                ${getMaterialTypeLabel(type)}
+                                <span class="mr-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                                    ${materials.length}
+                                </span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${materials.map(material => `
+                                    <div class="material-item bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                                        <h4 class="font-medium text-gray-900 mb-2">${escapeHtml(material.name)}</h4>
+                                        ${material.description ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(material.description)}</p>` : ''}
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs text-gray-500">${formatDate(material.timestamp)}</span>
+                                            <a href="${material.link}" target="_blank" rel="noopener noreferrer" 
+                                               class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
+                                                📖 فتح
+                                            </a>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function addMaterial(name, year, type, link, description) {
+            if (!currentUser || !currentUser.isAdmin) return false;
+            
+            const material = {
+                id: Date.now().toString(),
+                name: name,
+                year: parseInt(year),
+                type: type,
+                link: link,
+                description: description,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            academicData.materials.push(material);
+            
+            saveDataToLocalStorage();
+            if (isOnline) {
+                saveDataToCloud();
+            }
+            
+            if (currentMainTab === 'materials' && currentYear === parseInt(year)) {
+                loadMaterials(currentYear);
+            }
+            
+            showNotification('تم إضافة المادة بنجاح', 'success');
+            return true;
+        }
+
+        // Navigation functions
+        function switchMainTab(tabName) {
+            currentMainTab = tabName;
+            
+            // Hide all sections
+            const sections = ['homeSection', 'materialsSection', 'postsSection', 'chatSection', 'profileSection', 'adminPanel'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    section.classList.add('hidden');
+                }
+            });
+            
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-purple-600', 'font-semibold');
+                btn.classList.add('text-gray-700');
+            });
+            
+            // Show selected section
+            let targetSection = tabName + 'Section';
+            if (tabName === 'admin') targetSection = 'adminPanel';
+            
+            const section = document.getElementById(targetSection);
+            if (section) {
+                section.classList.remove('hidden');
+                
+                // Update active nav button
+                const navBtn = document.querySelector(`[onclick="switchMainTab('${tabName}')"]`);
+                if (navBtn) {
+                    navBtn.classList.remove('text-gray-700');
+                    navBtn.classList.add('text-purple-600', 'font-semibold');
+                }
+            }
+            
+            // Load section-specific data
+            switch(tabName) {
+                case 'posts':
+                    loadPosts();
+                    break;
+                case 'chat':
+                    loadChatMessages();
+                    break;
+                case 'materials':
+                    loadMaterials(currentYear);
+                    break;
+                case 'profile':
+                    loadProfile();
+                    break;
+                case 'admin':
+                    if (currentUser && currentUser.isAdmin) {
+                        updateAdminStats();
+                    }
+                    break;
+            }
+        }
+
+        function switchYear(year) {
+            currentYear = year;
+            
+            // Update year tabs
+            document.querySelectorAll('.year-tab').forEach(tab => {
+                tab.classList.remove('active', 'border-purple-600', 'text-purple-600');
+                tab.classList.add('border-transparent', 'text-gray-700');
+            });
+            
+            const activeTab = document.querySelector(`[data-year="${year}"]`);
+            if (activeTab) {
+                activeTab.classList.add('active', 'border-purple-600', 'text-purple-600');
+                activeTab.classList.remove('border-transparent', 'text-gray-700');
+            }
+            
+            loadMaterials(year);
+        }
+
+        // Profile functions
+        function loadProfile() {
+            if (!currentUser) return;
+            
+            const elements = {
+                profileAvatar: currentUser.avatar,
+                profileName: currentUser.name,
+                profileYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
+                profileUsername: currentUser.username,
+                profileRegDate: formatDate(currentUser.registrationDate || currentUser.loginTime),
+                profileMessages: currentUser.messageCount || 0,
+                profileLogins: currentUser.loginCount || 1
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+        }
+
+        // Admin functions
+        function updateAdminStats() {
+            if (!currentUser || !currentUser.isAdmin) return;
+            
+            const stats = {
+                totalUsers: academicData.users.length,
+                totalPosts: academicData.posts.length,
+                totalMaterials: academicData.materials.length
+            };
+            
+            Object.entries(stats).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+        }
+
+        // Authentication functions
         function checkLoginStatus() {
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
@@ -917,18 +1638,32 @@
             }
         }
 
-        // Setup event listeners
         function setupEventListeners() {
+            // Login form
             const loginForm = document.getElementById('loginForm');
             if (loginForm) {
                 loginForm.addEventListener('submit', handleLogin);
             }
             
+            // Register form
             const registerForm = document.getElementById('registerForm');
             if (registerForm) {
                 registerForm.addEventListener('submit', handleRegister);
             }
             
+            // Add post form
+            const addPostForm = document.getElementById('addPostForm');
+            if (addPostForm) {
+                addPostForm.addEventListener('submit', handleAddPost);
+            }
+            
+            // Add material form
+            const addMaterialForm = document.getElementById('addMaterialForm');
+            if (addMaterialForm) {
+                addMaterialForm.addEventListener('submit', handleAddMaterial);
+            }
+            
+            // User menu
             const userMenuBtn = document.getElementById('userMenuBtn');
             if (userMenuBtn) {
                 userMenuBtn.addEventListener('click', function(e) {
@@ -940,6 +1675,7 @@
                 });
             }
             
+            // Close dropdown when clicking outside
             document.addEventListener('click', function() {
                 const dropdown = document.getElementById('userDropdown');
                 if (dropdown) {
@@ -947,10 +1683,244 @@
                 }
             });
             
+            // Logout button
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', handleLogout);
             }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showNotification('يرجى إدخال جميع البيانات', 'error');
+                return;
+            }
+            
+            const isAdmin = username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password;
+            
+            if (isAdmin) {
+                currentUser = {
+                    id: 'admin',
+                    username: username,
+                    name: 'المدير العام',
+                    year: null,
+                    avatar: 'إ',
+                    isAdmin: true,
+                    loginTime: new Date().toISOString(),
+                    loginCount: 1
+                };
+            } else {
+                const existingUser = academicData.users.find(u => u.username === username);
+                if (!existingUser) {
+                    showNotification('اسم المستخدم غير موجود. يرجى إنشاء حساب جديد.', 'error');
+                    return;
+                }
+                
+                currentUser = {
+                    ...existingUser,
+                    lastLogin: new Date().toISOString(),
+                    loginCount: (existingUser.loginCount || 0) + 1
+                };
+                
+                // Update user data
+                const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    academicData.users[userIndex] = { ...currentUser };
+                }
+            }
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            saveDataToLocalStorage();
+            
+            if (isOnline) {
+                saveDataToCloud();
+            }
+            
+            closeModal('loginModal');
+            showMainPlatform();
+            showWelcomePopup(currentUser.name);
+            
+            showNotification(`مرحباً ${currentUser.name}!`, 'success');
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value.trim();
+            const username = document.getElementById('registerUsername').value.trim();
+            const year = document.getElementById('registerYear').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!name || !username || !year || !password) {
+                showNotification('يرجى إدخال جميع البيانات', 'error');
+                return;
+            }
+            
+            if (academicData.users.find(u => u.username === username)) {
+                showNotification('اسم المستخدم موجود بالفعل. يرجى اختيار اسم آخر.', 'error');
+                return;
+            }
+            
+            currentUser = {
+                id: Date.now().toString(),
+                username: username,
+                name: name,
+                year: parseInt(year),
+                avatar: name.charAt(0).toUpperCase(),
+                isAdmin: false,
+                registrationDate: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                loginCount: 1,
+                messageCount: 0,
+                status: 'متاح'
+            };
+            
+            academicData.users.push(currentUser);
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            saveDataToLocalStorage();
+            
+            if (isOnline) {
+                saveDataToCloud();
+            }
+            
+            closeModal('registerModal');
+            showMainPlatform();
+            showWelcomePopup(name);
+            
+            showNotification(`مرحباً ${name}! تم إنشاء حسابك بنجاح`, 'success');
+        }
+
+        function handleAddPost(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('postTitle').value.trim();
+            const content = document.getElementById('postContent').value.trim();
+            const type = document.getElementById('postType').value;
+            
+            if (!title || !content || !type) {
+                showNotification('يرجى إدخال جميع البيانات', 'error');
+                return;
+            }
+            
+            if (addPost(title, content, type)) {
+                closeModal('addPostModal');
+                document.getElementById('addPostForm').reset();
+            }
+        }
+
+        function handleAddMaterial(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('materialName').value.trim();
+            const year = document.getElementById('materialYear').value;
+            const type = document.getElementById('materialType').value;
+            const link = document.getElementById('materialLink').value.trim();
+            const description = document.getElementById('materialDescription').value.trim();
+            
+            if (!name || !year || !type || !link) {
+                showNotification('يرجى إدخال البيانات المطلوبة', 'error');
+                return;
+            }
+            
+            if (addMaterial(name, year, type, link, description)) {
+                closeModal('addMaterialModal');
+                document.getElementById('addMaterialForm').reset();
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                // Remove from online users
+                if (currentUser && academicData.onlineUsers[currentUser.id]) {
+                    delete academicData.onlineUsers[currentUser.id];
+                    if (isOnline) {
+                        saveDataToCloud();
+                    }
+                }
+                
+                // Clear sync interval
+                if (syncInterval) {
+                    clearInterval(syncInterval);
+                    syncInterval = null;
+                }
+                
+                // Clear user data
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                
+                // Show home page
+                const homePage = document.getElementById('homePage');
+                const mainPlatform = document.getElementById('mainPlatform');
+                
+                if (homePage && mainPlatform) {
+                    homePage.classList.remove('hidden');
+                    mainPlatform.classList.add('hidden');
+                }
+                
+                // Reset forms
+                const forms = ['loginForm', 'registerForm'];
+                forms.forEach(formId => {
+                    const form = document.getElementById(formId);
+                    if (form) form.reset();
+                });
+                
+                showNotification('تم تسجيل الخروج بنجاح', 'info');
+            }
+        }
+
+        function showMainPlatform() {
+            const homePage = document.getElementById('homePage');
+            const mainPlatform = document.getElementById('mainPlatform');
+            
+            if (homePage && mainPlatform) {
+                homePage.classList.add('hidden');
+                mainPlatform.classList.remove('hidden');
+            }
+            
+            // Update user info in UI
+            const userElements = {
+                userName: currentUser.name,
+                userFullName: currentUser.name,
+                userYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
+                userAvatar: currentUser.avatar
+            };
+            
+            Object.entries(userElements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            });
+            
+            // Show admin buttons if user is admin
+            if (currentUser.isAdmin) {
+                const adminElements = ['adminMaterialsBtn', 'adminPostsBtn'];
+                adminElements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.classList.remove('hidden');
+                    }
+                });
+                
+                // Add admin navigation
+                const nav = document.querySelector('nav');
+                if (nav && !document.querySelector('[onclick="switchMainTab(\'admin\')"]')) {
+                    const adminBtn = document.createElement('button');
+                    adminBtn.onclick = () => switchMainTab('admin');
+                    adminBtn.className = 'nav-btn px-4 py-2 text-gray-700 hover:text-purple-600 transition-colors';
+                    adminBtn.innerHTML = '🛠️ الإدارة';
+                    nav.appendChild(adminBtn);
+                }
+            }
+            
+            updateOnlineUsersCount();
+            updateUIAfterDataLoad();
         }
 
         // Modal functions
@@ -965,6 +1935,28 @@
         function showRegisterModal() {
             closeModal('loginModal');
             const modal = document.getElementById('registerModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function showAddPostModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك بإضافة منشورات', 'error');
+                return;
+            }
+            const modal = document.getElementById('addPostModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function showAddMaterialModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك بإضافة مواد', 'error');
+                return;
+            }
+            const modal = document.getElementById('addMaterialModal');
             if (modal) {
                 modal.classList.remove('hidden');
             }
@@ -993,192 +1985,49 @@
             }
         }
 
-        // Authentication functions
-        function handleLogin(event) {
-            event.preventDefault();
+        // Utility functions
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
             
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
+            const notification = document.createElement('div');
+            notification.className = `notification-popup bg-white rounded-lg shadow-lg border-l-4 p-4 ${
+                type === 'success' ? 'border-green-500' : 
+                type === 'error' ? 'border-red-500' : 
+                type === 'warning' ? 'border-yellow-500' : 'border-blue-500'
+            }`;
             
-            if (username && password) {
-                const isAdmin = username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password;
-                
-                if (isAdmin) {
-                    currentUser = {
-                        id: 'admin',
-                        username: username,
-                        name: 'المدير العام',
-                        year: null,
-                        avatar: 'إ',
-                        isAdmin: true,
-                        loginTime: new Date().toISOString()
-                    };
-                } else {
-                    const existingUser = academicData.users.find(u => u.username === username);
-                    if (!existingUser) {
-                        alert('اسم المستخدم غير موجود. يرجى إنشاء حساب جديد.');
-                        return;
-                    }
-                    
-                    currentUser = {
-                        ...existingUser,
-                        lastLogin: new Date().toISOString()
-                    };
-                    
-                    const userIndex = academicData.users.findIndex(u => u.id === currentUser.id);
-                    if (userIndex !== -1) {
-                        academicData.users[userIndex].lastLogin = currentUser.lastLogin;
-                    }
-                }
-                
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                saveDataToLocalStorage();
-                
-                if (isOnline) {
-                    saveDataToCloud();
-                }
-                
-                closeModal('loginModal');
-                showMainPlatform();
-                showWelcomePopup(currentUser.name);
-            }
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span class="text-lg mr-2">${icon}</span>
+                    <span class="text-sm font-medium text-gray-900">${escapeHtml(message)}</span>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
         }
 
-        function handleRegister(event) {
-            event.preventDefault();
-            
-            const name = document.getElementById('registerName').value.trim();
-            const username = document.getElementById('registerUsername').value.trim();
-            const year = document.getElementById('registerYear').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            if (name && username && year && password) {
-                if (academicData.users.find(u => u.username === username)) {
-                    alert('اسم المستخدم موجود بالفعل. يرجى اختيار اسم آخر.');
-                    return;
-                }
-                
-                currentUser = {
-                    id: Date.now().toString(),
-                    username: username,
-                    name: name,
-                    year: parseInt(year),
-                    avatar: name.charAt(0).toUpperCase(),
-                    isAdmin: false,
-                    registrationDate: new Date().toISOString(),
-                    lastLogin: new Date().toISOString(),
-                    status: 'متاح'
-                };
-                
-                academicData.users.push(currentUser);
-                
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                saveDataToLocalStorage();
-                
-                if (isOnline) {
-                    saveDataToCloud();
-                }
-                
-                closeModal('registerModal');
-                showMainPlatform();
-                showWelcomePopup(name);
-            }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        function handleLogout() {
-            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                if (currentUser && academicData.onlineUsers[currentUser.id]) {
-                    delete academicData.onlineUsers[currentUser.id];
-                    if (isOnline) {
-                        saveDataToCloud();
-                    }
-                }
-                
-                if (syncInterval) {
-                    clearInterval(syncInterval);
-                    syncInterval = null;
-                }
-                
-                currentUser = null;
-                localStorage.removeItem('currentUser');
-                
-                const homePage = document.getElementById('homePage');
-                const mainPlatform = document.getElementById('mainPlatform');
-                
-                if (homePage && mainPlatform) {
-                    homePage.classList.remove('hidden');
-                    mainPlatform.classList.add('hidden');
-                }
-                
-                const loginForm = document.getElementById('loginForm');
-                const registerForm = document.getElementById('registerForm');
-                if (loginForm) loginForm.reset();
-                if (registerForm) registerForm.reset();
-            }
-        }
-
-        function showMainPlatform() {
-            const homePage = document.getElementById('homePage');
-            const mainPlatform = document.getElementById('mainPlatform');
-            
-            if (homePage && mainPlatform) {
-                homePage.classList.add('hidden');
-                mainPlatform.classList.remove('hidden');
-            }
-            
-            const userElements = {
-                userName: currentUser.name,
-                userFullName: currentUser.name,
-                userYear: currentUser.year ? `السنة ${getYearName(currentUser.year)}` : 'المدير العام',
-                userAvatar: currentUser.avatar
-            };
-            
-            Object.entries(userElements).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.textContent = value;
-                }
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
-            
-            updateOnlineUsersCount();
-            
-            if (academicData.chatMessages && academicData.chatMessages.length > 0) {
-                loadChatMessages();
-            }
-        }
-
-        function switchMainTab(tabName) {
-            currentMainTab = tabName;
-            
-            const sections = ['postsSection', 'chatSection'];
-            sections.forEach(sectionId => {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    section.classList.add('hidden');
-                }
-            });
-            
-            const mainContent = document.querySelector('#mainPlatform main');
-            if (mainContent) {
-                mainContent.classList.add('hidden');
-            }
-            
-            if (tabName === 'posts') {
-                const postsSection = document.getElementById('postsSection');
-                if (postsSection) {
-                    postsSection.classList.remove('hidden');
-                }
-            } else if (tabName === 'chat') {
-                const chatSection = document.getElementById('chatSection');
-                if (chatSection) {
-                    chatSection.classList.remove('hidden');
-                }
-                loadChatMessages();
-            } else {
-                if (mainContent) {
-                    mainContent.classList.remove('hidden');
-                }
-            }
         }
 
         function getYearName(year) {
@@ -1192,8 +2041,81 @@
             return yearNames[year] || 'غير محدد';
         }
 
+        function getPostTypeIcon(type) {
+            const icons = {
+                announcement: '📢',
+                news: '📰',
+                reminder: '⏰',
+                update: '🔄'
+            };
+            return icons[type] || '📝';
+        }
+
+        function getPostTypeLabel(type) {
+            const labels = {
+                announcement: 'إعلان',
+                news: 'خبر',
+                reminder: 'تذكير',
+                update: 'تحديث'
+            };
+            return labels[type] || 'منشور';
+        }
+
+        function getPostTypeColor(type) {
+            const colors = {
+                announcement: 'blue',
+                news: 'green',
+                reminder: 'yellow',
+                update: 'purple'
+            };
+            return colors[type] || 'gray';
+        }
+
+        function getMaterialTypeIcon(type) {
+            const icons = {
+                slides: '📑',
+                recordings: '🎙️',
+                summaries: '📝',
+                books: '📚'
+            };
+            return icons[type] || '📄';
+        }
+
+        function getMaterialTypeLabel(type) {
+            const labels = {
+                slides: 'السلايدات',
+                recordings: 'التسجيلات',
+                summaries: 'الملخصات',
+                books: 'الكتب'
+            };
+            return labels[type] || 'مواد';
+        }
+
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Handle page visibility change for better sync
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && isOnline && currentUser) {
+                syncWithCloud();
+            }
+        });
+
+        // Handle online/offline events
+        window.addEventListener('online', function() {
+            console.log('🌐 تم استعادة الاتصال بالإنترنت');
+            connectToCloud();
+        });
+
+        window.addEventListener('offline', function() {
+            console.log('📴 تم فقدان الاتصال بالإنترنت');
+            updateConnectionStatus('offline');
+            isOnline = false;
+            if (syncInterval) {
+                clearInterval(syncInterval);
+                syncInterval = null;
+            }
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9787519cb2af32ae',t:'MTc1Njc1NjQ1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97875f9fe62532ae',t:'MTc1Njc1NzAzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

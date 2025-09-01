@@ -1295,6 +1295,301 @@
             checkLoginStatus();
             updateConnectionStatus('connecting');
             connectToCloud();
+            setupFileUpload();
+        }
+
+        // File upload setup
+        function setupFileUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const urlInput = document.getElementById('urlInput');
+            const addUrlBtn = document.getElementById('addUrlBtn');
+
+            // File input change
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Upload area click
+            uploadArea.addEventListener('click', () => {
+                if (currentUser && currentUser.isAdmin) {
+                    fileInput.click();
+                }
+            });
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (currentUser && currentUser.isAdmin) {
+                    const files = Array.from(e.dataTransfer.files);
+                    handleFiles(files);
+                }
+            });
+
+            // URL add button
+            addUrlBtn.addEventListener('click', handleUrlAdd);
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleUrlAdd();
+                }
+            });
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('هذه الميزة متاحة للمدير فقط');
+                return;
+            }
+
+            if (!currentSubject) {
+                alert('يرجى اختيار مادة دراسية أولاً');
+                return;
+            }
+
+            files.forEach(file => {
+                const material = {
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                    name: file.name,
+                    type: file.type || getFileTypeFromName(file.name),
+                    size: formatFileSize(file.size),
+                    uploadDate: new Date().toISOString(),
+                    uploadedBy: currentUser.id,
+                    subjectId: currentSubject.id,
+                    materialType: currentMaterialType,
+                    examType: currentExamType
+                };
+
+                // For demo purposes, we'll store file info without actual file data
+                // In a real app, you'd upload to a file server
+                addMaterialToSubject(material);
+            });
+
+            // Clear file input
+            document.getElementById('fileInput').value = '';
+            alert(`تم رفع ${files.length} ملف بنجاح!`);
+        }
+
+        function handleUrlAdd() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('هذه الميزة متاحة للمدير فقط');
+                return;
+            }
+
+            if (!currentSubject) {
+                alert('يرجى اختيار مادة دراسية أولاً');
+                return;
+            }
+
+            const urlInput = document.getElementById('urlInput');
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                alert('يرجى إدخال رابط صحيح');
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                alert('الرابط غير صحيح. يرجى إدخال رابط يبدأ بـ http:// أو https://');
+                return;
+            }
+
+            const fileName = prompt('اسم الملف:') || getFileNameFromUrl(url);
+            
+            const material = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                name: fileName,
+                url: url,
+                type: 'url',
+                size: 'رابط خارجي',
+                uploadDate: new Date().toISOString(),
+                uploadedBy: currentUser.id,
+                subjectId: currentSubject.id,
+                materialType: currentMaterialType,
+                examType: currentExamType
+            };
+
+            addMaterialToSubject(material);
+            urlInput.value = '';
+            alert('تم إضافة الرابط بنجاح!');
+        }
+
+        function addMaterialToSubject(material) {
+            if (!academicData.materials[currentSubject.id]) {
+                academicData.materials[currentSubject.id] = {
+                    slides: { mid: [], final: [] },
+                    recordings: { mid: [], final: [] },
+                    summaries: { mid: [], final: [] }
+                };
+            }
+
+            academicData.materials[currentSubject.id][currentMaterialType][currentExamType].push(material);
+            
+            saveDataToLocalStorage();
+            if (isOnline) saveDataToCloud();
+            
+            // Refresh the materials list
+            loadSubjectMaterials();
+            
+            // Update subject card counts
+            refreshSubjectsGrid();
+        }
+
+        function getFileTypeFromName(fileName) {
+            const extension = fileName.split('.').pop()?.toLowerCase();
+            const types = {
+                pdf: 'application/pdf',
+                doc: 'application/msword',
+                docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ppt: 'application/vnd.ms-powerpoint',
+                pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                mp3: 'audio/mpeg',
+                mp4: 'video/mp4',
+                avi: 'video/avi',
+                mov: 'video/quicktime',
+                jpg: 'image/jpeg',
+                jpeg: 'image/jpeg',
+                png: 'image/png',
+                gif: 'image/gif'
+            };
+            return types[extension] || 'application/octet-stream';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return string.startsWith('http://') || string.startsWith('https://');
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function getFileNameFromUrl(url) {
+            try {
+                const urlObj = new URL(url);
+                const pathname = urlObj.pathname;
+                const fileName = pathname.split('/').pop();
+                return fileName || 'رابط خارجي';
+            } catch (_) {
+                return 'رابط خارجي';
+            }
+        }
+
+        // Material management functions
+        function downloadMaterial(materialId) {
+            const material = findMaterialById(materialId);
+            if (!material) {
+                alert('الملف غير موجود');
+                return;
+            }
+
+            if (material.url) {
+                // Open URL in new tab
+                window.open(material.url, '_blank');
+            } else {
+                // For demo purposes, show download message
+                alert(`تحميل الملف: ${material.name}\n\nملاحظة: في النسخة التجريبية، لا يمكن تحميل الملفات الفعلية.`);
+            }
+        }
+
+        function deleteMaterial(materialId) {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('هذه الميزة متاحة للمدير فقط');
+                return;
+            }
+
+            if (confirm('هل أنت متأكد من حذف هذا الملف؟')) {
+                // Find and remove material
+                const materials = academicData.materials[currentSubject.id][currentMaterialType][currentExamType];
+                const index = materials.findIndex(m => m.id === materialId);
+                
+                if (index !== -1) {
+                    materials.splice(index, 1);
+                    saveDataToLocalStorage();
+                    if (isOnline) saveDataToCloud();
+                    
+                    loadSubjectMaterials();
+                    refreshSubjectsGrid();
+                    alert('تم حذف الملف بنجاح');
+                }
+            }
+        }
+
+        function toggleBookmark(materialId) {
+            if (!currentUser) return;
+            
+            if (!academicData.bookmarks[currentUser.id]) {
+                academicData.bookmarks[currentUser.id] = [];
+            }
+            
+            const bookmarks = academicData.bookmarks[currentUser.id];
+            const index = bookmarks.indexOf(materialId);
+            
+            if (index === -1) {
+                bookmarks.push(materialId);
+                alert('تم إضافة الملف للمفضلة');
+            } else {
+                bookmarks.splice(index, 1);
+                alert('تم إزالة الملف من المفضلة');
+            }
+            
+            saveDataToLocalStorage();
+            if (isOnline) saveDataToCloud();
+        }
+
+        function toggleFavorite(materialId) {
+            if (!currentUser) return;
+            
+            if (!academicData.favorites[currentUser.id]) {
+                academicData.favorites[currentUser.id] = [];
+            }
+            
+            const favorites = academicData.favorites[currentUser.id];
+            const index = favorites.indexOf(materialId);
+            
+            if (index === -1) {
+                favorites.push(materialId);
+                alert('تم إضافة الملف للمحفوظات');
+            } else {
+                favorites.splice(index, 1);
+                alert('تم إزالة الملف من المحفوظات');
+            }
+            
+            saveDataToLocalStorage();
+            if (isOnline) saveDataToCloud();
+        }
+
+        function findMaterialById(materialId) {
+            for (const subjectId in academicData.materials) {
+                const subjectMaterials = academicData.materials[subjectId];
+                for (const type in subjectMaterials) {
+                    for (const exam in subjectMaterials[type]) {
+                        const material = subjectMaterials[type][exam].find(m => m.id === materialId);
+                        if (material) return material;
+                    }
+                }
+            }
+            return null;
         }
 
         // Cloud connection functions
@@ -1409,6 +1704,15 @@
                 
                 // Update online users count
                 updateOnlineUsersCount();
+                
+                // Refresh admin data if admin is logged in and viewing users
+                if (currentUser && currentUser.isAdmin && currentMainTab === 'admin') {
+                    const activeAdminTab = document.querySelector('.admin-tab.border-purple-500');
+                    if (activeAdminTab && activeAdminTab.dataset.adminTab === 'users') {
+                        loadUsersTable();
+                        updateAdminStats();
+                    }
+                }
                 
             } catch (error) {
                 console.error('خطأ في المزامنة:', error);
@@ -1695,6 +1999,12 @@
                 document.getElementById('uploadSection').classList.remove('hidden');
                 document.getElementById('editAnnouncementsBtn').classList.remove('hidden');
                 document.getElementById('addPostBtn').classList.remove('hidden');
+                
+                // Load admin data immediately
+                setTimeout(() => {
+                    updateAdminStats();
+                    loadUsersTable();
+                }, 500);
             }
             
             // Load user profile picture
@@ -1747,6 +2057,9 @@
             document.getElementById('welcomeSection').classList.add('hidden');
             document.getElementById('semesterContent').classList.remove('hidden');
             document.getElementById('subjectMaterials').classList.add('hidden');
+            
+            // Load subjects for this semester
+            refreshSubjectsGrid();
         }
 
         function showSemesterContent() {
@@ -1777,12 +2090,20 @@
             
             // Update tab appearance
             document.querySelectorAll('.material-tab').forEach(tab => {
-                tab.classList.remove('border-purple-500', 'text-purple-600');
+                tab.classList.remove('border-purple-500', 'text-purple-600', 'active');
                 tab.classList.add('border-transparent', 'text-gray-500');
             });
             
-            document.querySelector(`[data-type="${type}"]`).classList.remove('border-transparent', 'text-gray-500');
-            document.querySelector(`[data-type="${type}"]`).classList.add('border-purple-500', 'text-purple-600');
+            const activeTab = document.querySelector(`[data-type="${type}"]`);
+            if (activeTab) {
+                activeTab.classList.remove('border-transparent', 'text-gray-500');
+                activeTab.classList.add('border-purple-500', 'text-purple-600', 'active');
+            }
+            
+            // Reload materials for new type
+            if (currentSubject) {
+                loadSubjectMaterials();
+            }
         }
 
         function switchExamTab(examType) {
@@ -1790,12 +2111,20 @@
             
             // Update tab appearance
             document.querySelectorAll('.exam-tab').forEach(tab => {
-                tab.classList.remove('bg-purple-600', 'text-white');
+                tab.classList.remove('bg-purple-600', 'text-white', 'active');
                 tab.classList.add('bg-gray-200', 'text-gray-700');
             });
             
-            document.querySelector(`[data-exam="${examType}"]`).classList.remove('bg-gray-200', 'text-gray-700');
-            document.querySelector(`[data-exam="${examType}"]`).classList.add('bg-purple-600', 'text-white');
+            const activeTab = document.querySelector(`[data-exam="${examType}"]`);
+            if (activeTab) {
+                activeTab.classList.remove('bg-gray-200', 'text-gray-700');
+                activeTab.classList.add('bg-purple-600', 'text-white', 'active');
+            }
+            
+            // Reload materials for new exam type
+            if (currentSubject) {
+                loadSubjectMaterials();
+            }
         }
 
         // Main tab switching
@@ -1915,8 +2244,10 @@
             
             // Load tab-specific data
             if (tabName === 'users') {
-                loadUsersTable();
-                updateAdminStats();
+                setTimeout(() => {
+                    loadUsersTable();
+                    updateAdminStats();
+                }, 100);
             } else if (tabName === 'content') {
                 loadRecentActivity();
             } else if (tabName === 'posts') {
@@ -1927,7 +2258,23 @@
         // Admin functions
         function loadUsersTable() {
             const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
+            
+            console.log('عدد المستخدمين:', academicData.users.length);
+            
+            if (academicData.users.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                        <div class="text-4xl mb-2">👥</div>
+                        <p>لا يوجد مستخدمين مسجلين حتى الآن</p>
+                    </td>
+                `;
+                tbody.appendChild(row);
+                return;
+            }
             
             academicData.users.forEach(user => {
                 const row = document.createElement('tr');
@@ -2022,32 +2369,234 @@
 
         // Admin action functions
         function showAddSubjectModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('هذه الميزة متاحة للمدير فقط');
+                return;
+            }
+
+            if (!currentYear || !currentSemester) {
+                alert('يرجى اختيار السنة والفصل الدراسي أولاً من القائمة الجانبية');
+                return;
+            }
+
             const subjectName = prompt('اسم المادة:');
-            const subjectDescription = prompt('وصف المادة:');
-            const year = prompt('السنة الدراسية (1-5):');
-            const semester = prompt('الفصل الدراسي (1 أو 2):');
+            if (!subjectName) return;
+
+            const subjectDescription = prompt('وصف المادة (اختياري):') || '';
             
-            if (subjectName && year && semester) {
+            if (subjectName) {
                 const subjectId = Date.now().toString();
-                const key = `${year}-${semester}`;
+                const key = `${currentYear}-${currentSemester}`;
                 
                 if (!academicData.subjects[key]) {
                     academicData.subjects[key] = [];
                 }
                 
-                academicData.subjects[key].push({
+                const newSubject = {
                     id: subjectId,
                     name: subjectName,
-                    description: subjectDescription || '',
-                    year: parseInt(year),
-                    semester: parseInt(semester),
-                    createdAt: new Date().toISOString()
-                });
+                    description: subjectDescription,
+                    year: currentYear,
+                    semester: currentSemester,
+                    createdAt: new Date().toISOString(),
+                    materials: {
+                        slides: { mid: [], final: [] },
+                        recordings: { mid: [], final: [] },
+                        summaries: { mid: [], final: [] }
+                    }
+                };
+                
+                academicData.subjects[key].push(newSubject);
+                
+                // Initialize materials for this subject
+                if (!academicData.materials[subjectId]) {
+                    academicData.materials[subjectId] = {
+                        slides: { mid: [], final: [] },
+                        recordings: { mid: [], final: [] },
+                        summaries: { mid: [], final: [] }
+                    };
+                }
                 
                 saveDataToLocalStorage();
                 if (isOnline) saveDataToCloud();
                 
                 alert('تم إضافة المادة بنجاح!');
+                updateAdminStats();
+                refreshSubjectsGrid();
+            }
+        }
+
+        function refreshSubjectsGrid() {
+            if (!currentYear || !currentSemester) return;
+            
+            const grid = document.getElementById('subjectsGrid');
+            const key = `${currentYear}-${currentSemester}`;
+            const subjects = academicData.subjects[key] || [];
+            
+            // Clear existing subjects except sample ones
+            const sampleSubjects = grid.querySelectorAll('.material-card[onclick="showSampleSubject()"]');
+            grid.innerHTML = '';
+            
+            // Re-add sample subjects
+            sampleSubjects.forEach(sample => {
+                grid.appendChild(sample.cloneNode(true));
+            });
+            
+            // Add real subjects
+            subjects.forEach(subject => {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'material-card rounded-xl p-6 cursor-pointer';
+                subjectCard.onclick = () => showSubjectMaterials(subject);
+                
+                const materialsCount = {
+                    slides: (academicData.materials[subject.id]?.slides?.mid?.length || 0) + (academicData.materials[subject.id]?.slides?.final?.length || 0),
+                    recordings: (academicData.materials[subject.id]?.recordings?.mid?.length || 0) + (academicData.materials[subject.id]?.recordings?.final?.length || 0),
+                    summaries: (academicData.materials[subject.id]?.summaries?.mid?.length || 0) + (academicData.materials[subject.id]?.summaries?.final?.length || 0)
+                };
+                
+                subjectCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
+                            <span class="text-white text-xl">📚</span>
+                        </div>
+                        ${currentUser && currentUser.isAdmin ? `
+                        <button onclick="event.stopPropagation(); deleteSubject('${subject.id}')" class="text-red-500 hover:text-red-700 text-sm">
+                            🗑️ حذف
+                        </button>
+                        ` : ''}
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">${subject.name}</h3>
+                    <p class="text-gray-600 text-sm mb-4">${subject.description || 'مادة دراسية'}</p>
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>📑 ${materialsCount.slides} سلايد</span>
+                        <span>🎙️ ${materialsCount.recordings} تسجيل</span>
+                        <span>📝 ${materialsCount.summaries} ملخص</span>
+                    </div>
+                `;
+                
+                grid.appendChild(subjectCard);
+            });
+        }
+
+        function showSubjectMaterials(subject) {
+            currentSubject = subject;
+            
+            document.getElementById('semesterContent').classList.add('hidden');
+            document.getElementById('subjectMaterials').classList.remove('hidden');
+            
+            // Update subject info
+            document.getElementById('subjectTitle').textContent = subject.name;
+            document.getElementById('subjectInfo').textContent = `السنة ${getYearName(subject.year)} - الفصل ${subject.semester === 1 ? 'الأول' : 'الثاني'}`;
+            
+            // Load materials
+            loadSubjectMaterials();
+        }
+
+        function loadSubjectMaterials() {
+            if (!currentSubject) return;
+            
+            const materialsList = document.getElementById('materialsList');
+            const materialsTitle = document.getElementById('materialsTitle');
+            
+            // Update title
+            const typeNames = {
+                slides: 'السلايدات',
+                recordings: 'التسجيلات', 
+                summaries: 'الملخصات'
+            };
+            const examNames = { mid: 'الميد', final: 'الفاينال' };
+            materialsTitle.textContent = `${typeNames[currentMaterialType]} - ${examNames[currentExamType]}`;
+            
+            // Get materials for current subject, type, and exam
+            const materials = academicData.materials[currentSubject.id]?.[currentMaterialType]?.[currentExamType] || [];
+            
+            materialsList.innerHTML = '';
+            
+            if (materials.length === 0) {
+                materialsList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <div class="text-4xl mb-2">📁</div>
+                        <p>لا توجد مواد متاحة حالياً</p>
+                        ${currentUser && currentUser.isAdmin ? '<p class="text-sm mt-2">استخدم قسم الرفع أعلاه لإضافة مواد جديدة</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            materials.forEach(material => {
+                const materialDiv = document.createElement('div');
+                materialDiv.className = 'flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50';
+                
+                const fileIcon = getFileIcon(material.type || material.name);
+                const fileSize = material.size || 'غير محدد';
+                const uploadDate = new Date(material.uploadDate).toLocaleDateString('ar-SA');
+                
+                materialDiv.innerHTML = `
+                    <div class="flex items-center space-x-3 space-x-reverse flex-1">
+                        <span class="text-2xl">${fileIcon}</span>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900">${material.name}</h4>
+                            <p class="text-sm text-gray-500">${fileSize} • ${uploadDate}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button onclick="toggleBookmark('${material.id}')" class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">
+                            📑
+                        </button>
+                        <button onclick="toggleFavorite('${material.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                            🤍
+                        </button>
+                        ${currentUser && currentUser.isAdmin ? `
+                        <button onclick="deleteMaterial('${material.id}')" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                            🗑️
+                        </button>
+                        ` : ''}
+                        <button onclick="downloadMaterial('${material.id}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                            ${material.url ? '🔗 فتح' : '📥 تحميل'}
+                        </button>
+                    </div>
+                `;
+                
+                materialsList.appendChild(materialDiv);
+            });
+        }
+
+        function getFileIcon(fileName) {
+            const extension = fileName.split('.').pop()?.toLowerCase();
+            const icons = {
+                pdf: '📄',
+                doc: '📝',
+                docx: '📝',
+                ppt: '📊',
+                pptx: '📊',
+                mp3: '🎵',
+                mp4: '🎥',
+                avi: '🎥',
+                mov: '🎥',
+                jpg: '🖼️',
+                jpeg: '🖼️',
+                png: '🖼️',
+                gif: '🖼️'
+            };
+            return icons[extension] || '📄';
+        }
+
+        function deleteSubject(subjectId) {
+            if (!currentUser || !currentUser.isAdmin) return;
+            
+            if (confirm('هل أنت متأكد من حذف هذه المادة؟ سيتم حذف جميع الملفات المرتبطة بها.')) {
+                const key = `${currentYear}-${currentSemester}`;
+                if (academicData.subjects[key]) {
+                    academicData.subjects[key] = academicData.subjects[key].filter(s => s.id !== subjectId);
+                }
+                
+                // Delete associated materials
+                delete academicData.materials[subjectId];
+                
+                saveDataToLocalStorage();
+                if (isOnline) saveDataToCloud();
+                
+                refreshSubjectsGrid();
                 updateAdminStats();
             }
         }
@@ -2278,5 +2827,5 @@
         // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9787209543bd32ae',t:'MTc1Njc1NDQ1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97873653e4ef32ae',t:'MTc1Njc1NTM0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

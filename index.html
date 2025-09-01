@@ -724,64 +724,20 @@
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6 border border-gray-100">
                     <div class="flex items-center justify-between">
                         <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
-                        <button id="addPostBtn" class="hidden px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
-                            ➕ إضافة منشور
-                        </button>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button onclick="showUserPostModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
+                                ✍️ كتابة منشور
+                            </button>
+                            <button id="addPostBtn" class="hidden px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
+                                ➕ إضافة منشور إداري
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Posts List -->
                 <div id="postsList" class="space-y-6">
-                    <!-- Sample Posts -->
-                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                        <div class="flex items-start space-x-4 space-x-reverse">
-                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                إ
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-semibold text-gray-900">الإدارة الأكاديمية</h3>
-                                    <span class="text-sm text-gray-500">منذ ساعتين</span>
-                                </div>
-                                <p class="text-gray-700 mb-4">تم إضافة محاضرات جديدة لمادة علم التشريح للسنة الأولى. يرجى مراجعة المواد الجديدة في قسم السلايدات.</p>
-                                <div class="flex items-center space-x-4 space-x-reverse text-sm text-gray-500">
-                                    <button class="flex items-center space-x-1 space-x-reverse hover:text-purple-600">
-                                        <span>👍</span>
-                                        <span>15</span>
-                                    </button>
-                                    <button class="flex items-center space-x-1 space-x-reverse hover:text-purple-600">
-                                        <span>💬</span>
-                                        <span>3</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-                        <div class="flex items-start space-x-4 space-x-reverse">
-                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                إ
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h3 class="font-semibold text-gray-900">الإدارة الأكاديمية</h3>
-                                    <span class="text-sm text-gray-500">أمس</span>
-                                </div>
-                                <p class="text-gray-700 mb-4">تذكير: موعد الامتحانات النهائية للسنة الثالثة سيبدأ الأسبوع القادم. يرجى مراجعة الجدول في قسم الامتحانات.</p>
-                                <div class="flex items-center space-x-4 space-x-reverse text-sm text-gray-500">
-                                    <button class="flex items-center space-x-1 space-x-reverse hover:text-purple-600">
-                                        <span>👍</span>
-                                        <span>28</span>
-                                    </button>
-                                    <button class="flex items-center space-x-1 space-x-reverse hover:text-purple-600">
-                                        <span>💬</span>
-                                        <span>7</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Posts will be loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -809,14 +765,44 @@
         <!-- Chat Section -->
         <div id="chatSection" class="hidden p-6 bg-gray-50 min-h-screen">
             <div class="max-w-4xl mx-auto">
+                <!-- Admin Chat Management (Admin Only) -->
+                <div id="adminChatManagement" class="hidden bg-white rounded-lg shadow-md border border-gray-100 mb-6 p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900 flex items-center">
+                            <span class="mr-2">👨‍💼</span>
+                            إدارة الدردشة
+                        </h3>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button onclick="clearAllMessages()" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                                🗑️ مسح الكل
+                            </button>
+                            <button onclick="exportChatHistory()" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                                📊 تصدير المحادثات
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <span>إجمالي الرسائل: <strong id="totalChatMessages">0</strong></span>
+                        <span class="mx-2">•</span>
+                        <span>المستخدمين النشطين: <strong id="activeChatUsers">0</strong></span>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-lg shadow-md border border-gray-100 h-96 flex flex-col">
                     <!-- Chat Header -->
                     <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
-                        <h3 class="font-semibold text-purple-900 flex items-center">
-                            <span class="mr-2">💬</span>
-                            الدردشة العامة
-                        </h3>
-                        <p class="text-sm text-purple-600">دردشة مباشرة مع جميع المستخدمين المتصلين</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-purple-900 flex items-center">
+                                    <span class="mr-2">💬</span>
+                                    الدردشة العامة
+                                </h3>
+                                <p class="text-sm text-purple-600">دردشة مباشرة مع جميع المستخدمين المتصلين</p>
+                            </div>
+                            <div class="text-sm text-purple-600">
+                                <span id="onlineChatUsers">1</span> متصل الآن
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Chat Messages -->
@@ -1999,11 +1985,13 @@
                 document.getElementById('uploadSection').classList.remove('hidden');
                 document.getElementById('editAnnouncementsBtn').classList.remove('hidden');
                 document.getElementById('addPostBtn').classList.remove('hidden');
+                document.getElementById('adminChatManagement').classList.remove('hidden');
                 
                 // Load admin data immediately
                 setTimeout(() => {
                     updateAdminStats();
                     loadUsersTable();
+                    updateChatStats();
                 }, 500);
             }
             
@@ -2021,6 +2009,12 @@
             if (academicData.chatMessages && academicData.chatMessages.length > 0) {
                 loadChatMessages();
             }
+            
+            // Load all posts
+            loadAllPosts();
+            
+            // Update sidebar announcements
+            updateSidebarAnnouncements();
         }
 
         // Academic year functions
@@ -2163,7 +2157,8 @@
                     userId: currentUser.id,
                     userName: currentUser.name,
                     userAvatar: currentUser.avatar,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    isAdmin: currentUser.isAdmin || false
                 };
 
                 academicData.chatMessages.push(messageData);
@@ -2174,8 +2169,78 @@
                     saveDataToCloud();
                 }
                 
+                // Update chat stats
+                updateChatStats();
+                
                 input.value = '';
             }
+        }
+
+        function clearAllMessages() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('هذه الميزة متاحة للمدير فقط');
+                return;
+            }
+            
+            if (confirm('هل أنت متأكد من حذف جميع رسائل الدردشة؟')) {
+                academicData.chatMessages = [];
+                saveDataToLocalStorage();
+                if (isOnline) saveDataToCloud();
+                
+                // Clear chat display
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <div class="text-4xl mb-2">💬</div>
+                        <p>ابدأ محادثة جديدة!</p>
+                    </div>
+                `;
+                
+                updateChatStats();
+                alert('تم حذف جميع الرسائل بنجاح');
+            }
+        }
+
+        function exportChatHistory() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('هذه الميزة متاحة للمدير فقط');
+                return;
+            }
+            
+            const chatData = academicData.chatMessages.map(msg => ({
+                التاريخ: new Date(msg.timestamp).toLocaleString('ar-SA'),
+                المستخدم: msg.userName,
+                الرسالة: msg.content,
+                نوع_المستخدم: msg.isAdmin ? 'مدير' : 'طالب'
+            }));
+            
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "التاريخ,المستخدم,الرسالة,نوع المستخدم\n"
+                + chatData.map(row => 
+                    `"${row.التاريخ}","${row.المستخدم}","${row.الرسالة}","${row.نوع_المستخدم}"`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `chat_history_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('تم تصدير سجل المحادثات بنجاح!');
+        }
+
+        function updateChatStats() {
+            document.getElementById('totalChatMessages').textContent = academicData.chatMessages.length;
+            
+            // Count unique active users in chat
+            const uniqueUsers = new Set(academicData.chatMessages.map(msg => msg.userId));
+            document.getElementById('activeChatUsers').textContent = uniqueUsers.size;
+            
+            // Update online chat users count
+            const onlineCount = Object.keys(academicData.onlineUsers).length;
+            document.getElementById('onlineChatUsers').textContent = onlineCount;
         }
 
         function displayChatMessage(messageData) {
@@ -2602,7 +2667,7 @@
         }
 
         function showAddPostModal() {
-            const title = prompt('عنوان المنشور:');
+            const title = prompt('عنوان المنشور الإداري:');
             const content = prompt('محتوى المنشور:');
             
             if (title && content) {
@@ -2612,17 +2677,260 @@
                     content: content,
                     authorId: currentUser.id,
                     authorName: currentUser.name,
+                    authorAvatar: currentUser.avatar,
                     createdAt: new Date().toISOString(),
-                    likes: 0,
-                    comments: []
+                    likes: [],
+                    comments: [],
+                    isAdmin: true,
+                    type: 'admin'
                 };
                 
-                academicData.posts.push(post);
+                academicData.posts.unshift(post);
                 saveDataToLocalStorage();
                 if (isOnline) saveDataToCloud();
                 
-                alert('تم إضافة المنشور بنجاح!');
+                alert('تم إضافة المنشور الإداري بنجاح!');
                 loadAdminPosts();
+                loadAllPosts();
+            }
+        }
+
+        function showUserPostModal() {
+            if (!currentUser) {
+                alert('يرجى تسجيل الدخول أولاً');
+                return;
+            }
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50';
+            modal.innerHTML = `
+                <div class="flex items-center justify-center min-h-screen p-4">
+                    <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">✍️ كتابة منشور جديد</h2>
+                            <button onclick="closeUserPostModal()" class="text-gray-400 hover:text-gray-600">
+                                <span class="text-xl">✕</span>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">عنوان المنشور (اختياري)</label>
+                                <input type="text" id="userPostTitle" placeholder="اكتب عنوان المنشور..." 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">محتوى المنشور</label>
+                                <textarea id="userPostContent" placeholder="شارك أفكارك مع زملائك..." rows="4"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></textarea>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2 space-x-reverse">
+                                <input type="checkbox" id="allowComments" checked class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                <label for="allowComments" class="text-sm text-gray-700">السماح بالتعليقات</label>
+                            </div>
+                            
+                            <div class="flex space-x-3 space-x-reverse pt-4">
+                                <button onclick="submitUserPost()" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
+                                    📝 نشر المنشور
+                                </button>
+                                <button onclick="closeUserPostModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function submitUserPost() {
+            const title = document.getElementById('userPostTitle').value.trim();
+            const content = document.getElementById('userPostContent').value.trim();
+            const allowComments = document.getElementById('allowComments').checked;
+            
+            if (!content) {
+                alert('يرجى كتابة محتوى المنشور');
+                return;
+            }
+            
+            const post = {
+                id: Date.now().toString(),
+                title: title || null,
+                content: content,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                authorAvatar: currentUser.avatar,
+                authorYear: currentUser.year,
+                createdAt: new Date().toISOString(),
+                likes: [],
+                comments: [],
+                allowComments: allowComments,
+                isAdmin: false,
+                type: 'user'
+            };
+            
+            academicData.posts.unshift(post);
+            saveDataToLocalStorage();
+            if (isOnline) saveDataToCloud();
+            
+            closeUserPostModal();
+            loadAllPosts();
+            
+            alert('تم نشر المنشور بنجاح! 🎉');
+        }
+
+        function closeUserPostModal() {
+            const modal = document.querySelector('.popup-overlay');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        function loadAllPosts() {
+            const container = document.getElementById('postsList');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (academicData.posts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📝</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد منشورات حتى الآن</h3>
+                        <p class="text-gray-600 mb-4">كن أول من يشارك منشوراً!</p>
+                        <button onclick="showUserPostModal()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">
+                            ✍️ اكتب منشور
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            academicData.posts.forEach(post => {
+                const postDiv = document.createElement('div');
+                postDiv.className = 'bg-white rounded-lg shadow-md p-6 border border-gray-100';
+                
+                const timeAgo = getTimeAgo(post.createdAt);
+                const likesCount = post.likes ? post.likes.length : 0;
+                const commentsCount = post.comments ? post.comments.length : 0;
+                const isLiked = post.likes && currentUser ? post.likes.includes(currentUser.id) : false;
+                
+                postDiv.innerHTML = `
+                    <div class="flex items-start space-x-4 space-x-reverse">
+                        <div class="w-12 h-12 ${post.isAdmin ? 'bg-purple-600' : 'bg-blue-600'} rounded-full flex items-center justify-center text-white font-semibold">
+                            ${post.authorAvatar}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 flex items-center">
+                                        ${post.authorName}
+                                        ${post.isAdmin ? '<span class="mr-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">إدارة</span>' : ''}
+                                        ${post.authorYear && !post.isAdmin ? `<span class="mr-2 text-sm text-gray-500">• السنة ${getYearName(post.authorYear)}</span>` : ''}
+                                    </h3>
+                                    ${post.title ? `<h4 class="font-medium text-gray-800 mt-1">${post.title}</h4>` : ''}
+                                </div>
+                                <div class="flex items-center space-x-2 space-x-reverse">
+                                    <span class="text-sm text-gray-500">${timeAgo}</span>
+                                    ${currentUser && (currentUser.isAdmin || currentUser.id === post.authorId) ? `
+                                    <button onclick="deletePost('${post.id}')" class="text-red-500 hover:text-red-700 text-sm">
+                                        🗑️
+                                    </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <p class="text-gray-700 mb-4 whitespace-pre-wrap">${post.content}</p>
+                            <div class="flex items-center space-x-6 space-x-reverse text-sm text-gray-500">
+                                <button onclick="togglePostLike('${post.id}')" class="flex items-center space-x-1 space-x-reverse hover:text-purple-600 transition-colors ${isLiked ? 'text-purple-600' : ''}">
+                                    <span>${isLiked ? '❤️' : '🤍'}</span>
+                                    <span>${likesCount}</span>
+                                </button>
+                                ${post.allowComments !== false ? `
+                                <button onclick="showPostComments('${post.id}')" class="flex items-center space-x-1 space-x-reverse hover:text-purple-600 transition-colors">
+                                    <span>💬</span>
+                                    <span>${commentsCount}</span>
+                                </button>
+                                ` : ''}
+                                <button onclick="sharePost('${post.id}')" class="flex items-center space-x-1 space-x-reverse hover:text-purple-600 transition-colors">
+                                    <span>📤</span>
+                                    <span>مشاركة</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(postDiv);
+            });
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const postTime = new Date(timestamp);
+            const diffInMinutes = Math.floor((now - postTime) / (1000 * 60));
+            
+            if (diffInMinutes < 1) return 'الآن';
+            if (diffInMinutes < 60) return `منذ ${diffInMinutes} دقيقة`;
+            
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            if (diffInHours < 24) return `منذ ${diffInHours} ساعة`;
+            
+            const diffInDays = Math.floor(diffInHours / 24);
+            if (diffInDays < 7) return `منذ ${diffInDays} يوم`;
+            
+            return postTime.toLocaleDateString('ar-SA');
+        }
+
+        function togglePostLike(postId) {
+            if (!currentUser) {
+                alert('يرجى تسجيل الدخول أولاً');
+                return;
+            }
+            
+            const post = academicData.posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            if (!post.likes) post.likes = [];
+            
+            const userIndex = post.likes.indexOf(currentUser.id);
+            if (userIndex === -1) {
+                post.likes.push(currentUser.id);
+            } else {
+                post.likes.splice(userIndex, 1);
+            }
+            
+            saveDataToLocalStorage();
+            if (isOnline) saveDataToCloud();
+            
+            loadAllPosts();
+        }
+
+        function showPostComments(postId) {
+            alert('سيتم إضافة نظام التعليقات قريباً');
+        }
+
+        function sharePost(postId) {
+            const post = academicData.posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const shareText = `${post.title ? post.title + '\n\n' : ''}${post.content}\n\n- ${post.authorName}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: post.title || 'منشور من المنصة الأكاديمية',
+                    text: shareText
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('تم نسخ المنشور للحافظة!');
+                }).catch(() => {
+                    alert('لا يمكن مشاركة المنشور في هذا المتصفح');
+                });
             }
         }
 
@@ -2827,5 +3135,5 @@
         // Initialize the app when the page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97873653e4ef32ae',t:'MTc1Njc1NTM0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97873bb1c0c632ae',t:'MTc1Njc1NTU2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

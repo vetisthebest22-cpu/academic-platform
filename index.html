@@ -957,13 +957,30 @@
         let isOnline = false;
         let syncInterval = null;
         let lastSyncTime = null;
+        let connectionRetryCount = 0;
+        const MAX_RETRY_ATTEMPTS = 3;
         
-        // JSONBin.io Configuration
-        const JSONBIN_CONFIG = {
-            apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
-            binId: '676b8c8ead19ca34f8d5b7b8',
-            baseUrl: 'https://api.jsonbin.io/v3'
-        };
+        // Cloud Storage Configuration - Multiple providers for redundancy
+        const CLOUD_PROVIDERS = [
+            {
+                name: 'JSONBin',
+                config: {
+                    apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
+                    binId: '676b8c8ead19ca34f8d5b7b8',
+                    baseUrl: 'https://api.jsonbin.io/v3'
+                }
+            },
+            {
+                name: 'Pastebin',
+                config: {
+                    apiKey: 'your_pastebin_key',
+                    pasteId: 'your_paste_id',
+                    baseUrl: 'https://pastebin.com/api'
+                }
+            }
+        ];
+        
+        let currentProvider = 0;
         
         // Data structure
         let academicData = {
@@ -991,48 +1008,90 @@
             console.log('🚀 تهيئة المنصة الأكاديمية...');
             setupEventListeners();
             checkLoginStatus();
+            loadDataFromLocalStorage(); // Load local data first
             updateConnectionStatus('connecting');
-            connectToCloud();
+            
+            // Try to connect to cloud with retry mechanism
+            connectToCloudWithRetry();
             
             // Set active year tab
             switchYear(1);
         }
 
+        // Enhanced cloud connection with retry mechanism
+        async function connectToCloudWithRetry() {
+            for (let attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
+                try {
+                    console.log(`🔄 محاولة الاتصال ${attempt + 1}/${MAX_RETRY_ATTEMPTS}...`);
+                    await connectToCloud();
+                    return; // Success, exit retry loop
+                } catch (error) {
+                    console.error(`❌ فشلت المحاولة ${attempt + 1}:`, error);
+                    
+                    if (attempt < MAX_RETRY_ATTEMPTS - 1) {
+                        // Try next provider
+                        currentProvider = (currentProvider + 1) % CLOUD_PROVIDERS.length;
+                        console.log(`🔄 التبديل إلى مزود آخر: ${CLOUD_PROVIDERS[currentProvider].name}`);
+                        
+                        // Wait before retry
+                        await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
+                    }
+                }
+            }
+            
+            // All attempts failed
+            console.log('❌ فشل الاتصال بجميع المزودين، التبديل للوضع المحلي');
+            updateConnectionStatus('offline');
+            isOnline = false;
+            showNotification('تم التبديل للوضع المحلي - البيانات محفوظة محلياً', 'warning');
+            
+            // Retry connection every 60 seconds
+            setTimeout(connectToCloudWithRetry, 60000);
+        }
+
         // Cloud connection functions
         async function connectToCloud() {
+            const provider = CLOUD_PROVIDERS[currentProvider];
+            console.log(`🔄 محاولة الاتصال بـ ${provider.name}...`);
+            
+            updateConnectionStatus('connecting');
+            
+            if (provider.name === 'JSONBin') {
+                await connectToJSONBin(provider.config);
+            } else {
+                throw new Error(`مزود غير مدعوم: ${provider.name}`);
+            }
+            
+            updateConnectionStatus('online');
+            isOnline = true;
+            connectionRetryCount = 0;
+            
+            console.log('✅ تم الاتصال بالسحابة بنجاح');
+            showNotification('تم الاتصال بالسحابة بنجاح', 'success');
+            
+            // Start sync interval
+            if (syncInterval) clearInterval(syncInterval);
+            syncInterval = setInterval(syncWithCloud, 30000); // Every 30 seconds
+        }
+
+        async function connectToJSONBin(config) {
             try {
-                console.log('🔄 محاولة الاتصال بالسحابة...');
-                updateConnectionStatus('connecting');
-                await loadDataFromCloud();
-                updateConnectionStatus('online');
-                isOnline = true;
-                
-                console.log('✅ تم الاتصال بالسحابة بنجاح');
-                showNotification('تم الاتصال بالسحابة بنجاح', 'success');
-                
-                // Start sync interval
-                if (syncInterval) clearInterval(syncInterval);
-                syncInterval = setInterval(syncWithCloud, 15000); // Every 15 seconds
-                
+                await loadDataFromJSONBin(config);
             } catch (error) {
-                console.error('❌ فشل الاتصال بالسحابة:', error);
-                updateConnectionStatus('offline');
-                isOnline = false;
-                loadDataFromLocalStorage();
-                showNotification('تم التبديل للوضع المحلي', 'warning');
-                
-                // Retry connection every 30 seconds
-                setTimeout(connectToCloud, 30000);
+                // If loading fails, try to create/update the bin
+                console.log('🔄 محاولة إنشاء/تحديث البيانات...');
+                await saveDataToJSONBin(config);
             }
         }
 
-        async function loadDataFromCloud() {
+        async function loadDataFromJSONBin(config) {
             showSyncIndicator();
             
             try {
-                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}/latest`, {
+                const response = await fetch(`${config.baseUrl}/b/${config.binId}/latest`, {
                     headers: {
-                        'X-Master-Key': JSONBIN_CONFIG.apiKey
+                        'X-Master-Key': config.apiKey,
+                        'X-Bin-Meta': 'false'
                     }
                 });
 
@@ -1040,27 +1099,15 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const result = await response.json();
-                const cloudData = result.record;
+                const cloudData = await response.json();
                 
-                if (cloudData && cloudData.lastUpdated) {
-                    // Check if cloud data is newer
-                    const cloudTime = new Date(cloudData.lastUpdated);
-                    const localTime = lastSyncTime ? new Date(lastSyncTime) : new Date(0);
+                if (cloudData && typeof cloudData === 'object') {
+                    // Merge cloud data with local data
+                    const mergedData = mergeData(academicData, cloudData);
                     
-                    if (cloudTime > localTime) {
-                        academicData = {
-                            ...academicData,
-                            ...cloudData,
-                            users: cloudData.users || [],
-                            posts: cloudData.posts || [],
-                            materials: cloudData.materials || [],
-                            chatMessages: cloudData.chatMessages || [],
-                            onlineUsers: cloudData.onlineUsers || {},
-                            settings: { ...academicData.settings, ...(cloudData.settings || {}) }
-                        };
-                        
-                        lastSyncTime = cloudData.lastUpdated;
+                    if (mergedData.lastUpdated !== academicData.lastUpdated) {
+                        academicData = mergedData;
+                        lastSyncTime = academicData.lastUpdated;
                         saveDataToLocalStorage();
                         
                         // Update UI
@@ -1071,14 +1118,14 @@
                 }
                 
             } catch (error) {
-                console.error('خطأ في تحميل البيانات من السحابة:', error);
+                console.error('خطأ في تحميل البيانات من JSONBin:', error);
                 throw error;
             } finally {
                 hideSyncIndicator();
             }
         }
 
-        async function saveDataToCloud() {
+        async function saveDataToJSONBin(config) {
             if (!isOnline) return false;
             
             try {
@@ -1087,11 +1134,12 @@
                 academicData.lastUpdated = new Date().toISOString();
                 lastSyncTime = academicData.lastUpdated;
                 
-                const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/b/${JSONBIN_CONFIG.binId}`, {
+                const response = await fetch(`${config.baseUrl}/b/${config.binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Master-Key': JSONBIN_CONFIG.apiKey
+                        'X-Master-Key': config.apiKey,
+                        'X-Bin-Meta': 'false'
                     },
                     body: JSON.stringify(academicData)
                 });
@@ -1100,15 +1148,66 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                console.log('📤 تم حفظ البيانات في السحابة');
+                console.log('📤 تم حفظ البيانات في JSONBin');
                 return true;
                 
             } catch (error) {
-                console.error('خطأ في حفظ البيانات في السحابة:', error);
-                return false;
+                console.error('خطأ في حفظ البيانات في JSONBin:', error);
+                throw error;
             } finally {
                 hideSyncIndicator();
             }
+        }
+
+        // Smart data merging function
+        function mergeData(localData, cloudData) {
+            const merged = { ...localData };
+            
+            // Merge arrays by ID, keeping the most recent items
+            ['users', 'posts', 'materials', 'chatMessages'].forEach(key => {
+                if (cloudData[key] && Array.isArray(cloudData[key])) {
+                    const localItems = merged[key] || [];
+                    const cloudItems = cloudData[key] || [];
+                    
+                    // Create a map of all items by ID
+                    const itemsMap = new Map();
+                    
+                    // Add local items first
+                    localItems.forEach(item => {
+                        if (item.id) {
+                            itemsMap.set(item.id, item);
+                        }
+                    });
+                    
+                    // Add/update with cloud items
+                    cloudItems.forEach(item => {
+                        if (item.id) {
+                            const existing = itemsMap.get(item.id);
+                            if (!existing || new Date(item.timestamp || item.lastUpdated || 0) > new Date(existing.timestamp || existing.lastUpdated || 0)) {
+                                itemsMap.set(item.id, item);
+                            }
+                        }
+                    });
+                    
+                    merged[key] = Array.from(itemsMap.values());
+                }
+            });
+            
+            // Merge other properties
+            if (cloudData.onlineUsers) {
+                merged.onlineUsers = { ...merged.onlineUsers, ...cloudData.onlineUsers };
+            }
+            
+            if (cloudData.settings) {
+                merged.settings = { ...merged.settings, ...cloudData.settings };
+            }
+            
+            // Use the most recent timestamp
+            if (cloudData.lastUpdated && (!merged.lastUpdated || new Date(cloudData.lastUpdated) > new Date(merged.lastUpdated))) {
+                merged.lastUpdated = cloudData.lastUpdated;
+            }
+            
+            return merged;
         }
 
         async function syncWithCloud() {
@@ -1118,11 +1217,17 @@
                 // Update online status
                 updateOnlineUsersCount();
                 
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                
                 // Save to cloud
-                await saveDataToCloud();
+                if (provider.name === 'JSONBin') {
+                    await saveDataToJSONBin(provider.config);
+                }
                 
                 // Load from cloud to get updates from other users
-                await loadDataFromCloud();
+                if (provider.name === 'JSONBin') {
+                    await loadDataFromJSONBin(provider.config);
+                }
                 
             } catch (error) {
                 console.error('خطأ في المزامنة:', error);
@@ -1130,7 +1235,7 @@
                 isOnline = false;
                 
                 // Try to reconnect
-                setTimeout(connectToCloud, 10000);
+                setTimeout(connectToCloudWithRetry, 30000);
             }
         }
 
@@ -1171,7 +1276,7 @@
             if (indicator) {
                 setTimeout(() => {
                     indicator.classList.remove('show');
-                }, 1000);
+                }, 1500);
             }
         }
 
@@ -1211,7 +1316,7 @@
                 
                 if (saved) {
                     const parsedData = JSON.parse(saved);
-                    academicData = { ...academicData, ...parsedData };
+                    academicData = mergeData(academicData, parsedData);
                     lastSyncTime = savedSyncTime;
                     console.log('📁 تم تحميل البيانات المحلية');
                     
@@ -1231,11 +1336,11 @@
                     lastSeen: new Date().toISOString()
                 };
                 
-                // Remove users who haven't been seen for more than 2 minutes
-                const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+                // Remove users who haven't been seen for more than 5 minutes
+                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
                 Object.keys(academicData.onlineUsers).forEach(userId => {
                     const lastSeen = new Date(academicData.onlineUsers[userId].lastSeen);
-                    if (lastSeen < twoMinutesAgo) {
+                    if (lastSeen < fiveMinutesAgo) {
                         delete academicData.onlineUsers[userId];
                     }
                 });
@@ -1342,7 +1447,10 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                saveDataToCloud();
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
             }
         }
 
@@ -1410,7 +1518,10 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                saveDataToCloud();
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
             }
             
             if (currentMainTab === 'posts') {
@@ -1498,7 +1609,10 @@
             
             saveDataToLocalStorage();
             if (isOnline) {
-                saveDataToCloud();
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
             }
             
             if (currentMainTab === 'materials' && currentYear === parseInt(year)) {
@@ -1738,7 +1852,10 @@
             saveDataToLocalStorage();
             
             if (isOnline) {
-                saveDataToCloud();
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
             }
             
             closeModal('loginModal');
@@ -1786,7 +1903,10 @@
             saveDataToLocalStorage();
             
             if (isOnline) {
-                saveDataToCloud();
+                const provider = CLOUD_PROVIDERS[currentProvider];
+                if (provider.name === 'JSONBin') {
+                    saveDataToJSONBin(provider.config).catch(console.error);
+                }
             }
             
             closeModal('registerModal');
@@ -1840,7 +1960,10 @@
                 if (currentUser && academicData.onlineUsers[currentUser.id]) {
                     delete academicData.onlineUsers[currentUser.id];
                     if (isOnline) {
-                        saveDataToCloud();
+                        const provider = CLOUD_PROVIDERS[currentProvider];
+                        if (provider.name === 'JSONBin') {
+                            saveDataToJSONBin(provider.config).catch(console.error);
+                        }
                     }
                 }
                 
@@ -2104,7 +2227,7 @@
         // Handle online/offline events
         window.addEventListener('online', function() {
             console.log('🌐 تم استعادة الاتصال بالإنترنت');
-            connectToCloud();
+            connectToCloudWithRetry();
         });
 
         window.addEventListener('offline', function() {
@@ -2116,6 +2239,14 @@
                 syncInterval = null;
             }
         });
+
+        // Periodic connection check
+        setInterval(() => {
+            if (!isOnline && navigator.onLine) {
+                console.log('🔄 محاولة إعادة الاتصال...');
+                connectToCloudWithRetry();
+            }
+        }, 60000); // Check every minute
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97875f9fe62532ae',t:'MTc1Njc1NzAzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9787684b603232ae',t:'MTc1Njc1NzM4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

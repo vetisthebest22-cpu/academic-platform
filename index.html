@@ -434,17 +434,19 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900">📚 المواد الدراسية</h2>
-                            <p class="text-gray-600 mt-1">جميع المصادر الأكاديمية منظمة حسب السنة والفصل</p>
+                            <p class="text-gray-600 mt-1">جميع المصادر الأكاديمية منظمة حسب السنة والفصل والمادة</p>
                         </div>
                         <div class="flex space-x-2 space-x-reverse">
                             <div id="adminMaterialsBtn" class="hidden">
-                                <button onclick="showAddMaterialModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                <button onclick="showAddSubjectModal()" type="button" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                                     ➕ إضافة مادة
                                 </button>
                             </div>
-                            <button onclick="showUploadModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                📤 رفع ملف
-                            </button>
+                            <div id="logoSettingsBtn" class="hidden">
+                                <button onclick="showLogoModal()" type="button" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    🎨 تعديل الشعار
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -470,6 +472,18 @@
                     </div>
                 </div>
 
+                <!-- Semester Tabs -->
+                <div id="semesterTabs" class="bg-gray-50 border-b border-gray-200">
+                    <div class="flex space-x-1 space-x-reverse p-3 overflow-x-auto">
+                        <button onclick="switchSemester(1)" class="semester-tab px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-semester="1">
+                            الفصل الأول
+                        </button>
+                        <button onclick="switchSemester(2)" class="semester-tab px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-semester="2">
+                            الفصل الثاني
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Search and Filter -->
                 <div class="bg-white border-b border-gray-200 p-4">
                     <div class="flex space-x-4 space-x-reverse">
@@ -478,6 +492,10 @@
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                                    oninput="filterMaterials()">
                         </div>
+                        <select id="subjectFilter" onchange="filterMaterials()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                            <option value="">جميع المواد</option>
+                        </select>
                         <select id="materialTypeFilter" onchange="filterMaterials()" 
                                 class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                             <option value="">جميع الأنواع</option>
@@ -495,8 +513,8 @@
                     <div id="materialsContent">
                         <div class="text-center py-16">
                             <div class="text-6xl mb-4">📚</div>
-                            <h3 class="text-xl font-semibold text-gray-900 mb-2">اختر السنة الدراسية</h3>
-                            <p class="text-gray-600">انقر على إحدى السنوات أعلاه لعرض المواد المتاحة</p>
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2">اختر السنة والفصل الدراسي</h3>
+                            <p class="text-gray-600">انقر على السنة والفصل أعلاه لعرض المواد المتاحة</p>
                         </div>
                     </div>
                 </div>
@@ -907,69 +925,228 @@
         </div>
     </div>
 
-    <!-- Add Material Modal -->
-    <div id="addMaterialModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+    <!-- Add Subject Modal -->
+    <div id="addSubjectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 welcome-popup">
                 <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span class="text-white text-2xl">📚</span>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">إضافة مادة جديدة</h2>
-                    <p class="text-gray-600">أضف مصدر أكاديمي جديد للطلاب</p>
+                    <p class="text-gray-600">أضف مادة دراسية جديدة للمنصة</p>
                 </div>
 
-                <form id="addMaterialForm" class="space-y-4">
+                <form id="addSubjectForm" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
+                            <select id="subjectYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">اختر السنة</option>
+                                <option value="1">السنة الأولى</option>
+                                <option value="2">السنة الثانية</option>
+                                <option value="3">السنة الثالثة</option>
+                                <option value="4">السنة الرابعة</option>
+                                <option value="5">السنة الخامسة</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الفصل الدراسي</label>
+                            <select id="subjectSemester" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <option value="">اختر الفصل</option>
+                                <option value="1">الفصل الأول</option>
+                                <option value="2">الفصل الثاني</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">اسم المادة</label>
-                        <input type="text" id="materialName" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                               placeholder="أدخل اسم المادة">
+                        <input type="text" id="subjectName" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                               placeholder="مثال: التشريح البيطري 1">
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
-                        <select id="materialYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                            <option value="">اختر السنة</option>
-                            <option value="1">السنة الأولى</option>
-                            <option value="2">السنة الثانية</option>
-                            <option value="3">السنة الثالثة</option>
-                            <option value="4">السنة الرابعة</option>
-                            <option value="5">السنة الخامسة</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المحتوى</label>
-                        <select id="materialType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                            <option value="">اختر النوع</option>
-                            <option value="slides">سلايدات</option>
-                            <option value="recordings">تسجيلات</option>
-                            <option value="summaries">ملخصات</option>
-                            <option value="books">كتب</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">رابط المحتوى</label>
-                        <input type="url" id="materialLink" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                               placeholder="https://example.com/material">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف المحتوى</label>
-                        <textarea id="materialDescription" rows="3"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                  placeholder="وصف مختصر للمحتوى..."></textarea>
-                    </div>
-
-                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 font-medium">
+                    <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
                         📚 إضافة المادة
                     </button>
                 </form>
 
-                <button onclick="closeModal('addMaterialModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                <button onclick="closeModal('addSubjectModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo Settings Modal -->
+    <div id="logoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup max-h-[90vh] overflow-y-auto">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">🎨</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">تعديل شعار المنصة</h2>
+                    <p class="text-gray-600">قم بتخصيص شعار ومعلومات المنصة</p>
+                </div>
+
+                <form id="logoForm" class="space-y-6">
+                    <!-- Logo Upload Section -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">رفع شعار جديد</h3>
+                        
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center file-upload-area" 
+                             ondrop="handleLogoDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                            <input type="file" id="logoFileInput" class="hidden" accept="image/*" onchange="handleLogoSelect(event)">
+                            <div class="text-4xl mb-2">🖼️</div>
+                            <p class="text-gray-600 mb-2">اسحب الصورة هنا أو انقر للاختيار</p>
+                            <button type="button" onclick="document.getElementById('logoFileInput').click()" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                اختيار صورة
+                            </button>
+                            <p class="text-xs text-gray-500 mt-2">PNG, JPG, GIF (حد أقصى 2MB)</p>
+                        </div>
+
+                        <!-- Logo Preview -->
+                        <div id="newLogoPreview" class="hidden mt-4 p-4 bg-white rounded-lg border">
+                            <h4 class="font-medium text-gray-900 mb-3">معاينة الشعار الجديد:</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="text-center">
+                                    <p class="text-xs text-gray-600 mb-2">كبير</p>
+                                    <div class="w-16 h-16 mx-auto border rounded-lg overflow-hidden">
+                                        <img id="logoPreviewLarge" class="w-full h-full object-cover" alt="معاينة كبيرة">
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-xs text-gray-600 mb-2">متوسط</p>
+                                    <div class="w-12 h-12 mx-auto border rounded-lg overflow-hidden">
+                                        <img id="logoPreviewMedium" class="w-full h-full object-cover" alt="معاينة متوسطة">
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-xs text-gray-600 mb-2">صغير</p>
+                                    <div class="w-8 h-8 mx-auto border rounded-lg overflow-hidden">
+                                        <img id="logoPreviewSmall" class="w-full h-full object-cover" alt="معاينة صغيرة">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Info Section -->
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-4">معلومات المنصة</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">اسم المنصة</label>
+                                <input type="text" id="platformName" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="المنصة الأكاديمية">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">وصف المنصة</label>
+                                <input type="text" id="platformDescription" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="لجنة الطب والجراحة البيطرية">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Logo Display -->
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-2">الشعار الحالي:</h4>
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <div id="currentLogoDisplay" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl">
+                                🏥
+                            </div>
+                            <div>
+                                <div class="font-medium text-blue-900" id="currentPlatformName">المنصة الأكاديمية</div>
+                                <div class="text-sm text-blue-700" id="currentPlatformDescription">لجنة الطب والجراحة البيطرية</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3 space-x-reverse">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200 font-medium">
+                            💾 حفظ التغييرات
+                        </button>
+                        <button type="button" onclick="resetToDefaultLogo()" class="px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            🔄 الافتراضي
+                        </button>
+                    </div>
+                </form>
+
+                <button onclick="closeModal('logoModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
+                    <span class="text-xl">✕</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal for Materials -->
+    <div id="fileUploadModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                        <span class="text-white text-2xl">📤</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">رفع ملف جديد</h2>
+                    <p class="text-gray-600" id="uploadModalSubtitle">اختر الملف وأدخل التفاصيل</p>
+                </div>
+
+                <form id="fileUploadForm" class="space-y-4">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center file-upload-area" 
+                         ondrop="handleMaterialFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <input type="file" id="materialFileInput" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.mp4,.mp3" onchange="handleMaterialFileSelect(event)">
+                        <div class="text-4xl mb-2">📁</div>
+                        <p class="text-gray-600 mb-2">اسحب الملف هنا أو انقر للاختيار</p>
+                        <button type="button" onclick="document.getElementById('materialFileInput').click()" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                            اختيار ملف
+                        </button>
+                        <p class="text-xs text-gray-500 mt-2">PDF, DOC, PPT, صور، فيديو، صوت</p>
+                    </div>
+
+                    <div id="materialFileInfo" class="hidden bg-gray-50 rounded-lg p-4">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <span class="text-2xl" id="materialFileIcon">📄</span>
+                            <div class="flex-1">
+                                <div class="font-medium" id="materialFileName">اسم الملف</div>
+                                <div class="text-sm text-gray-500" id="materialFileSize">حجم الملف</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">عنوان الملف</label>
+                        <input type="text" id="fileTitle" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               placeholder="أدخل عنوان الملف">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف الملف</label>
+                        <textarea id="fileDescription" rows="3"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  placeholder="وصف مختصر للملف..."></textarea>
+                    </div>
+
+                    <!-- Hidden fields for subject and category info -->
+                    <input type="hidden" id="uploadSubjectName">
+                    <input type="hidden" id="uploadMaterialType">
+                    <input type="hidden" id="uploadCategory">
+
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 font-medium">
+                        📤 رفع الملف
+                    </button>
+                </form>
+
+                <button onclick="closeModal('fileUploadModal')" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600">
                     <span class="text-xl">✕</span>
                 </button>
             </div>
@@ -1300,6 +1477,7 @@
         let currentUser = null;
         let currentTab = 'welcome';
         let currentYear = 1;
+        let currentSemester = 1;
         let isOnline = false;
         let syncInterval = null;
         let lastSyncTime = null;
@@ -1310,12 +1488,23 @@
         let socket = null;
         let socketConnected = false;
         
-        // Cloud Storage Configuration - JSONBin.io
-        const CLOUD_CONFIG = {
-            apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
-            binId: '676b8c8ead19ca34f8d5b7b8',
-            baseUrl: 'https://api.jsonbin.io/v3'
-        };
+        // Cloud Storage Configuration - Multiple Providers
+        const CLOUD_PROVIDERS = [
+            {
+                name: 'JSONBin',
+                config: {
+                    apiKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
+                    binId: '676b8c8ead19ca34f8d5b7b8',
+                    baseUrl: 'https://api.jsonbin.io/v3'
+                }
+            },
+            {
+                name: 'LocalStorage',
+                config: {
+                    fallback: true
+                }
+            }
+        ];
         
         let currentProvider = 0;
         
@@ -1324,6 +1513,7 @@
             users: [],
             posts: [],
             materials: [],
+            subjects: [], // New: Dynamic subjects
             chatMessages: [],
             onlineUsers: {},
             exams: [],
@@ -1333,15 +1523,158 @@
             settings: {
                 name: 'المنصة الأكاديمية',
                 description: 'لجنة الطب والجراحة البيطرية',
-                version: '2.0.0'
+                version: '2.0.0',
+                logo: null // New: Custom logo storage
             },
             lastUpdated: new Date().toISOString()
         };
+
+        // Initialize with some sample subjects for testing
+        function initializeSampleData() {
+            if (academicData.subjects.length === 0) {
+                const sampleSubjects = [
+                    {
+                        id: 'sample1',
+                        name: 'التشريح البيطري 1',
+                        year: 1,
+                        semester: 1,
+                        authorId: 'admin',
+                        authorName: 'المدير العام',
+                        timestamp: new Date().toISOString()
+                    },
+                    {
+                        id: 'sample2', 
+                        name: 'علم وظائف الأعضاء 1',
+                        year: 1,
+                        semester: 1,
+                        authorId: 'admin',
+                        authorName: 'المدير العام',
+                        timestamp: new Date().toISOString()
+                    }
+                ];
+                
+                academicData.subjects = sampleSubjects;
+                saveDataToLocalStorage();
+                console.log('تم إنشاء بيانات تجريبية للمواد');
+            }
+        }
+
+        // Logo management
+        let currentLogo = {
+            type: 'emoji',
+            data: '🏥',
+            name: 'Default Logo',
+            icon: '🏥'
+        };
+        let selectedLogoFile = null;
 
         // Admin credentials
         const ADMIN_CREDENTIALS = {
             username: 'AcademicVETnew',
             password: 'AcaDemic_2025_New'
+        };
+
+        // Academic subjects database
+        const ACADEMIC_SUBJECTS = {
+            1: { // السنة الأولى
+                1: [ // الفصل الأول
+                    'التشريح البيطري 1',
+                    'علم وظائف الأعضاء 1',
+                    'الكيمياء الحيوية البيطرية',
+                    'علم الأنسجة البيطرية',
+                    'الفيزياء الطبية',
+                    'الرياضيات التطبيقية',
+                    'مقدمة في الطب البيطري'
+                ],
+                2: [ // الفصل الثاني
+                    'التشريح البيطري 2',
+                    'علم وظائف الأعضاء 2',
+                    'علم الأجنة البيطرية',
+                    'الأحياء الدقيقة البيطرية 1',
+                    'الإحصاء الحيوي',
+                    'سلوك الحيوان',
+                    'رعاية الحيوان'
+                ]
+            },
+            2: { // السنة الثانية
+                1: [ // الفصل الأول
+                    'التشريح البيطري 3',
+                    'علم وظائف الأعضاء 3',
+                    'الأحياء الدقيقة البيطرية 2',
+                    'علم الطفيليات البيطرية 1',
+                    'علم الأدوية البيطرية 1',
+                    'التغذية الحيوانية 1',
+                    'الوراثة البيطرية'
+                ],
+                2: [ // الفصل الثاني
+                    'علم الأمراض العام',
+                    'علم الطفيليات البيطرية 2',
+                    'علم الأدوية البيطرية 2',
+                    'التغذية الحيوانية 2',
+                    'الصحة العامة البيطرية 1',
+                    'علم المناعة البيطرية',
+                    'الإنتاج الحيواني 1'
+                ]
+            },
+            3: { // السنة الثالثة
+                1: [ // الفصل الأول
+                    'علم الأمراض الخاص 1',
+                    'الطب الباطني البيطري 1',
+                    'الجراحة البيطرية 1',
+                    'التوليد البيطري 1',
+                    'الصحة العامة البيطرية 2',
+                    'الإنتاج الحيواني 2',
+                    'تشخيص الأمراض البيطرية 1'
+                ],
+                2: [ // الفصل الثاني
+                    'علم الأمراض الخاص 2',
+                    'الطب الباطني البيطري 2',
+                    'الجراحة البيطرية 2',
+                    'التوليد البيطري 2',
+                    'أمراض الدواجن 1',
+                    'أمراض الأسماك',
+                    'تشخيص الأمراض البيطرية 2'
+                ]
+            },
+            4: { // السنة الرابعة
+                1: [ // الفصل الأول
+                    'الطب الباطني البيطري 3',
+                    'الجراحة البيطرية 3',
+                    'التوليد البيطري 3',
+                    'أمراض الدواجن 2',
+                    'طب الحيوانات البرية',
+                    'الطب الشرعي البيطري',
+                    'إدارة المستشفيات البيطرية'
+                ],
+                2: [ // الفصل الثاني
+                    'الممارسة السريرية 1',
+                    'طب الطوارئ البيطرية',
+                    'الأشعة البيطرية',
+                    'التخدير البيطري',
+                    'أخلاقيات المهنة',
+                    'الاقتصاد البيطري',
+                    'بحث التخرج 1'
+                ]
+            },
+            5: { // السنة الخامسة
+                1: [ // الفصل الأول
+                    'الممارسة السريرية 2',
+                    'طب المجتمع البيطري',
+                    'الطب البديل البيطري',
+                    'تطبيقات الذكاء الاصطناعي',
+                    'إدارة الأعمال البيطرية',
+                    'بحث التخرج 2',
+                    'التدريب الميداني 1'
+                ],
+                2: [ // الفصل الثاني
+                    'التدريب الميداني 2',
+                    'مشروع التخرج',
+                    'ندوة علمية',
+                    'الممارسة المهنية',
+                    'التطوير المهني المستمر',
+                    'ريادة الأعمال البيطرية'
+                ]
+            }
         };
 
         // Initialize the application
@@ -1350,7 +1683,14 @@
             setupEventListeners();
             checkLoginStatus();
             loadDataFromLocalStorage();
+            
+            // Initialize sample data if needed
+            initializeSampleData();
+            
             updateConnectionStatus('connecting');
+            
+            // Load saved logo
+            loadSavedLogo();
             
             // Initialize Socket.io for real-time sync
             initializeSocket();
@@ -1358,8 +1698,41 @@
             // Try to connect to cloud with retry mechanism
             connectToCloudWithRetry();
             
-            // Set active year tab
+            // Set active year and semester tabs
             switchYear(1);
+            switchSemester(1);
+            
+            // Setup material button event listeners
+            setupMaterialButtonListeners();
+        }
+        
+        // Setup event listeners for material buttons
+        function setupMaterialButtonListeners() {
+            // Use event delegation for dynamically created buttons
+            document.addEventListener('click', function(event) {
+                const target = event.target;
+                
+                // Check if clicked element is a material type button
+                if (target.classList.contains('material-type-btn') || target.closest('.material-type-btn')) {
+                    const button = target.classList.contains('material-type-btn') ? target : target.closest('.material-type-btn');
+                    const subjectId = button.getAttribute('data-subject');
+                    const materialType = button.getAttribute('data-type');
+                    
+                    if (subjectId && materialType) {
+                        console.log(`🖱️ تم النقر على زر ${materialType} للمادة ${subjectId}`);
+                        event.preventDefault();
+                        event.stopPropagation();
+                        showSubjectSection(subjectId, materialType);
+                    }
+                }
+            });
+        }
+
+        function loadSavedLogo() {
+            if (academicData.settings.logo) {
+                currentLogo = { ...academicData.settings.logo };
+                updateLogoInUI();
+            }
         }
 
         // Test cloud connection manually
@@ -1368,22 +1741,12 @@
             showNotification('جاري اختبار الاتصال بالسحابة...', 'info');
             
             try {
-                updateConnectionStatus('connecting');
-                await testConnection();
-                await loadDataFromCloud();
-                updateConnectionStatus('online');
-                isOnline = true;
+                await connectToJSONBin();
                 showNotification('✅ الاتصال بالسحابة يعمل بشكل صحيح!', 'success');
-                
-                // بدء المزامنة الدورية
-                if (syncInterval) clearInterval(syncInterval);
-                syncInterval = setInterval(syncWithCloud, 30000);
-                
             } catch (error) {
                 console.error('❌ فشل اختبار الاتصال:', error);
-                updateConnectionStatus('offline');
-                isOnline = false;
-                showNotification('❌ فشل الاتصال بالسحابة - الوضع المحلي فعال', 'error');
+                await connectToLocalMode();
+                showNotification('❌ فشل الاتصال بالسحابة - تم التبديل للوضع المحلي', 'warning');
             }
         }
 
@@ -1497,11 +1860,11 @@
 
         // تفعيل أزرار المدير
         function enableAdminButtons() {
+            console.log('🔧 تفعيل أزرار المدير...');
+            
             const adminButtons = [
-                'adminMaterialsBtn', 'adminPostsBtn', 'adminTab', 'adminExamButtons',
-                'addSubjectBtn', 'addPostBtn', 'addExamBtn', 
-                'logoSettingsBtn', 'uploadSection', 'editAnnouncementsBtn',
-                'adminChatManagement'
+                'adminMaterialsBtn', 'adminPostsBtn', 'adminNav', 'adminExamButtons',
+                'logoSettingsBtn'
             ];
             
             adminButtons.forEach(id => {
@@ -1509,158 +1872,205 @@
                 if (element) {
                     element.classList.remove('hidden');
                     element.removeAttribute('disabled');
+                    console.log(`✅ تم تفعيل: ${id}`);
+                } else {
+                    console.log(`⚠️ لم يتم العثور على: ${id}`);
                 }
             });
-        }
-
-        // Enhanced cloud connection with retry mechanism
-        async function connectToCloudWithRetry() {
-            for (let attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
-                try {
-                    console.log(`🔄 محاولة الاتصال ${attempt + 1}/${MAX_RETRY_ATTEMPTS}...`);
-                    await connectToCloud();
-                    return;
-                } catch (error) {
-                    console.error(`❌ فشلت المحاولة ${attempt + 1}:`, error);
-                    
-                    if (attempt < MAX_RETRY_ATTEMPTS - 1) {
-                        console.log(`🔄 إعادة المحاولة خلال ${2 * (attempt + 1)} ثانية...`);
-                        await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
-                    }
-                }
+            
+            // تفعيل أزرار إضافية في قسم الامتحانات
+            const examButtons = document.getElementById('adminExamButtons');
+            if (examButtons) {
+                examButtons.classList.remove('hidden');
             }
             
-            console.log('❌ فشل الاتصال بالسحابة، التبديل للوضع المحلي');
-            updateConnectionStatus('offline');
-            isOnline = false;
-            showNotification('تم التبديل للوضع المحلي - البيانات محفوظة محلياً', 'warning');
-            
-            // إعادة المحاولة كل دقيقة
-            setTimeout(connectToCloudWithRetry, 60000);
+            console.log('✅ تم تفعيل جميع أزرار المدير');
         }
 
-        async function connectToCloud() {
-            console.log('🔄 محاولة الاتصال بـ JSONBin.io...');
+        // Enhanced cloud connection with multiple providers
+        async function connectToCloudWithRetry() {
+            console.log('🔄 بدء محاولة الاتصال بالسحابة...');
             updateConnectionStatus('connecting');
             
-            // اختبار الاتصال أولاً
-            await testConnection();
-            
-            // تحميل البيانات من السحابة
-            await loadDataFromCloud();
-            
-            updateConnectionStatus('online');
-            isOnline = true;
-            connectionRetryCount = 0;
-            
-            console.log('✅ تم الاتصال بالسحابة بنجاح');
-            showNotification('تم الاتصال بالسحابة بنجاح 🌐', 'success');
-            
-            // بدء المزامنة الدورية
-            if (syncInterval) clearInterval(syncInterval);
-            syncInterval = setInterval(syncWithCloud, 30000);
-        }
-
-        async function testConnection() {
-            console.log('🔍 اختبار الاتصال بـ JSONBin.io...');
-            
-            const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}/latest`, {
-                method: 'GET',
-                headers: {
-                    'X-Master-Key': CLOUD_CONFIG.apiKey,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            // محاولة الاتصال بـ JSONBin أولاً
+            try {
+                await connectToJSONBin();
+                return;
+            } catch (error) {
+                console.log('⚠️ فشل الاتصال بـ JSONBin، التبديل للوضع المحلي المحسن');
             }
             
-            console.log('✅ اختبار الاتصال نجح');
-            return response;
+            // التبديل للوضع المحلي المحسن
+            await connectToLocalMode();
         }
 
-        async function loadDataFromCloud() {
-            console.log('📥 تحميل البيانات من JSONBin.io...');
-            showSyncIndicator();
+        async function connectToJSONBin() {
+            console.log('🔄 محاولة الاتصال بـ JSONBin.io...');
+            const provider = CLOUD_PROVIDERS[0];
+            
+            // اختبار الاتصال مع timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
             
             try {
-                const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}/latest`, {
+                const response = await fetch(`${provider.config.baseUrl}/b/${provider.config.binId}/latest`, {
                     method: 'GET',
                     headers: {
-                        'X-Master-Key': CLOUD_CONFIG.apiKey,
+                        'X-Master-Key': provider.config.apiKey,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    signal: controller.signal
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-                }
+                clearTimeout(timeoutId);
 
-                const cloudData = await response.json();
-                console.log('📊 البيانات المستلمة من السحابة:', cloudData);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                // تحميل البيانات
+                const result = await response.json();
+                const cloudData = result.record || result;
                 
                 if (cloudData && typeof cloudData === 'object') {
-                    const mergedData = mergeData(academicData, cloudData);
-                    
-                    if (mergedData.lastUpdated !== academicData.lastUpdated) {
-                        academicData = mergedData;
-                        lastSyncTime = academicData.lastUpdated;
-                        saveDataToLocalStorage();
-                        updateUIAfterDataLoad();
-                        console.log('✅ تم دمج البيانات من السحابة');
-                        showNotification('تم تحديث البيانات من السحابة', 'success');
-                    } else {
-                        console.log('ℹ️ البيانات محدثة بالفعل');
-                    }
+                    mergeCloudData(cloudData);
                 }
                 
+                updateConnectionStatus('online');
+                isOnline = true;
+                currentProvider = 0;
+                
+                console.log('✅ تم الاتصال بـ JSONBin بنجاح');
+                showNotification('متصل بالسحابة - البيانات محدثة 🌐', 'success');
+                
+                // بدء المزامنة الدورية
+                if (syncInterval) clearInterval(syncInterval);
+                syncInterval = setInterval(syncWithCloud, 30000);
+                
             } catch (error) {
-                console.error('❌ خطأ في تحميل البيانات:', error);
+                clearTimeout(timeoutId);
+                console.error('❌ خطأ في الاتصال بـ JSONBin:', error.message);
                 throw error;
-            } finally {
-                hideSyncIndicator();
             }
+        }
+
+        async function connectToLocalMode() {
+            console.log('🔄 تفعيل الوضع المحلي المحسن...');
+            
+            updateConnectionStatus('offline');
+            isOnline = false;
+            currentProvider = 1;
+            
+            // تحميل البيانات المحلية وتحديث الواجهة
+            loadDataFromLocalStorage();
+            updateUIAfterDataLoad();
+            
+            console.log('✅ تم تفعيل الوضع المحلي');
+            showNotification('الوضع المحلي فعال - جميع البيانات محفوظة محلياً 💾', 'info');
+            
+            // محاولة إعادة الاتصال كل دقيقة
+            setTimeout(() => {
+                if (!isOnline) {
+                    connectToCloudWithRetry();
+                }
+            }, 60000);
+        }
+
+        function mergeCloudData(cloudData) {
+            console.log('🔄 دمج البيانات من السحابة...');
+            
+            // دمج البيانات مع الحفاظ على البيانات المحلية
+            academicData = {
+                ...academicData,
+                users: mergeArrayData(academicData.users, cloudData.users || []),
+                posts: mergeArrayData(academicData.posts, cloudData.posts || []),
+                materials: mergeArrayData(academicData.materials, cloudData.materials || []),
+                chatMessages: mergeArrayData(academicData.chatMessages, cloudData.chatMessages || []),
+                exams: mergeArrayData(academicData.exams, cloudData.exams || []),
+                notifications: mergeArrayData(academicData.notifications, cloudData.notifications || []),
+                favorites: mergeArrayData(academicData.favorites, cloudData.favorites || []),
+                onlineUsers: { ...academicData.onlineUsers, ...(cloudData.onlineUsers || {}) },
+                settings: { ...academicData.settings, ...(cloudData.settings || {}) },
+                lastUpdated: cloudData.lastUpdated || academicData.lastUpdated
+            };
+            
+            saveDataToLocalStorage();
+            updateUIAfterDataLoad();
+            
+            console.log('✅ تم دمج البيانات بنجاح');
+        }
+
+        function mergeArrayData(localArray, cloudArray) {
+            const merged = new Map();
+            
+            // إضافة البيانات المحلية
+            localArray.forEach(item => {
+                if (item.id) {
+                    merged.set(item.id, item);
+                }
+            });
+            
+            // دمج البيانات السحابية (الأحدث يفوز)
+            cloudArray.forEach(item => {
+                if (item.id) {
+                    const existing = merged.get(item.id);
+                    if (!existing || new Date(item.timestamp || item.lastUpdated || 0) > new Date(existing.timestamp || existing.lastUpdated || 0)) {
+                        merged.set(item.id, item);
+                    }
+                }
+            });
+            
+            return Array.from(merged.values());
         }
 
         async function saveDataToCloud() {
-            if (!isOnline) {
-                console.log('⚠️ غير متصل - حفظ محلي فقط');
+            if (!isOnline || currentProvider !== 0) {
+                console.log('⚠️ غير متصل بالسحابة - حفظ محلي فقط');
                 return false;
             }
             
-            console.log('📤 حفظ البيانات في JSONBin.io...');
+            console.log('📤 حفظ البيانات في السحابة...');
             showSyncIndicator();
             
             try {
+                const provider = CLOUD_PROVIDERS[0];
                 academicData.lastUpdated = new Date().toISOString();
                 lastSyncTime = academicData.lastUpdated;
                 
-                console.log('📊 البيانات المرسلة للسحابة:', academicData);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
                 
-                const response = await fetch(`${CLOUD_CONFIG.baseUrl}/b/${CLOUD_CONFIG.binId}`, {
+                const response = await fetch(`${provider.config.baseUrl}/b/${provider.config.binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Master-Key': CLOUD_CONFIG.apiKey
+                        'X-Master-Key': provider.config.apiKey
                     },
-                    body: JSON.stringify(academicData)
+                    body: JSON.stringify(academicData),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const result = await response.json();
-                console.log('✅ تم حفظ البيانات في السحابة:', result);
-                showNotification('تم حفظ البيانات في السحابة', 'success');
+                console.log('✅ تم حفظ البيانات في السحابة');
                 return true;
                 
             } catch (error) {
-                console.error('❌ خطأ في حفظ البيانات:', error);
-                showNotification('خطأ في حفظ البيانات - محفوظة محلياً', 'warning');
-                throw error;
+                console.error('❌ خطأ في حفظ البيانات:', error.message);
+                
+                // في حالة فشل الحفظ، التبديل للوضع المحلي
+                if (error.name === 'AbortError' || error.message.includes('fetch')) {
+                    updateConnectionStatus('offline');
+                    isOnline = false;
+                    showNotification('انقطع الاتصال - تم التبديل للوضع المحلي', 'warning');
+                }
+                
+                return false;
             } finally {
                 hideSyncIndicator();
             }
@@ -1711,8 +2121,8 @@
         }
 
         async function syncWithCloud() {
-            if (!isOnline || !currentUser) {
-                console.log('⚠️ تخطي المزامنة - غير متصل أو لا يوجد مستخدم');
+            if (!isOnline || !currentUser || currentProvider !== 0) {
+                console.log('⚠️ تخطي المزامنة - غير متصل أو وضع محلي');
                 return;
             }
             
@@ -1720,42 +2130,48 @@
                 console.log('🔄 بدء المزامنة مع السحابة...');
                 updateOnlineUsersCount();
                 
-                // حفظ البيانات المحلية أولاً
-                await saveDataToCloud();
+                // محاولة حفظ البيانات
+                const saveSuccess = await saveDataToCloud();
                 
-                // ثم تحميل أي تحديثات من السحابة
-                await loadDataFromCloud();
+                if (saveSuccess) {
+                    // محاولة تحميل التحديثات
+                    try {
+                        await connectToJSONBin();
+                    } catch (error) {
+                        console.log('⚠️ فشل تحميل التحديثات، البيانات محفوظة');
+                    }
+                }
                 
-                console.log('✅ تمت المزامنة بنجاح');
+                console.log('✅ تمت المزامنة');
                 
             } catch (error) {
                 console.error('❌ خطأ في المزامنة:', error);
-                updateConnectionStatus('offline');
-                isOnline = false;
                 
-                // إعادة المحاولة بعد 30 ثانية
-                setTimeout(connectToCloudWithRetry, 30000);
+                // في حالة فشل المزامنة، التبديل للوضع المحلي
+                await connectToLocalMode();
             }
         }
 
         function updateUIAfterDataLoad() {
-            if (currentTab === 'chat') {
-                loadChatMessages();
-            }
+            console.log('🔄 تحديث واجهة المستخدم بعد تحميل البيانات...');
             
-            if (currentTab === 'posts') {
-                loadPosts();
-            }
-            
-            if (currentTab === 'materials') {
-                loadMaterials(currentYear);
-            }
+            // تحديث جميع الأقسام بغض النظر عن القسم الحالي
+            loadChatMessages();
+            loadPosts();
+            loadMaterials(currentYear, currentSemester);
+            loadExams();
+            loadNotifications();
+            loadFavorites();
+            updateSubjectFilter();
             
             if (currentUser && currentUser.isAdmin) {
                 updateAdminStats();
             }
             
             updateOnlineUsersCount();
+            updateNotificationBadge();
+            
+            console.log('✅ تم تحديث واجهة المستخدم');
         }
 
         function showSyncIndicator() {
@@ -1782,16 +2198,16 @@
             
             switch(status) {
                 case 'online':
-                    statusElement.innerHTML = '🟢 متصل بالسحابة (انقر للاختبار)';
-                    statusElement.title = 'متصل بـ JSONBin.io - انقر لاختبار الاتصال';
+                    statusElement.innerHTML = '🟢 متصل بالسحابة';
+                    statusElement.title = 'متصل بالسحابة - البيانات محدثة';
                     break;
                 case 'offline':
-                    statusElement.innerHTML = '🔴 وضع محلي (انقر للاتصال)';
-                    statusElement.title = 'غير متصل بالسحابة - انقر لإعادة المحاولة';
+                    statusElement.innerHTML = '🔵 وضع محلي';
+                    statusElement.title = 'وضع محلي - البيانات محفوظة محلياً';
                     break;
                 case 'connecting':
                     statusElement.innerHTML = '🔄 جاري الاتصال...';
-                    statusElement.title = 'جاري الاتصال بـ JSONBin.io...';
+                    statusElement.title = 'جاري محاولة الاتصال بالسحابة...';
                     break;
             }
         }
@@ -1813,10 +2229,34 @@
                 
                 if (saved) {
                     const parsedData = JSON.parse(saved);
-                    academicData = mergeData(academicData, parsedData);
+                    // دمج البيانات بدلاً من استبدالها
+                    academicData = {
+                        ...academicData,
+                        users: parsedData.users || academicData.users,
+                        posts: parsedData.posts || academicData.posts,
+                        materials: parsedData.materials || academicData.materials,
+                        chatMessages: parsedData.chatMessages || academicData.chatMessages,
+                        exams: parsedData.exams || academicData.exams,
+                        notifications: parsedData.notifications || academicData.notifications,
+                        favorites: parsedData.favorites || academicData.favorites,
+                        onlineUsers: parsedData.onlineUsers || academicData.onlineUsers,
+                        settings: parsedData.settings || academicData.settings,
+                        lastUpdated: parsedData.lastUpdated || academicData.lastUpdated
+                    };
                     lastSyncTime = savedSyncTime;
-                    console.log('📁 تم تحميل البيانات المحلية');
+                    console.log('📁 تم تحميل البيانات المحلية:', academicData);
                     updateUIAfterDataLoad();
+                    
+                    // إجبار تحديث العرض
+                    if (currentTab === 'materials') {
+                        loadMaterials(currentYear);
+                    }
+                    if (currentTab === 'posts') {
+                        loadPosts();
+                    }
+                    if (currentTab === 'chat') {
+                        loadChatMessages();
+                    }
                 }
             } catch (error) {
                 console.error('خطأ في تحميل البيانات المحلية:', error);
@@ -1854,6 +2294,7 @@
         // Navigation functions
         function switchTab(tabName) {
             currentTab = tabName;
+            console.log(`🔄 التبديل إلى قسم: ${tabName}`);
             
             // Hide all sections
             const sections = ['welcomeSection', 'loginSection', 'registerSection', 'materialsSection', 'postsSection', 'chatSection', 'examsSection', 'notificationsSection', 'favoritesSection', 'toolsSection', 'profileSection', 'adminSection'];
@@ -1881,35 +2322,46 @@
                 }
             }
             
-            // Load section-specific data
+            // Load section-specific data with forced refresh
             switch(tabName) {
                 case 'posts':
-                    loadPosts();
+                    console.log('📝 تحميل المنشورات...');
+                    setTimeout(() => loadPosts(), 100);
                     break;
                 case 'chat':
-                    loadChatMessages();
+                    console.log('💬 تحميل الدردشة...');
+                    setTimeout(() => loadChatMessages(), 100);
                     break;
                 case 'materials':
-                    loadMaterials(currentYear);
+                    console.log('📚 تحميل المواد...');
+                    setTimeout(() => {
+                        loadMaterials(currentYear, currentSemester);
+                        updateSubjectFilter();
+                    }, 100);
                     break;
                 case 'exams':
-                    loadExams();
+                    console.log('📝 تحميل الامتحانات...');
+                    setTimeout(() => loadExams(), 100);
                     break;
                 case 'notifications':
-                    loadNotifications();
+                    console.log('🔔 تحميل الإشعارات...');
+                    setTimeout(() => loadNotifications(), 100);
                     break;
                 case 'favorites':
-                    loadFavorites();
+                    console.log('❤️ تحميل المفضلة...');
+                    setTimeout(() => loadFavorites(), 100);
                     break;
                 case 'tools':
                     // Tools section is static, no loading needed
                     break;
                 case 'profile':
-                    loadProfile();
+                    console.log('👤 تحميل الملف الشخصي...');
+                    setTimeout(() => loadProfile(), 100);
                     break;
                 case 'admin':
                     if (currentUser && currentUser.isAdmin) {
-                        updateAdminStats();
+                        console.log('⚙️ تحميل لوحة التحكم...');
+                        setTimeout(() => updateAdminStats(), 100);
                     }
                     break;
             }
@@ -1917,6 +2369,7 @@
 
         function switchYear(year) {
             currentYear = year;
+            currentSemester = 1; // Reset to first semester when changing year
             
             // Update year tabs
             document.querySelectorAll('.year-tab').forEach(tab => {
@@ -1930,7 +2383,28 @@
                 activeTab.classList.remove('text-gray-700', 'hover:bg-gray-100');
             }
             
-            loadMaterials(year);
+            // Reset semester tabs
+            switchSemester(1);
+            loadMaterials(year, currentSemester);
+        }
+
+        function switchSemester(semester) {
+            currentSemester = semester;
+            
+            // Update semester tabs
+            document.querySelectorAll('.semester-tab').forEach(tab => {
+                tab.classList.remove('bg-blue-600', 'text-white');
+                tab.classList.add('text-gray-700', 'hover:bg-gray-100');
+            });
+            
+            const activeTab = document.querySelector(`[data-semester="${semester}"]`);
+            if (activeTab) {
+                activeTab.classList.add('bg-blue-600', 'text-white');
+                activeTab.classList.remove('text-gray-700', 'hover:bg-gray-100');
+            }
+            
+            loadMaterials(currentYear, semester);
+            updateSubjectFilter();
         }
 
         // Authentication functions
@@ -1966,16 +2440,39 @@
                 addPostForm.addEventListener('submit', handleAddPost);
             }
             
-            // Add material form
-            const addMaterialForm = document.getElementById('addMaterialForm');
-            if (addMaterialForm) {
-                addMaterialForm.addEventListener('submit', handleAddMaterial);
+            // Add subject form
+            const addSubjectForm = document.getElementById('addSubjectForm');
+            if (addSubjectForm) {
+                addSubjectForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (addSubject()) {
+                        closeModal('addSubjectModal');
+                        document.getElementById('addSubjectForm').reset();
+                    }
+                });
+            }
+            
+            // File upload form
+            const fileUploadForm = document.getElementById('fileUploadForm');
+            if (fileUploadForm) {
+                fileUploadForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (uploadMaterialFile()) {
+                        closeModal('fileUploadModal');
+                    }
+                });
             }
             
             // Add exam form
             const addExamForm = document.getElementById('addExamForm');
             if (addExamForm) {
                 addExamForm.addEventListener('submit', handleAddExam);
+            }
+            
+            // Logo form
+            const logoForm = document.getElementById('logoForm');
+            if (logoForm) {
+                logoForm.addEventListener('submit', handleLogoSubmit);
             }
         }
 
@@ -2040,6 +2537,12 @@
             
             // تحديث شارة الإشعارات
             updateNotificationBadge();
+            
+            // تحديث فوري لجميع البيانات
+            setTimeout(() => {
+                updateUIAfterDataLoad();
+                console.log('🔄 تم تحديث البيانات بعد تسجيل الدخول');
+            }, 500);
             
             // إشعار Socket.io بدخول المستخدم
             if (socketConnected && socket) {
@@ -2127,18 +2630,21 @@
         function handleAddMaterial(event) {
             event.preventDefault();
             
-            const name = document.getElementById('materialName').value.trim();
+            const title = document.getElementById('materialTitle').value.trim();
             const year = document.getElementById('materialYear').value;
+            const semester = document.getElementById('materialSemester').value;
+            const subject = document.getElementById('materialSubject').value.trim();
             const type = document.getElementById('materialType').value;
+            const category = document.getElementById('materialCategory').value;
             const link = document.getElementById('materialLink').value.trim();
             const description = document.getElementById('materialDescription').value.trim();
             
-            if (!name || !year || !type || !link) {
-                showNotification('يرجى إدخال البيانات المطلوبة', 'error');
+            if (!title || !year || !semester || !subject || !type || !category || !link) {
+                showNotification('يرجى إدخال جميع البيانات المطلوبة', 'error');
                 return;
             }
             
-            if (addMaterial(name, year, type, link, description)) {
+            if (addMaterial(title, year, semester, subject, type, link, description, category)) {
                 closeModal('addMaterialModal');
                 document.getElementById('addMaterialForm').reset();
             }
@@ -2169,6 +2675,41 @@
             if (addExam(examData)) {
                 closeModal('addExamModal');
                 document.getElementById('addExamForm').reset();
+            }
+        }
+
+        function handleLogoSubmit(event) {
+            event.preventDefault();
+            
+            const platformName = document.getElementById('platformName').value.trim() || 'المنصة الأكاديمية';
+            const platformDescription = document.getElementById('platformDescription').value.trim() || 'لجنة الطب والجراحة البيطرية';
+            
+            if (selectedLogoFile) {
+                // Process uploaded image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoData = {
+                        type: 'image',
+                        data: e.target.result,
+                        name: selectedLogoFile.name,
+                        icon: null
+                    };
+                    
+                    applyLogoChanges(logoData, platformName, platformDescription);
+                    closeModal('logoModal');
+                    showNotification('تم تحديث الشعار بنجاح!', 'success');
+                    
+                    // Reset form
+                    selectedLogoFile = null;
+                    document.getElementById('logoFileInput').value = '';
+                    document.getElementById('newLogoPreview').classList.add('hidden');
+                };
+                reader.readAsDataURL(selectedLogoFile);
+            } else {
+                // Update only text without changing logo
+                applyLogoChanges(currentLogo, platformName, platformDescription);
+                closeModal('logoModal');
+                showNotification('تم تحديث معلومات المنصة بنجاح!', 'success');
             }
         }
 
@@ -2434,85 +2975,266 @@
                 saveDataToCloud().catch(console.error);
             }
             
-            if (currentTab === 'posts') {
+            // تحديث فوري للمنشورات
+            setTimeout(() => {
                 loadPosts();
-            }
+                console.log('🔄 تم تحديث المنشورات بعد الإضافة');
+            }, 100);
             
             showNotification('تم إضافة المنشور بنجاح', 'success');
             return true;
         }
 
-        // Materials functions
-        function loadMaterials(year) {
+        // Materials functions - New Dynamic System
+        function loadMaterials(year, semester) {
             const materialsContent = document.getElementById('materialsContent');
-            if (!materialsContent) return;
-            
-            const yearMaterials = academicData.materials.filter(m => m.year === year);
-            
-            if (yearMaterials.length === 0) {
-                materialsContent.innerHTML = `
-                    <div class="text-center py-16">
-                        <div class="text-6xl mb-4">📚</div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد مواد للسنة ${getYearName(year)}</h3>
-                        <p class="text-gray-600">ستظهر المواد الدراسية هنا عند إضافتها</p>
-                    </div>
-                `;
+            if (!materialsContent) {
+                console.error('❌ لم يتم العثور على حاوية المواد');
                 return;
             }
             
-            const groupedMaterials = yearMaterials.reduce((groups, material) => {
-                const type = material.type;
-                if (!groups[type]) groups[type] = [];
-                groups[type].push(material);
-                return groups;
-            }, {});
+            console.log(`📚 تحميل المواد للسنة ${year} الفصل ${semester}`);
+            console.log(`📊 إجمالي المواد في النظام: ${academicData.subjects ? academicData.subjects.length : 0}`);
+            
+            // Initialize subjects if empty
+            if (!academicData.subjects || academicData.subjects.length === 0) {
+                academicData.subjects = [];
+                console.log('🔧 تم إنشاء مصفوفة المواد فارغة');
+            }
+            
+            // Get subjects for this year and semester
+            const yearSemesterSubjects = academicData.subjects.filter(s => {
+                const match = s.year === year && s.semester === semester;
+                console.log(`🔍 فحص المادة "${s.name}": السنة=${s.year}, الفصل=${s.semester}, مطابق=${match}`);
+                return match;
+            });
+            
+            console.log(`✅ وجد ${yearSemesterSubjects.length} مواد للسنة ${year} الفصل ${semester}`);
+            
+            if (yearSemesterSubjects.length === 0) {
+                materialsContent.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد مواد للسنة ${getYearName(year)} - ${getSemesterName(semester)}</h3>
+                        <p class="text-gray-600 mb-4">ابدأ بإضافة مادة جديدة باستخدام الزر أعلاه</p>
+                        ${currentUser && currentUser.isAdmin ? `
+                            <button onclick="showAddSubjectModal()" class="mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                ➕ إضافة أول مادة
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                console.log('📄 تم عرض رسالة "لا توجد مواد"');
+                return;
+            }
+            
+            console.log('🔄 إنشاء HTML للمواد...');
+            const subjectsHTML = yearSemesterSubjects.map((subject, index) => {
+                console.log(`🏗️ إنشاء HTML للمادة ${index + 1}: ${subject.name}`);
+                return generateSubjectHTML(subject);
+            }).join('');
             
             materialsContent.innerHTML = `
                 <div class="space-y-6">
-                    ${Object.entries(groupedMaterials).map(([type, materials]) => `
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                <span class="ml-2">${getMaterialTypeIcon(type)}</span>
-                                ${getMaterialTypeLabel(type)}
-                                <span class="mr-2 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                                    ${materials.length}
+                    ${subjectsHTML}
+                </div>
+            `;
+            
+            console.log('✅ تم إنشاء HTML للمواد');
+            
+            // Show first subject's first section by default
+            if (yearSemesterSubjects.length > 0) {
+                const firstSubjectId = yearSemesterSubjects[0].id;
+                console.log(`🎯 عرض القسم الافتراضي للمادة الأولى: ${firstSubjectId}`);
+                setTimeout(() => {
+                    showSubjectSection(firstSubjectId, 'recordings');
+                }, 200);
+            }
+        }
+
+        function generateSubjectHTML(subject) {
+            const subjectId = subject.id;
+            console.log(`🏗️ إنشاء HTML للمادة: ${subject.name} (ID: ${subjectId})`);
+            
+            const filesCount = getSubjectFilesCount(subjectId);
+            const recordingsCount = getSubjectTypeFilesCount(subjectId, 'recordings');
+            const slidesCount = getSubjectTypeFilesCount(subjectId, 'slides');
+            const summariesCount = getSubjectTypeFilesCount(subjectId, 'summaries');
+            
+            console.log(`📊 إحصائيات المادة ${subject.name}: إجمالي=${filesCount}, تسجيلات=${recordingsCount}, سلايدات=${slidesCount}, ملخصات=${summariesCount}`);
+            
+            return `
+                <div class="bg-white rounded-lg shadow-lg border-r-4 border-purple-500 overflow-hidden" data-subject-container="${subjectId}">
+                    <!-- Subject Header -->
+                    <div class="p-6 bg-gradient-to-l from-purple-50 to-purple-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-2xl ml-3">📖</span>
+                                <h2 class="text-xl font-bold text-gray-900">${escapeHtml(subject.name)}</h2>
+                                <span class="mr-3 px-3 py-1 bg-purple-600 text-white text-sm rounded-full">
+                                    ${filesCount} ملف
                                 </span>
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                ${materials.map(material => `
-                                    <div class="material-card rounded-lg p-4 border hover:shadow-lg transition-all">
-                                        <h4 class="font-medium text-gray-900 mb-2">${escapeHtml(material.name)}</h4>
-                                        ${material.description ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(material.description)}</p>` : ''}
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs text-gray-500">${formatDate(material.timestamp)}</span>
-                                            <div class="flex space-x-2 space-x-reverse">
-                                                <button onclick="addToFavorites('${material.id}', '${escapeHtml(material.name)}', '${material.link}', '${escapeHtml(material.description || '')}')" 
-                                                        class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors" title="إضافة للمفضلة">
-                                                    ❤️
-                                                </button>
-                                                <a href="${material.link}" target="_blank" rel="noopener noreferrer" 
-                                                   class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
-                                                    📖 فتح
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('')}
                             </div>
+                            ${currentUser && currentUser.isAdmin ? `
+                                <button onclick="deleteSubject('${subjectId}')" class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors" type="button">
+                                    🗑️ حذف المادة
+                                </button>
+                            ` : ''}
                         </div>
-                    `).join('')}
+                    </div>
+                    
+                    <!-- Material Type Buttons -->
+                    <div class="p-6 bg-gray-50 border-b">
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="showSubjectSection('${subjectId}', 'recordings')" type="button"
+                                    class="material-type-btn px-4 py-2 rounded-lg border-2 bg-orange-50 border-orange-200 text-orange-800 hover:bg-orange-100 transition-all duration-200"
+                                    data-subject="${subjectId}" data-type="recordings" id="btn-${subjectId}-recordings">
+                                <span class="ml-2">🎙️</span>
+                                Records
+                                <span class="mr-2 px-2 py-1 bg-white rounded-full text-xs">
+                                    ${recordingsCount}
+                                </span>
+                            </button>
+                            
+                            <button onclick="showSubjectSection('${subjectId}', 'slides')" type="button"
+                                    class="material-type-btn px-4 py-2 rounded-lg border-2 bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100 transition-all duration-200"
+                                    data-subject="${subjectId}" data-type="slides" id="btn-${subjectId}-slides">
+                                <span class="ml-2">📑</span>
+                                Slides
+                                <span class="mr-2 px-2 py-1 bg-white rounded-full text-xs">
+                                    ${slidesCount}
+                                </span>
+                            </button>
+                            
+                            <button onclick="showSubjectSection('${subjectId}', 'summaries')" type="button"
+                                    class="material-type-btn px-4 py-2 rounded-lg border-2 bg-green-50 border-green-200 text-green-800 hover:bg-green-100 transition-all duration-200"
+                                    data-subject="${subjectId}" data-type="summaries" id="btn-${subjectId}-summaries">
+                                <span class="ml-2">📝</span>
+                                ملخصات
+                                <span class="mr-2 px-2 py-1 bg-white rounded-full text-xs">
+                                    ${summariesCount}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Material Sections -->
+                    <div id="content-${subjectId}" class="p-6">
+                        ${generateMaterialSectionHTML(subjectId, 'recordings')}
+                        ${generateMaterialSectionHTML(subjectId, 'slides')}
+                        ${generateMaterialSectionHTML(subjectId, 'summaries')}
+                    </div>
                 </div>
             `;
         }
 
-        function addMaterial(name, year, type, link, description) {
+        function generateMaterialSectionHTML(subjectId, materialType) {
+            const sectionId = `section-${subjectId}-${materialType}`;
+            console.log(`📄 إنشاء قسم المواد: ${sectionId}`);
+            
+            const midtermFiles = generateFilesHTML(subjectId, materialType, 'midterm');
+            const finalFiles = generateFilesHTML(subjectId, materialType, 'final');
+            
+            return `
+                <div id="${sectionId}" class="material-section hidden" data-subject="${subjectId}" data-type="${materialType}">
+                    <div class="space-y-4">
+                        <!-- Midterm Section -->
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-semibold text-blue-800 flex items-center">
+                                    <span class="ml-2">📝</span>
+                                    امتحان المنتصف (Midterm)
+                                </h4>
+                                ${currentUser && currentUser.isAdmin ? `
+                                    <button onclick="showFileUploadModal('${subjectId}', '${materialType}', 'midterm')" type="button"
+                                            class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                                        📤 Upload
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <div id="files-${subjectId}-${materialType}-midterm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${midtermFiles}
+                            </div>
+                        </div>
+                        
+                        <!-- Final Section -->
+                        <div class="bg-red-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-semibold text-red-800 flex items-center">
+                                    <span class="ml-2">📋</span>
+                                    امتحان النهائي (Final)
+                                </h4>
+                                ${currentUser && currentUser.isAdmin ? `
+                                    <button onclick="showFileUploadModal('${subjectId}', '${materialType}', 'final')" type="button"
+                                            class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors">
+                                        📤 Upload
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <div id="files-${subjectId}-${materialType}-final" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${finalFiles}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateFilesHTML(subjectId, materialType, category) {
+            const files = academicData.materials.filter(m => 
+                m.subjectId === subjectId && m.type === materialType && m.category === category
+            );
+            
+            if (files.length === 0) {
+                return `
+                    <div class="col-span-full text-center py-8 text-gray-500">
+                        <div class="text-3xl mb-2">📁</div>
+                        <p>لا توجد ملفات بعد</p>
+                        ${currentUser && currentUser.isAdmin ? '<p class="text-sm">استخدم زر Upload لإضافة ملفات</p>' : ''}
+                    </div>
+                `;
+            }
+            
+            return files.map(file => `
+                <div class="material-card bg-white rounded-lg p-4 border hover:shadow-lg transition-all">
+                    <div class="flex items-center mb-2">
+                        <span class="text-lg ml-2">${getFileIcon(file.fileName)}</span>
+                        <h5 class="font-medium text-gray-900 flex-1">${escapeHtml(file.title)}</h5>
+                        ${currentUser && currentUser.isAdmin ? `
+                            <button onclick="deleteFile('${file.id}')" type="button" class="text-red-600 hover:text-red-800 text-sm">
+                                🗑️
+                            </button>
+                        ` : ''}
+                    </div>
+                    ${file.description ? `<p class="text-sm text-gray-600 mb-3">${escapeHtml(file.description)}</p>` : ''}
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-500">${formatDate(file.timestamp)}</span>
+                        <div class="flex space-x-2 space-x-reverse">
+                            <button onclick="addToFavorites('${file.id}', '${escapeHtml(file.title)}', '${file.link}', '${escapeHtml(file.description || '')}')" type="button"
+                                    class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors" title="إضافة للمفضلة">
+                                ❤️
+                            </button>
+                            <a href="${file.link}" target="_blank" rel="noopener noreferrer" 
+                               class="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg hover:bg-purple-700 transition-colors">
+                                📖 فتح
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addMaterial(title, year, semester, subject, type, link, description, category) {
             if (!currentUser || !currentUser.isAdmin) return false;
             
             const material = {
                 id: Date.now().toString(),
-                name: name,
+                title: title,
                 year: parseInt(year),
+                semester: parseInt(semester),
+                subject: subject,
                 type: type,
+                category: category,
                 link: link,
                 description: description,
                 authorId: currentUser.id,
@@ -2530,12 +3252,58 @@
                 saveDataToCloud().catch(console.error);
             }
             
-            if (currentTab === 'materials' && currentYear === parseInt(year)) {
-                loadMaterials(currentYear);
-            }
+            // تحديث فوري للمواد
+            setTimeout(() => {
+                loadMaterials(currentYear, currentSemester);
+                console.log('🔄 تم تحديث المواد بعد الإضافة');
+            }, 100);
             
             showNotification('تم إضافة المادة بنجاح', 'success');
             return true;
+        }
+
+        // Update subject options based on selected year and semester
+        function updateSubjectOptions() {
+            const yearSelect = document.getElementById('materialYear');
+            const semesterSelect = document.getElementById('materialSemester');
+            const subjectSelect = document.getElementById('materialSubject');
+            
+            if (!yearSelect || !semesterSelect || !subjectSelect) return;
+            
+            const year = parseInt(yearSelect.value);
+            const semester = parseInt(semesterSelect.value);
+            
+            subjectSelect.innerHTML = '<option value="">اختر المادة</option>';
+            
+            if (year && semester && ACADEMIC_SUBJECTS[year] && ACADEMIC_SUBJECTS[year][semester]) {
+                ACADEMIC_SUBJECTS[year][semester].forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Update subject filter based on current year and semester
+        function updateSubjectFilter() {
+            const subjectFilter = document.getElementById('subjectFilter');
+            if (!subjectFilter) return;
+            
+            subjectFilter.innerHTML = '<option value="">جميع المواد</option>';
+            
+            if (ACADEMIC_SUBJECTS[currentYear] && ACADEMIC_SUBJECTS[currentYear][currentSemester]) {
+                ACADEMIC_SUBJECTS[currentYear][currentSemester].forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectFilter.appendChild(option);
+                });
+            }
+        }
+
+        function getSemesterName(semester) {
+            return semester === 1 ? 'الفصل الأول' : 'الفصل الثاني';
         }
 
         // Profile functions
@@ -3541,6 +4309,605 @@
             }
         }
 
+        // New interaction functions for materials
+        function toggleSubject(subject) {
+            const contentId = `content-${subject.replace(/\s+/g, '-')}`;
+            const arrowId = `arrow-${subject.replace(/\s+/g, '-')}`;
+            const content = document.getElementById(contentId);
+            const arrow = document.getElementById(arrowId);
+            
+            if (content && arrow) {
+                if (content.style.display === 'none' || content.style.display === '') {
+                    content.style.display = 'block';
+                    arrow.textContent = '▲';
+                } else {
+                    content.style.display = 'none';
+                    arrow.textContent = '▼';
+                }
+            }
+        }
+
+        function showMaterialType(subject, type) {
+            const subjectId = subject.replace(/\s+/g, '-');
+            
+            // Hide all type contents for this subject
+            const allTypeContents = document.querySelectorAll(`[id^="type-${subjectId}-"]`);
+            allTypeContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected type content
+            const selectedContent = document.getElementById(`type-${subjectId}-${type}`);
+            if (selectedContent) {
+                selectedContent.classList.remove('hidden');
+            }
+            
+            // Update button styles
+            const allTypeButtons = document.querySelectorAll(`[onclick*="showMaterialType('${subject.replace(/'/g, "\\'")}',"]`);
+            allTypeButtons.forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-blue-500', 'ring-green-500', 'ring-orange-500');
+                btn.classList.remove('bg-blue-100', 'bg-green-100', 'bg-orange-100');
+                
+                if (type === 'slides') {
+                    btn.classList.add('bg-blue-50');
+                } else if (type === 'summaries') {
+                    btn.classList.add('bg-green-50');
+                } else if (type === 'recordings') {
+                    btn.classList.add('bg-orange-50');
+                }
+            });
+            
+            // Highlight selected button
+            const selectedButton = document.querySelector(`[onclick="showMaterialType('${subject.replace(/'/g, "\\'")}', '${type}')"]`);
+            if (selectedButton) {
+                if (type === 'slides') {
+                    selectedButton.classList.add('ring-2', 'ring-blue-500', 'bg-blue-100');
+                } else if (type === 'summaries') {
+                    selectedButton.classList.add('ring-2', 'ring-green-500', 'bg-green-100');
+                } else if (type === 'recordings') {
+                    selectedButton.classList.add('ring-2', 'ring-orange-500', 'bg-orange-100');
+                }
+            }
+        }
+
+        // New helper functions for dynamic materials system
+        function showAddSubjectModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك بإضافة مواد', 'error');
+                return;
+            }
+            const modal = document.getElementById('addSubjectModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function showLogoModal() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك بتعديل الشعار', 'error');
+                return;
+            }
+            
+            // Load current settings
+            const platformNameInput = document.getElementById('platformName');
+            const platformDescInput = document.getElementById('platformDescription');
+            
+            if (platformNameInput) platformNameInput.value = academicData.settings.name || 'المنصة الأكاديمية';
+            if (platformDescInput) platformDescInput.value = academicData.settings.description || 'لجنة الطب والجراحة البيطرية';
+            
+            const modal = document.getElementById('logoModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function showSubjectSection(subjectId, materialType) {
+            console.log(`🔄 عرض قسم ${materialType} للمادة ${subjectId}`);
+            
+            try {
+                // Hide all sections for this specific subject only
+                const subjectContainer = document.querySelector(`[data-subject-container="${subjectId}"]`);
+                if (!subjectContainer) {
+                    console.error(`❌ لم يتم العثور على حاوية المادة: ${subjectId}`);
+                    return;
+                }
+                
+                // Hide all material sections within this subject
+                const allSections = subjectContainer.querySelectorAll('.material-section');
+                console.log(`🔍 وجد ${allSections.length} أقسام في المادة ${subjectId}`);
+                
+                allSections.forEach(section => {
+                    section.classList.add('hidden');
+                    console.log(`👁️ إخفاء القسم: ${section.id}`);
+                });
+                
+                // Show selected section
+                const selectedSectionId = `section-${subjectId}-${materialType}`;
+                const selectedSection = document.getElementById(selectedSectionId);
+                
+                if (selectedSection) {
+                    selectedSection.classList.remove('hidden');
+                    console.log(`✅ تم عرض القسم: ${selectedSectionId}`);
+                } else {
+                    console.error(`❌ لم يتم العثور على القسم: ${selectedSectionId}`);
+                    
+                    // Try to find any section with the material type
+                    const fallbackSection = subjectContainer.querySelector(`[data-type="${materialType}"]`);
+                    if (fallbackSection && fallbackSection.classList.contains('material-section')) {
+                        fallbackSection.classList.remove('hidden');
+                        console.log(`✅ تم عرض القسم البديل: ${fallbackSection.id}`);
+                    } else {
+                        console.error(`❌ لم يتم العثور على أي قسم للنوع ${materialType}`);
+                        showNotification(`لم يتم العثور على قسم ${materialType}`, 'error');
+                        return;
+                    }
+                }
+                
+                // Update button styles for this subject only
+                const subjectButtons = subjectContainer.querySelectorAll('.material-type-btn');
+                console.log(`🔘 وجد ${subjectButtons.length} أزرار في المادة ${subjectId}`);
+                
+                subjectButtons.forEach(btn => {
+                    const btnSubject = btn.getAttribute('data-subject');
+                    const btnType = btn.getAttribute('data-type');
+                    
+                    // Only update buttons for this subject
+                    if (btnSubject === subjectId) {
+                        // Reset button styles
+                        btn.classList.remove('ring-2', 'ring-blue-500', 'ring-orange-500', 'ring-green-500');
+                        btn.classList.remove('bg-blue-100', 'bg-orange-100', 'bg-green-100');
+                        
+                        // Highlight selected button
+                        if (btnType === materialType) {
+                            if (materialType === 'recordings') {
+                                btn.classList.add('ring-2', 'ring-orange-500', 'bg-orange-100');
+                            } else if (materialType === 'slides') {
+                                btn.classList.add('ring-2', 'ring-blue-500', 'bg-blue-100');
+                            } else if (materialType === 'summaries') {
+                                btn.classList.add('ring-2', 'ring-green-500', 'bg-green-100');
+                            }
+                            console.log(`✅ تم تفعيل زر ${materialType} للمادة ${subjectId}`);
+                        }
+                    }
+                });
+                
+                console.log(`✅ تم عرض قسم ${materialType} للمادة ${subjectId} بنجاح`);
+                
+            } catch (error) {
+                console.error('❌ خطأ في عرض قسم المادة:', error);
+                showNotification('حدث خطأ في عرض القسم', 'error');
+            }
+        }
+
+        function showFileUploadModal(subjectId, materialType, category) {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('غير مسموح لك برفع ملفات', 'error');
+                return;
+            }
+            
+            // Set hidden fields
+            document.getElementById('uploadSubjectName').value = subjectId;
+            document.getElementById('uploadMaterialType').value = materialType;
+            document.getElementById('uploadCategory').value = category;
+            
+            // Update modal subtitle
+            const subject = academicData.subjects.find(s => s.id === subjectId);
+            const subjectName = subject ? subject.name : 'المادة';
+            const typeLabel = materialType === 'recordings' ? 'Records' : materialType === 'slides' ? 'Slides' : 'ملخصات';
+            const categoryLabel = category === 'midterm' ? 'ميد تيرم' : 'فاينال';
+            
+            const subtitle = document.getElementById('uploadModalSubtitle');
+            if (subtitle) {
+                subtitle.textContent = `${subjectName} - ${typeLabel} - ${categoryLabel}`;
+            }
+            
+            const modal = document.getElementById('fileUploadModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function getSubjectFilesCount(subjectId) {
+            return academicData.materials.filter(m => m.subjectId === subjectId).length;
+        }
+
+        function getSubjectTypeFilesCount(subjectId, materialType) {
+            return academicData.materials.filter(m => m.subjectId === subjectId && m.type === materialType).length;
+        }
+
+        function getFileIcon(fileName) {
+            if (!fileName) return '📄';
+            const ext = fileName.split('.').pop().toLowerCase();
+            const icons = {
+                'pdf': '📄',
+                'doc': '📝', 'docx': '📝',
+                'ppt': '📊', 'pptx': '📊',
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
+                'mp4': '🎥', 'avi': '🎥', 'mov': '🎥',
+                'mp3': '🎵', 'wav': '🎵', 'm4a': '🎵'
+            };
+            return icons[ext] || '📄';
+        }
+
+        function addSubject() {
+            console.log('🔄 بدء عملية إضافة مادة جديدة...');
+            
+            const yearSelect = document.getElementById('subjectYear');
+            const semesterSelect = document.getElementById('subjectSemester');
+            const nameInput = document.getElementById('subjectName');
+            
+            if (!yearSelect || !semesterSelect || !nameInput) {
+                console.error('❌ لم يتم العثور على عناصر النموذج');
+                showNotification('خطأ في العثور على عناصر النموذج', 'error');
+                return false;
+            }
+            
+            const year = parseInt(yearSelect.value);
+            const semester = parseInt(semesterSelect.value);
+            const name = nameInput.value.trim();
+            
+            console.log(`📝 بيانات المادة: السنة=${year}, الفصل=${semester}, الاسم="${name}"`);
+            
+            if (!year || !semester || !name) {
+                console.error('❌ بيانات ناقصة');
+                showNotification('يرجى إدخال جميع البيانات', 'error');
+                return false;
+            }
+            
+            // Initialize subjects array if needed
+            if (!academicData.subjects) {
+                academicData.subjects = [];
+                console.log('🔧 تم إنشاء مصفوفة المواد');
+            }
+            
+            // Check if subject already exists
+            const existingSubject = academicData.subjects.find(s => 
+                s.name === name && s.year === year && s.semester === semester
+            );
+            
+            if (existingSubject) {
+                console.log('⚠️ المادة موجودة بالفعل');
+                showNotification('هذه المادة موجودة بالفعل في نفس السنة والفصل', 'error');
+                return false;
+            }
+            
+            const subject = {
+                id: `subject_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: name,
+                year: year,
+                semester: semester,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString(),
+                materialsCount: 0
+            };
+            
+            console.log('✅ إنشاء مادة جديدة:', subject);
+            
+            // Add to subjects array
+            academicData.subjects.push(subject);
+            console.log(`📊 عدد المواد الآن: ${academicData.subjects.length}`);
+            
+            // Save data
+            saveDataToLocalStorage();
+            console.log('💾 تم حفظ البيانات محلياً');
+            
+            if (isOnline) {
+                saveDataToCloud().then(() => {
+                    console.log('☁️ تم حفظ البيانات في السحابة');
+                }).catch(error => {
+                    console.error('❌ خطأ في حفظ البيانات في السحابة:', error);
+                });
+            }
+            
+            // Force refresh materials view
+            console.log('🔄 تحديث عرض المواد...');
+            setTimeout(() => {
+                loadMaterials(currentYear, currentSemester);
+                updateSubjectFilter();
+            }, 200);
+            
+            showNotification(`تم إضافة مادة "${name}" بنجاح`, 'success');
+            console.log('✅ تمت عملية إضافة المادة بنجاح');
+            return true;
+        }
+
+        function deleteSubject(subjectId) {
+            console.log(`🗑️ محاولة حذف المادة: ${subjectId}`);
+            
+            if (!currentUser || !currentUser.isAdmin) {
+                console.log('❌ المستخدم ليس مديراً');
+                showNotification('غير مسموح لك بحذف المواد', 'error');
+                return;
+            }
+            
+            const subject = academicData.subjects.find(s => s.id === subjectId);
+            if (!subject) {
+                console.log('❌ لم يتم العثور على المادة');
+                showNotification('المادة غير موجودة', 'error');
+                return;
+            }
+            
+            console.log(`📋 المادة الموجودة: ${subject.name}`);
+            
+            if (confirm(`هل أنت متأكد من حذف مادة "${subject.name}"؟ سيتم حذف جميع الملفات المرتبطة بها.`)) {
+                console.log('✅ تأكيد الحذف من المستخدم');
+                
+                // Remove subject
+                const subjectsCountBefore = academicData.subjects.length;
+                academicData.subjects = academicData.subjects.filter(s => s.id !== subjectId);
+                console.log(`📊 عدد المواد قبل الحذف: ${subjectsCountBefore}, بعد الحذف: ${academicData.subjects.length}`);
+                
+                // Remove all materials for this subject
+                const materialsCountBefore = academicData.materials.length;
+                academicData.materials = academicData.materials.filter(m => m.subjectId !== subjectId);
+                console.log(`📊 عدد الملفات قبل الحذف: ${materialsCountBefore}, بعد الحذف: ${academicData.materials.length}`);
+                
+                saveDataToLocalStorage();
+                
+                if (isOnline) {
+                    saveDataToCloud().catch(console.error);
+                }
+                
+                // Refresh view
+                console.log('🔄 تحديث العرض...');
+                setTimeout(() => {
+                    loadMaterials(currentYear, currentSemester);
+                }, 100);
+                
+                showNotification('تم حذف المادة وجميع ملفاتها', 'success');
+            } else {
+                console.log('❌ تم إلغاء الحذف من قبل المستخدم');
+            }
+        }
+
+        function deleteFile(fileId) {
+            if (!currentUser || !currentUser.isAdmin) return;
+            
+            if (confirm('هل أنت متأكد من حذف هذا الملف؟')) {
+                academicData.materials = academicData.materials.filter(m => m.id !== fileId);
+                saveDataToLocalStorage();
+                
+                if (isOnline) {
+                    saveDataToCloud().catch(console.error);
+                }
+                
+                // Refresh view
+                loadMaterials(currentYear, currentSemester);
+                showNotification('تم حذف الملف', 'success');
+            }
+        }
+
+        // Logo handling functions
+        function handleLogoSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleLogoFile(file);
+            }
+        }
+
+        function handleLogoDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleLogoFile(file);
+            }
+            event.target.classList.remove('dragover');
+        }
+
+        function handleLogoFile(file) {
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                showNotification('حجم الملف كبير جداً. الحد الأقصى 2MB', 'error');
+                return;
+            }
+            
+            selectedLogoFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewContainer = document.getElementById('newLogoPreview');
+                const previews = ['logoPreviewLarge', 'logoPreviewMedium', 'logoPreviewSmall'];
+                
+                previews.forEach(id => {
+                    const img = document.getElementById(id);
+                    if (img) {
+                        img.src = e.target.result;
+                    }
+                });
+                
+                if (previewContainer) {
+                    previewContainer.classList.remove('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetToDefaultLogo() {
+            selectedLogoFile = null;
+            currentLogo = {
+                type: 'emoji',
+                data: '🏥',
+                name: 'Default Logo',
+                icon: '🏥'
+            };
+            
+            const previewContainer = document.getElementById('newLogoPreview');
+            if (previewContainer) {
+                previewContainer.classList.add('hidden');
+            }
+            
+            document.getElementById('logoFileInput').value = '';
+            updateLogoInUI();
+            showNotification('تم إعادة تعيين الشعار الافتراضي', 'success');
+        }
+
+        function applyLogoChanges(logoData, platformName, platformDescription) {
+            currentLogo = logoData;
+            academicData.settings.logo = logoData;
+            academicData.settings.name = platformName;
+            academicData.settings.description = platformDescription;
+            
+            updateLogoInUI();
+            saveDataToLocalStorage();
+            
+            if (isOnline) {
+                saveDataToCloud().catch(console.error);
+            }
+        }
+
+        function updateLogoInUI() {
+            // Update header logo
+            const headerLogo = document.querySelector('.w-12.h-12.bg-white.bg-opacity-20');
+            if (headerLogo && currentLogo) {
+                if (currentLogo.type === 'image') {
+                    headerLogo.innerHTML = `<img src="${currentLogo.data}" class="w-full h-full object-cover rounded-full" alt="شعار المنصة">`;
+                } else {
+                    headerLogo.innerHTML = `<span class="text-2xl">${currentLogo.icon}</span>`;
+                }
+            }
+            
+            // Update platform name and description
+            const platformNameElements = document.querySelectorAll('h1');
+            const platformDescElements = document.querySelectorAll('p');
+            
+            platformNameElements.forEach(el => {
+                if (el.textContent.includes('المنصة الأكاديمية')) {
+                    el.textContent = academicData.settings.name;
+                }
+            });
+            
+            // Update current logo display in modal
+            const currentLogoDisplay = document.getElementById('currentLogoDisplay');
+            if (currentLogoDisplay && currentLogo) {
+                if (currentLogo.type === 'image') {
+                    currentLogoDisplay.innerHTML = `<img src="${currentLogo.data}" class="w-full h-full object-cover rounded-full" alt="الشعار الحالي">`;
+                } else {
+                    currentLogoDisplay.innerHTML = `<span class="text-xl">${currentLogo.icon}</span>`;
+                }
+            }
+        }
+
+        // Material file handling functions
+        function handleMaterialFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleMaterialFile(file);
+            }
+        }
+
+        function handleMaterialFileDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                handleMaterialFile(file);
+            }
+            event.target.classList.remove('dragover');
+        }
+
+        function handleMaterialFile(file) {
+            const fileInfo = document.getElementById('materialFileInfo');
+            const fileName = document.getElementById('materialFileName');
+            const fileSize = document.getElementById('materialFileSize');
+            const fileIcon = document.getElementById('materialFileIcon');
+            
+            if (fileInfo && fileName && fileSize && fileIcon) {
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileIcon.textContent = getFileIcon(file.name);
+                fileInfo.classList.remove('hidden');
+            }
+            
+            // Store file for upload
+            window.selectedMaterialFile = file;
+        }
+
+        function uploadMaterialFile() {
+            console.log('📤 بدء عملية رفع الملف...');
+            
+            const subjectId = document.getElementById('uploadSubjectName').value;
+            const materialType = document.getElementById('uploadMaterialType').value;
+            const category = document.getElementById('uploadCategory').value;
+            const title = document.getElementById('fileTitle').value.trim();
+            const description = document.getElementById('fileDescription').value.trim();
+            
+            console.log(`📋 بيانات الرفع: المادة=${subjectId}, النوع=${materialType}, الفئة=${category}, العنوان="${title}"`);
+            
+            if (!window.selectedMaterialFile || !title || !subjectId || !materialType || !category) {
+                console.error('❌ بيانات ناقصة للرفع');
+                showNotification('يرجى اختيار ملف وإدخال جميع البيانات المطلوبة', 'error');
+                return false;
+            }
+            
+            // Verify subject exists
+            const subject = academicData.subjects.find(s => s.id === subjectId);
+            if (!subject) {
+                console.error(`❌ المادة غير موجودة: ${subjectId}`);
+                showNotification('المادة المحددة غير موجودة', 'error');
+                return false;
+            }
+            
+            // Create file URL (in real app, upload to server)
+            const fileURL = URL.createObjectURL(window.selectedMaterialFile);
+            
+            const material = {
+                id: `material_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                subjectId: subjectId,
+                subjectName: subject.name,
+                title: title,
+                description: description,
+                type: materialType,
+                category: category,
+                link: fileURL,
+                fileName: window.selectedMaterialFile.name,
+                fileSize: window.selectedMaterialFile.size,
+                authorId: currentUser.id,
+                authorName: currentUser.name,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('✅ إنشاء ملف جديد:', material);
+            
+            // Add to materials array
+            academicData.materials.push(material);
+            console.log(`📊 عدد الملفات الآن: ${academicData.materials.length}`);
+            
+            // Update subject materials count
+            const subjectIndex = academicData.subjects.findIndex(s => s.id === subjectId);
+            if (subjectIndex !== -1) {
+                academicData.subjects[subjectIndex].materialsCount = (academicData.subjects[subjectIndex].materialsCount || 0) + 1;
+            }
+            
+            saveDataToLocalStorage();
+            console.log('💾 تم حفظ البيانات محلياً');
+            
+            if (isOnline) {
+                saveDataToCloud().then(() => {
+                    console.log('☁️ تم حفظ البيانات في السحابة');
+                }).catch(error => {
+                    console.error('❌ خطأ في حفظ البيانات في السحابة:', error);
+                });
+            }
+            
+            // Refresh view to show new file
+            console.log('🔄 تحديث عرض المواد...');
+            setTimeout(() => {
+                loadMaterials(currentYear, currentSemester);
+                // Show the section where the file was uploaded
+                setTimeout(() => {
+                    showSubjectSection(subjectId, materialType);
+                }, 300);
+            }, 200);
+            
+            // Reset form
+            document.getElementById('fileUploadForm').reset();
+            document.getElementById('materialFileInfo').classList.add('hidden');
+            window.selectedMaterialFile = null;
+            
+            showNotification(`تم رفع "${title}" بنجاح في ${subject.name}`, 'success');
+            console.log('✅ تمت عملية رفع الملف بنجاح');
+            return true;
+        }
+
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', () => {
             initializeApp();
@@ -3578,5 +4945,5 @@
             }
         }, 60000);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97879b33e23732ae',t:'MTc1Njc1OTQ3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97988c0e70dc32ad',t:'MTc1NjkzNzExMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

@@ -1,7 +1,8 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة الأكاديمية - مزامنة فورية</title>
     <title>المنصة الأكاديمية - لجنة الطب والجراحة البيطرية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,15 +35,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
         body { font-family: 'Cairo', sans-serif; }
-
-        .realtime-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+        
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { 
             from { opacity: 0; transform: translateY(20px); } 
@@ -87,59 +80,33 @@
             border: 2px dashed #d8b4fe;
             transition: all 0.3s ease;
         }
-
-        .realtime-indicator.online {
-            background: #10b981;
-            color: white;
-            animation: pulse 2s infinite;
+        
         .file-upload-area:hover {
             border-color: #9333ea;
             background-color: #faf5ff;
         }
-
-        .realtime-indicator.syncing {
-            background: #f59e0b;
-            color: white;
+        
         .file-upload-area.dragover {
             border-color: #7c3aed;
             background-color: #f3e8ff;
         }
-
-        .realtime-indicator.offline {
-            background: #ef4444;
-            color: white;
+        
         .material-card {
             background: linear-gradient(145deg, #ffffff, #f8fafc);
             border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        
         .material-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
             border-color: #c084fc;
         }
-
-        .notification {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            z-index: 1000;
-            max-width: 350px;
-            padding: 16px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            animation: slideIn 0.3s ease-out;
+        
         .welcome-popup {
             animation: popupSlide 0.5s ease-out;
         }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        
         @keyframes popupSlide {
             from { 
                 opacity: 0; 
@@ -159,8 +126,7 @@
         .notification-badge {
             animation: pulse 2s infinite;
         }
-
-        .upload-progress {
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -182,35 +148,20 @@
 
         .connection-status {
             position: fixed;
-            bottom: 20px;
             top: 20px;
             left: 20px;
             z-index: 1000;
-            background: white;
-            border-radius: 10px;
-            padding: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            min-width: 300px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        
-        .upload-progress.show {
-            opacity: 1;
 
         .connection-status.online {
             background: #10b981;
             color: white;
         }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
 
         .connection-status.offline {
             background: #ef4444;
@@ -235,40 +186,22 @@
         .scrollbar-thin::-webkit-scrollbar-track {
             background: #f3f4f6;
             border-radius: 4px;
-            overflow: hidden;
         }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
 
         .scrollbar-thin::-webkit-scrollbar-thumb {
             background: #c084fc;
             border-radius: 4px;
-            transition: width 0.3s ease;
             transition: background 0.3s ease;
         }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
 
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
             background: #a855f7;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
 
         /* Materials Container Specific Styles */
         #materialsContent {
             scroll-behavior: smooth;
         }
-        
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
 
         #materialsContent::-webkit-scrollbar {
             width: 10px;
@@ -324,24 +257,11 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Realtime Status Indicator -->
-    <div id="realtimeStatus" class="realtime-indicator offline">
-        🔴 غير متصل
     <!-- Connection Status -->
     <div id="connectionStatus" class="connection-status connecting" onclick="testCloudConnection()">
         🔄 جاري الاتصال...
     </div>
 
-    <!-- Upload Progress -->
-    <div id="uploadProgress" class="upload-progress">
-        <div class="flex items-center mb-2">
-            <span class="text-sm font-medium text-gray-900">جاري رفع الملف...</span>
-            <span id="uploadPercent" class="mr-auto text-sm text-gray-600">0%</span>
-        </div>
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
-        </div>
-        <div id="uploadFileName" class="text-xs text-gray-500 mt-1">اسم الملف</div>
     <!-- Sync Indicator -->
     <div id="syncIndicator" class="sync-indicator">
         🔄 جاري المزامنة...
@@ -351,19 +271,6 @@
     <div id="notificationContainer"></div>
 
     <!-- Main Container -->
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        <!-- Header -->
-        <header class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-6">
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                            <span class="text-white text-2xl">🎓</span>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900">المنصة الأكاديمية</h1>
-                            <p class="text-sm text-gray-600">مزامنة فورية مع Supabase</p>
-                        </div>
     <div class="flex h-screen bg-gray-100">
         <!-- Sidebar -->
         <div class="w-80 bg-white shadow-xl border-l border-gray-200 flex flex-col">
@@ -414,26 +321,7 @@
                         <span class="text-xl">📚</span>
                         <span>المواد الدراسية</span>
                     </button>
-
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <div id="userInfo" class="hidden flex items-center space-x-3 space-x-reverse">
-                            <div class="text-right">
-                                <div class="font-medium text-gray-900" id="userName">المستخدم</div>
-                                <div class="text-sm text-gray-600" id="userRole">طالب</div>
-                            </div>
-                            <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold" id="userAvatar">
-                                👤
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center space-x-2 space-x-reverse text-sm text-green-600">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <span id="onlineCount">0</span>
-                            <span>متصل</span>
-                        </div>
-                        
-                        <button id="logoutBtn" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                            تسجيل الخروج
+                    
                     <button onclick="switchTab('posts')" id="postsTab" class="sidebar-item w-full text-right px-4 py-3 rounded-lg flex items-center space-x-3 space-x-reverse">
                         <span class="text-xl">📝</span>
                         <span>المنشورات</span>
@@ -486,11 +374,9 @@
                     <span>تسجيل الخروج</span>
                 </button>
             </div>
-        </header>
         </div>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Welcome Section -->
             <div id="welcomeSection" class="flex-1 flex items-center justify-center bg-gradient-to-br from-purple-600 to-purple-800">
@@ -507,45 +393,53 @@
             </div>
 
             <!-- Login Section -->
-            <div id="loginSection" class="max-w-md mx-auto">
-                <div class="bg-white rounded-xl shadow-xl p-8">
             <div id="loginSection" class="hidden flex-1 flex items-center justify-center p-8">
                 <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
                     <div class="text-center mb-8">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span class="text-white text-2xl">🔑</span>
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">تسجيل الدخول</h2>
-@@ -203,20 +422,14 @@ <h2 class="text-2xl font-bold text-gray-900">تسجيل الدخول</h2>
+                        <p class="text-gray-600 mt-2">أدخل بياناتك للوصول إلى المنصة</p>
+                    </div>
+
+                    <form id="loginForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
+                            <input type="text" id="loginUsername" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="أدخل اسم المستخدم">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
+                            <input type="password" id="loginPassword" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="أدخل كلمة المرور">
+                        </div>
+
+                        <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
                             🔑 تسجيل الدخول
                         </button>
                     </form>
-
-                    <div class="mt-6 text-center">
-                        <button onclick="showRegisterForm()" class="text-purple-600 hover:text-purple-700 font-medium">
-                            إنشاء حساب جديد
-                        </button>
-                    </div>
                 </div>
             </div>
 
             <!-- Register Section -->
-            <div id="registerSection" class="hidden max-w-md mx-auto">
-                <div class="bg-white rounded-xl shadow-xl p-8">
             <div id="registerSection" class="hidden flex-1 flex items-center justify-center p-8">
                 <div class="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
                     <div class="text-center mb-8">
-                        <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span class="text-white text-2xl">📝</span>
                         </div>
                         <h2 class="text-2xl font-bold text-gray-900">إنشاء حساب جديد</h2>
-@@ -227,20 +440,20 @@ <h2 class="text-2xl font-bold text-gray-900">إنشاء حساب جديد</h2>
+                        <p class="text-gray-600 mt-2">انضم إلى المنصة الأكاديمية</p>
+                    </div>
+
+                    <form id="registerForm" class="space-y-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">الاسم الكامل</label>
                             <input type="text" id="registerName" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                    placeholder="أدخل اسمك الكامل">
                         </div>
@@ -553,41 +447,29 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
                             <input type="text" id="registerUsername" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                    placeholder="اختر اسم مستخدم">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">السنة الدراسية</label>
-                            <select id="registerYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                             <select id="registerYear" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                                 <option value="">اختر السنة</option>
                                 <option value="1">السنة الأولى</option>
                                 <option value="2">السنة الثانية</option>
-@@ -250,1456 +463,4878 @@ <h2 class="text-2xl font-bold text-gray-900">إنشاء حساب جديد</h2>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">نوع المستخدم</label>
-                            <select id="registerRole" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                                <option value="">اختر النوع</option>
-                                <option value="student">طالب</option>
-                                <option value="teacher">مدرس</option>
-                                <option value="admin">مشرف</option>
+                                <option value="3">السنة الثالثة</option>
+                                <option value="4">السنة الرابعة</option>
+                                <option value="5">السنة الخامسة</option>
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">كلمة المرور</label>
                             <input type="password" id="registerPassword" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                    placeholder="أدخل كلمة مرور قوية">
                         </div>
 
-                        <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 font-medium">
                         <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 focus:ring-4 focus:ring-purple-200 transition-all duration-200 font-medium">
                             📝 إنشاء الحساب
                         </button>
@@ -595,10 +477,6 @@
                 </div>
             </div>
 
-                    <div class="mt-6 text-center">
-                        <button onclick="showLoginForm()" class="text-green-600 hover:text-green-700 font-medium">
-                            لديك حساب بالفعل؟ تسجيل الدخول
-                        </button>
             <!-- Materials Section -->
             <div id="materialsSection" class="hidden flex-1 flex flex-col">
                 <!-- Header -->
@@ -622,56 +500,28 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Dashboard Section -->
-            <div id="dashboardSection" class="hidden">
-                <!-- Navigation Tabs -->
-                <div class="bg-white rounded-lg shadow-sm mb-6">
                 <!-- Year Tabs -->
                 <div class="bg-white border-b border-gray-200">
                     <div class="flex space-x-1 space-x-reverse p-4 overflow-x-auto">
-                        <button onclick="switchTab('posts')" id="postsTab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-blue-600 text-white">
-                            📝 المنشورات
                         <button onclick="switchYear(1)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="1">
                             السنة الأولى
                         </button>
                         <button onclick="switchYear(2)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="2">
                             السنة الثانية
                         </button>
-                        <button onclick="switchTab('files')" id="filesTab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100">
-                            📁 الملفات
                         <button onclick="switchYear(3)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="3">
                             السنة الثالثة
                         </button>
-                        <button onclick="switchTab('users')" id="usersTab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100">
-                            👥 المستخدمون
                         <button onclick="switchYear(4)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="4">
                             السنة الرابعة
                         </button>
-                        <button onclick="switchTab('chat')" id="chatTab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100">
-                            💬 الدردشة
                         <button onclick="switchYear(5)" class="year-tab px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap" data-year="5">
                             السنة الخامسة
                         </button>
                     </div>
                 </div>
 
-                <!-- Posts Tab -->
-                <div id="postsContent" class="tab-content">
-                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">📝 المنشورات</h3>
-                            <button onclick="showAddPostModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                ➕ إضافة منشور
-                            </button>
-                        </div>
-                        <div id="postsList" class="space-y-4">
-                            <div class="text-center py-8 text-gray-500">
-                                <div class="text-4xl mb-2">📝</div>
-                                <p>لا توجد منشورات حالياً</p>
-                            </div>
-                        </div>
                 <!-- Semester Tabs -->
                 <div id="semesterTabs" class="bg-gray-50 border-b border-gray-200">
                     <div class="flex space-x-1 space-x-reverse p-3 overflow-x-auto">
@@ -684,20 +534,6 @@
                     </div>
                 </div>
 
-                <!-- Files Tab -->
-                <div id="filesContent" class="tab-content hidden">
-                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">📁 الملفات</h3>
-                            <button onclick="showUploadModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                                📤 رفع ملف
-                            </button>
-                        </div>
-                        <div id="filesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="col-span-full text-center py-8 text-gray-500">
-                                <div class="text-4xl mb-2">📁</div>
-                                <p>لا توجد ملفات حالياً</p>
-                            </div>
                 <!-- Search and Filter -->
                 <div class="bg-white border-b border-gray-200 p-4">
                     <div class="flex space-x-4 space-x-reverse">
@@ -722,20 +558,6 @@
                     </div>
                 </div>
 
-                <!-- Users Tab -->
-                <div id="usersContent" class="tab-content hidden">
-                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold text-gray-900">👥 المستخدمون المتصلون</h3>
-                            <div class="text-sm text-gray-600">
-                                إجمالي: <span id="totalUsers">0</span>
-                            </div>
-                        </div>
-                        <div id="usersList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="col-span-full text-center py-8 text-gray-500">
-                                <div class="text-4xl mb-2">👥</div>
-                                <p>لا يوجد مستخدمون متصلون</p>
-                            </div>
                 <!-- Materials Content -->
                 <div class="flex-1 flex flex-col min-h-0">
                     <div id="materialsContent" class="flex-1 overflow-y-auto p-6 max-h-[calc(100vh-320px)] scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-gray-100">
@@ -748,11 +570,6 @@
                 </div>
             </div>
 
-                <!-- Chat Tab -->
-                <div id="chatContent" class="tab-content hidden">
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-xl font-bold text-gray-900">💬 الدردشة المباشرة</h3>
             <!-- Posts Section -->
             <div id="postsSection" class="hidden flex-1 flex flex-col">
                 <!-- Header -->
@@ -762,27 +579,11 @@
                             <h2 class="text-2xl font-bold text-gray-900">📝 المنشورات والإعلانات</h2>
                             <p class="text-gray-600 mt-1">آخر الأخبار والإعلانات المهمة</p>
                         </div>
-                        
-                        <div id="chatMessages" class="h-96 overflow-y-auto p-6 space-y-4 bg-gray-50">
-                            <div class="text-center text-gray-500 py-8">
-                                <div class="text-4xl mb-2">💬</div>
-                                <p>ابدأ محادثة جديدة!</p>
-                            </div>
                         <div id="adminPostsBtn" class="hidden">
                             <button onclick="showAddPostModal()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                                 ➕ إضافة منشور
                             </button>
                         </div>
-                        
-                        <div class="p-4 border-t border-gray-200">
-                            <div class="flex space-x-2 space-x-reverse">
-                                <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." 
-                                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                       onkeypress="if(event.key==='Enter') sendMessage()">
-                                <button onclick="sendMessage()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                    📤 إرسال
-                                </button>
-                            </div>
                     </div>
                 </div>
                 
@@ -797,16 +598,7 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Add Post Modal -->
-    <div id="addPostModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="text-white text-2xl">📝</span>
             <!-- Chat Section -->
             <div id="chatSection" class="hidden flex-1 flex flex-col">
                 <!-- Chat Header -->
@@ -823,33 +615,8 @@
                             <span id="onlineChatUsers">0</span> متصل الآن
                         </div>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">إضافة منشور جديد</h2>
                 </div>
 
-                <form id="addPostForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">عنوان المنشور</label>
-                        <input type="text" id="postTitle" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                               placeholder="أدخل عنوان المنشور">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">محتوى المنشور</label>
-                        <textarea id="postContent" required rows="4"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                  placeholder="اكتب محتوى المنشور هنا..."></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المنشور</label>
-                        <select id="postType" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">اختر النوع</option>
-                            <option value="announcement">إعلان</option>
-                            <option value="news">خبر</option>
-                            <option value="reminder">تذكير</option>
-                            <option value="update">تحديث</option>
-                        </select>
                 <!-- Chat Messages -->
                 <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
                     <div class="text-center text-gray-500 py-8">
@@ -861,11 +628,6 @@
                 <!-- Chat Input -->
                 <div class="bg-white border-t border-gray-200 p-4">
                     <div class="flex space-x-2 space-x-reverse">
-                        <button type="submit" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                            📝 نشر المنشور
-                        </button>
-                        <button type="button" onclick="closeModal('addPostModal')" class="px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
-                            إلغاء
                         <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." 
                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
                                onkeypress="if(event.key==='Enter') sendMessage()">
@@ -873,16 +635,9 @@
                             📤 إرسال
                         </button>
                     </div>
-                </form>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Upload File Modal -->
-    <div id="uploadModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
             <!-- Exams Section -->
             <div id="examsSection" class="hidden flex-1 flex flex-col">
                 <!-- Header -->
@@ -1387,26 +1142,19 @@
         <div class="flex items-center justify-center min-h-screen p-4">
             <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 welcome-popup">
                 <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                         <span class="text-white text-2xl">📤</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900">رفع ملف جديد</h2>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">رفع ملف جديد</h2>
                     <p class="text-gray-600" id="uploadModalSubtitle">اختر الملف وأدخل التفاصيل</p>
                 </div>
 
-                <form id="uploadForm" class="space-y-4">
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" 
-                         ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)">
-                        <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(event)">
                 <form id="fileUploadForm" class="space-y-4">
                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center file-upload-area" 
                          ondrop="handleMaterialFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                         <input type="file" id="materialFileInput" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.mp4,.mp3" onchange="handleMaterialFileSelect(event)">
                         <div class="text-4xl mb-2">📁</div>
                         <p class="text-gray-600 mb-2">اسحب الملف هنا أو انقر للاختيار</p>
-                        <button type="button" onclick="document.getElementById('fileInput').click()" 
                         <button type="button" onclick="document.getElementById('materialFileInput').click()" 
                                 class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
                             اختيار ملف
@@ -1414,14 +1162,10 @@
                         <p class="text-xs text-gray-500 mt-2">PDF, DOC, PPT, صور، فيديو، صوت</p>
                     </div>
 
-                    <div id="fileInfo" class="hidden bg-gray-50 rounded-lg p-4">
                     <div id="materialFileInfo" class="hidden bg-gray-50 rounded-lg p-4">
                         <div class="flex items-center space-x-3 space-x-reverse">
-                            <span class="text-2xl" id="fileIcon">📄</span>
                             <span class="text-2xl" id="materialFileIcon">📄</span>
                             <div class="flex-1">
-                                <div class="font-medium" id="fileName">اسم الملف</div>
-                                <div class="text-sm text-gray-500" id="fileSize">حجم الملف</div>
                                 <div class="font-medium" id="materialFileName">اسم الملف</div>
                                 <div class="text-sm text-gray-500" id="materialFileSize">حجم الملف</div>
                             </div>
@@ -1431,7 +1175,6 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">عنوان الملف</label>
                         <input type="text" id="fileTitle" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                placeholder="أدخل عنوان الملف">
                     </div>
@@ -1439,35 +1182,15 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">وصف الملف</label>
                         <textarea id="fileDescription" rows="3"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                   placeholder="وصف مختصر للملف..."></textarea>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">فئة الملف</label>
-                        <select id="fileCategory" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                            <option value="">اختر الفئة</option>
-                            <option value="lecture">محاضرة</option>
-                            <option value="assignment">واجب</option>
-                            <option value="exam">امتحان</option>
-                            <option value="reference">مرجع</option>
-                            <option value="other">أخرى</option>
-                        </select>
-                    </div>
                     <!-- Hidden fields for subject and category info -->
                     <input type="hidden" id="uploadSubjectName">
                     <input type="hidden" id="uploadMaterialType">
                     <input type="hidden" id="uploadCategory">
 
-                    <div class="flex space-x-2 space-x-reverse">
-                        <button type="submit" class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                            📤 رفع الملف
-                        </button>
-                        <button type="button" onclick="closeModal('uploadModal')" class="px-4 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
-                            إلغاء
-                        </button>
-                    </div>
                     <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 font-medium">
                         📤 رفع الملف
                     </button>
@@ -1480,91 +1203,6 @@
         </div>
     </div>
 
-    <script>
-        // ===== SUPABASE REALTIME CONFIGURATION =====
-        
-        // Supabase Configuration - تم تحديث القيم
-        const SUPABASE_URL = 'https://rmwrsbdmiwhhbanfirtx.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtd3JzYmRtaXdoaGJhbmZpcnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5MzQ2NTMsImV4cCI6MjA3MjUxMDY1M30.kBeJkAjO4r6ZDNrarHh9MkzfErPCt4TtilUgclqccvk';
-        
-        // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Application State
-        let currentUser = null;
-        let currentTab = 'posts';
-        let realtimeChannel = null;
-        let isConnected = false;
-        let selectedFile = null;
-        
-        // Data Collections
-        let posts = [];
-        let files = [];
-        let users = [];
-        let chatMessages = [];
-        let onlineUsers = new Set();
-        
-        // ===== SUPABASE REALTIME INITIALIZATION =====
-        
-        async function initializeRealtime() {
-            try {
-                console.log('🔄 تهيئة Supabase Realtime...');
-                
-                // Test connection first
-                const { data, error } = await supabase
-                    .from('students_data')
-                    .select('count')
-                    .limit(1);
-                
-                if (error) {
-                    console.error('❌ خطأ في الاتصال:', error.message);
-                    
-                    // Show setup instructions
-                    showNotification('يجب إعداد قاعدة البيانات أولاً! راجع التعليمات أسفل الصفحة', 'warning');
-                    showSetupInstructions();
-                    throw error;
-                }
-                
-                // Setup realtime subscription
-                realtimeChannel = supabase
-                    .channel('academic_platform')
-                    .on('postgres_changes', 
-                        { 
-                            event: '*', 
-                            schema: 'public', 
-                            table: 'students_data' 
-                        }, 
-                        handleRealtimeUpdate
-                    )
-                    .on('postgres_changes', 
-                        { 
-                            event: '*', 
-                            schema: 'public', 
-                            table: 'online_users' 
-                        }, 
-                        handleOnlineUsersUpdate
-                    )
-                    .subscribe((status) => {
-                        console.log('📡 حالة الاشتراك:', status);
-                        if (status === 'SUBSCRIBED') {
-                            isConnected = true;
-                            updateRealtimeStatus('online');
-                            showNotification('تم تفعيل المزامنة الفورية 🚀', 'success');
-                        }
-                    });
-                
-                // Load initial data
-                await loadInitialData();
-                
-                return true;
-                
-            } catch (error) {
-                console.error('❌ خطأ في تهيئة Realtime:', error);
-                isConnected = false;
-                updateRealtimeStatus('offline');
-                showNotification('فشل الاتصال - الوضع المحلي فقط', 'error');
-                return false;
-            }
     <!-- Upload Modal -->
     <div id="uploadModal" class="hidden fixed inset-0 bg-black bg-opacity-50 popup-overlay z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -4281,20 +3919,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 handleFileSelection(files[0]);
             }
         }
-        
-        // ===== REALTIME EVENT HANDLERS =====
-        
-        function handleRealtimeUpdate(payload) {
-            const { eventType, new: newRecord, old: oldRecord } = payload;
 
         function handleFileSelection(file) {
             selectedFile = file;
             const fileInfo = document.getElementById('fileInfo');
             const fileName = document.getElementById('fileName');
             const fileSize = document.getElementById('fileSize');
-
-            console.log(`📡 تحديث فوري: ${eventType}`, newRecord);
-            updateRealtimeStatus('syncing');
+            
             if (fileInfo && fileName && fileSize) {
                 fileName.textContent = file.name;
                 fileSize.textContent = formatFileSize(file.size);
@@ -4314,10 +3945,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         function filterMaterials() {
             const searchTerm = document.getElementById('materialSearch')?.value.toLowerCase() || '';
             const typeFilter = document.getElementById('materialTypeFilter')?.value || '';
-
-            setTimeout(() => {
-                updateRealtimeStatus('online');
-            }, 1000);
+            
             // This would filter the displayed materials based on search and type
             // For now, just reload materials for the current year
             loadMaterials(currentYear);
@@ -4327,8 +3955,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         function loadExams() {
             const examsContent = document.getElementById('examsContent');
             if (!examsContent) return;
-
-            if (!newRecord || !newRecord.data) return;
+            
             if (academicData.exams.length === 0) {
                 examsContent.innerHTML = `
                     <div class="text-center py-16">
@@ -4339,25 +3966,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 `;
                 return;
             }
-
-            const data = newRecord.data;
+            
             const sortedExams = [...academicData.exams].sort((a, b) => 
                 new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time)
             );
-
-            switch (data.type) {
-                case 'post':
-                    handleNewPost(data);
-                    break;
-                case 'file':
-                    handleNewFile(data);
-                    break;
-                case 'user':
-                    handleNewUser(data);
-                    break;
-                case 'chat_message':
-                    handleNewChatMessage(data);
-                    break;
+            
             examsContent.innerHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${sortedExams.map(exam => `
@@ -4446,9 +4059,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             // Re-render with filtered exams
             loadExams();
         }
-        
-        function handleOnlineUsersUpdate(payload) {
-            const { eventType, new: newRecord, old: oldRecord } = payload;
 
         function showAddExamModal() {
             if (!currentUser || !currentUser.isAdmin) {
@@ -4480,17 +4090,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             };
             
             academicData.exams.push(exam);
-
-            if (eventType === 'INSERT' && newRecord) {
-                onlineUsers.add(newRecord.user_id);
-            } else if (eventType === 'DELETE' && oldRecord) {
-                onlineUsers.delete(oldRecord.user_id);
+            
             // إرسال إشعارات للطلاب
             if (examData.sendNotification) {
                 sendExamNotification(exam);
             }
-
-            updateOnlineCount();
+            
             saveDataToLocalStorage();
             if (isOnline) {
                 saveDataToCloud().catch(console.error);
@@ -4503,12 +4108,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             showNotification('تم إضافة الامتحان بنجاح', 'success');
             return true;
         }
-        
-        // ===== REALTIME DATA HANDLERS =====
-        
-        function handleNewPost(postData) {
-            // تجنب التكرار
-            if (posts.find(p => p.id === postData.id)) return;
 
         function sendExamNotification(exam) {
             const notification = {
@@ -4671,8 +4270,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             if (!favoritesContent) return;
             
             const userFavorites = academicData.favorites.filter(f => f.userId === currentUser?.id);
-
-            posts.unshift(postData);
+            
             if (userFavorites.length === 0) {
                 favoritesContent.innerHTML = `
                     <div class="text-center py-16">
@@ -4978,10 +4576,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         function resetTimerButtons() {
             const startBtn = document.getElementById('startTimerBtn');
             const pauseBtn = document.getElementById('pauseTimerBtn');
-
-            // تحديث واجهة المستخدم فوراً
-            if (currentTab === 'posts') {
-                renderPosts();
+            
             if (startBtn) startBtn.classList.remove('hidden');
             if (pauseBtn) pauseBtn.classList.add('hidden');
         }
@@ -5067,10 +4662,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             const arrowId = `arrow-${subject.replace(/\s+/g, '-')}`;
             const content = document.getElementById(contentId);
             const arrow = document.getElementById(arrowId);
-
-            // إشعار للمستخدمين الآخرين
-            if (postData.author_id !== currentUser?.id) {
-                showNotification(`منشور جديد: ${postData.title} 📝`, 'info');
+            
             if (content && arrow) {
                 if (content.style.display === 'none' || content.style.display === '') {
                     content.style.display = 'block';
@@ -5081,33 +4673,22 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 }
             }
         }
-        
-        function handleNewFile(fileData) {
-            // تجنب التكرار
-            if (files.find(f => f.id === fileData.id)) return;
 
         function showMaterialType(subject, type) {
             const subjectId = subject.replace(/\s+/g, '-');
-
-            files.unshift(fileData);
+            
             // Hide all type contents for this subject
             const allTypeContents = document.querySelectorAll(`[id^="type-${subjectId}-"]`);
             allTypeContents.forEach(content => {
                 content.classList.add('hidden');
             });
-
-            // تحديث واجهة المستخدم فوراً
-            if (currentTab === 'files') {
-                renderFiles();
+            
             // Show selected type content
             const selectedContent = document.getElementById(`type-${subjectId}-${type}`);
             if (selectedContent) {
                 selectedContent.classList.remove('hidden');
             }
-
-            // إشعار للمستخدمين الآخرين
-            if (fileData.author_id !== currentUser?.id) {
-                showNotification(`ملف جديد: ${fileData.title} 📁`, 'info');
+            
             // Update button styles
             const allTypeButtons = document.querySelectorAll(`[onclick*="showMaterialType('${subject.replace(/'/g, "\\'")}',"]`);
             allTypeButtons.forEach(btn => {
@@ -5135,17 +4716,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 }
             }
         }
-        
-        function handleNewUser(userData) {
-            // تجنب التكرار
-            if (users.find(u => u.id === userData.id)) return;
-            
-            users.push(userData);
-            onlineUsers.add(userData.id);
-            
-            // تحديث واجهة المستخدم فوراً
-            if (currentTab === 'users') {
-                renderUsers();
 
         // New helper functions for dynamic materials system
         function showAddSubjectModal() {
@@ -5153,188 +4723,55 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 showNotification('غير مسموح لك بإضافة مواد', 'error');
                 return;
             }
-            
-            updateOnlineCount();
-            
-            // إشعار للمشرفين
-            if (currentUser?.role === 'admin' && userData.id !== currentUser?.id) {
-                showNotification(`مستخدم جديد انضم: ${userData.name} 👋`, 'info');
             const modal = document.getElementById('addSubjectModal');
             if (modal) {
                 modal.classList.remove('hidden');
             }
         }
-        
-        function handleNewChatMessage(messageData) {
-            // تجنب التكرار والرسائل الذاتية
-            if (chatMessages.find(m => m.id === messageData.id) || 
-                messageData.author_id === currentUser?.id) return;
 
         function showLogoModal() {
             if (!currentUser || !currentUser.isAdmin) {
                 showNotification('غير مسموح لك بتعديل الشعار', 'error');
                 return;
             }
-
-            chatMessages.push(messageData);
+            
             // Load current settings
             const platformNameInput = document.getElementById('platformName');
             const platformDescInput = document.getElementById('platformDescription');
-
-            // تحديث واجهة المستخدم فوراً
-            if (currentTab === 'chat') {
-                renderChatMessage(messageData);
-                scrollChatToBottom();
-            }
-        }
-        
-        // ===== DATA OPERATIONS WITH REALTIME SYNC =====
-        
-        async function addPost(title, content, type) {
-            if (!currentUser) return false;
+            
             if (platformNameInput) platformNameInput.value = academicData.settings.name || 'المنصة الأكاديمية';
             if (platformDescInput) platformDescInput.value = academicData.settings.description || 'لجنة الطب والجراحة البيطرية';
-
-            try {
-                const postData = {
-                    id: generateId(),
-                    title: title,
-                    content: content,
-                    type: type,
-                    author_id: currentUser.id,
-                    author_name: currentUser.name,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // حفظ في قاعدة البيانات مع JSON
-                const { data, error } = await supabase
-                    .from('students_data')
-                    .insert([{
-                        data: {
-                            ...postData,
-                            type: 'post'
-                        }
-                    }])
-                    .select();
-                
-                if (error) throw error;
-                
-                // إضافة محلياً فوراً
-                posts.unshift(postData);
-                renderPosts();
-                
-                showNotification('تم نشر المنشور بنجاح 🎉', 'success');
-                return true;
-                
-            } catch (error) {
-                console.error('❌ خطأ في إضافة المنشور:', error);
-                showNotification('حدث خطأ في نشر المنشور', 'error');
-                return false;
+            
             const modal = document.getElementById('logoModal');
             if (modal) {
                 modal.classList.remove('hidden');
             }
         }
-        
-        async function uploadFile(file, title, description, category) {
-            if (!currentUser || !file) return false;
 
         function showSubjectSection(subjectId, materialType) {
             console.log(`🔄 عرض قسم ${materialType} للمادة ${subjectId}`);
-
+            
             try {
-                showUploadProgress(file.name, 0);
-                
-                // رفع الملف إلى Supabase Storage
-                const fileName = `${Date.now()}_${file.name}`;
-                const filePath = `files/${currentUser.id}/${fileName}`;
-                
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('academic-files')
-                    .upload(filePath, file);
-                
-                if (uploadError) throw uploadError;
-                
-                showUploadProgress(file.name, 50);
-                
-                // الحصول على الرابط العام
-                const { data: urlData } = supabase.storage
-                    .from('academic-files')
-                    .getPublicUrl(filePath);
-                
-                showUploadProgress(file.name, 75);
-                
-                // حفظ معلومات الملف في قاعدة البيانات
-                const fileData = {
-                    id: generateId(),
-                    title: title,
-                    description: description,
-                    category: category,
-                    file_name: file.name,
-                    file_size: file.size,
-                    file_url: urlData.publicUrl,
-                    file_path: filePath,
-                    author_id: currentUser.id,
-                    author_name: currentUser.name,
-                    timestamp: new Date().toISOString()
-                };
-                
-                const { data, error } = await supabase
-                    .from('students_data')
-                    .insert([{
-                        data: {
-                            ...fileData,
-                            type: 'file'
-                        }
-                    }])
-                    .select();
-                
-                if (error) throw error;
-                
-                showUploadProgress(file.name, 100);
                 // Hide all sections for this specific subject only
                 const subjectContainer = document.querySelector(`[data-subject-container="${subjectId}"]`);
                 if (!subjectContainer) {
                     console.error(`❌ لم يتم العثور على حاوية المادة: ${subjectId}`);
                     return;
                 }
-
-                // إضافة محلياً فوراً
-                files.unshift(fileData);
-                renderFiles();
+                
                 // Hide all material sections within this subject
                 const allSections = subjectContainer.querySelectorAll('.material-section');
                 console.log(`🔍 وجد ${allSections.length} أقسام في المادة ${subjectId}`);
-
-                setTimeout(() => {
-                    hideUploadProgress();
-                }, 2000);
+                
                 allSections.forEach(section => {
                     section.classList.add('hidden');
                     console.log(`👁️ إخفاء القسم: ${section.id}`);
                 });
-
-                showNotification('تم رفع الملف بنجاح 🎉', 'success');
-                return true;
+                
                 // Show selected section
                 const selectedSectionId = `section-${subjectId}-${materialType}`;
                 const selectedSection = document.getElementById(selectedSectionId);
-
-            } catch (error) {
-                console.error('❌ خطأ في رفع الملف:', error);
-                hideUploadProgress();
-                showNotification('حدث خطأ في رفع الملف', 'error');
-                return false;
-            }
-        }
-        
-        async function registerUser(name, username, year, role, password) {
-            try {
-                // التحقق من عدم وجود المستخدم
-                const existingUser = users.find(u => u.username === username);
-                if (existingUser) {
-                    showNotification('اسم المستخدم موجود بالفعل', 'error');
-                    return false;
+                
                 if (selectedSection) {
                     selectedSection.classList.remove('hidden');
                     console.log(`✅ تم عرض القسم: ${selectedSectionId}`);
@@ -5352,28 +4789,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                         return;
                     }
                 }
-
-                const userData = {
-                    id: generateId(),
-                    name: name,
-                    username: username,
-                    year: parseInt(year),
-                    role: role,
-                    avatar: name.charAt(0).toUpperCase(),
-                    registration_date: new Date().toISOString(),
-                    last_login: new Date().toISOString()
-                };
+                
                 // Update button styles for this subject only
                 const subjectButtons = subjectContainer.querySelectorAll('.material-type-btn');
                 console.log(`🔘 وجد ${subjectButtons.length} أزرار في المادة ${subjectId}`);
-
-                // حفظ في قاعدة البيانات
-                const { data, error } = await supabase
-                    .from('students_data')
-                    .insert([{
-                        data: {
-                            ...userData,
-                            type: 'user'
+                
                 subjectButtons.forEach(btn => {
                     const btnSubject = btn.getAttribute('data-subject');
                     const btnType = btn.getAttribute('data-type');
@@ -5395,93 +4815,28 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                             }
                             console.log(`✅ تم تفعيل زر ${materialType} للمادة ${subjectId}`);
                         }
-                    }])
-                    .select();
-                
-                if (error) throw error;
-                
-                // إضافة إلى المستخدمين المتصلين
-                const { data: onlineData, error: onlineError } = await supabase
-                    .from('online_users')
-                    .insert([{
-                        user_id: userData.id,
-                        user_name: userData.name,
-                        login_time: new Date().toISOString()
-                    }])
-                    .select();
-                
-                // تسجيل الدخول
-                currentUser = userData;
-                users.push(userData);
-                onlineUsers.add(userData.id);
-                
-                showDashboard();
-                updateOnlineCount();
                     }
                 });
-
-                showNotification(`مرحباً ${name}! تم إنشاء حسابك بنجاح 🎉`, 'success');
-                return true;
+                
                 console.log(`✅ تم عرض قسم ${materialType} للمادة ${subjectId} بنجاح`);
-
+                
             } catch (error) {
-                console.error('❌ خطأ في التسجيل:', error);
-                showNotification('حدث خطأ في إنشاء الحساب', 'error');
-                return false;
                 console.error('❌ خطأ في عرض قسم المادة:', error);
                 showNotification('حدث خطأ في عرض القسم', 'error');
             }
         }
-        
-        async function sendMessage() {
-            const chatInput = document.getElementById('chatInput');
-            if (!chatInput || !currentUser) return;
 
         function showFileUploadModal(subjectId, materialType, category) {
             if (!currentUser || !currentUser.isAdmin) {
                 showNotification('غير مسموح لك برفع ملفات', 'error');
                 return;
             }
-
-            const messageText = chatInput.value.trim();
-            if (!messageText) return;
+            
             // Set hidden fields
             document.getElementById('uploadSubjectName').value = subjectId;
             document.getElementById('uploadMaterialType').value = materialType;
             document.getElementById('uploadCategory').value = category;
-
-            try {
-                const messageData = {
-                    id: generateId(),
-                    message: messageText,
-                    author_id: currentUser.id,
-                    author_name: currentUser.name,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // حفظ في قاعدة البيانات
-                const { data, error } = await supabase
-                    .from('students_data')
-                    .insert([{
-                        data: {
-                            ...messageData,
-                            type: 'chat_message'
-                        }
-                    }])
-                    .select();
-                
-                if (error) throw error;
-                
-                // إضافة محلياً فوراً
-                chatMessages.push(messageData);
-                renderChatMessage(messageData);
-                scrollChatToBottom();
-                
-                chatInput.value = '';
-                
-            } catch (error) {
-                console.error('❌ خطأ في إرسال الرسالة:', error);
-                showNotification('حدث خطأ في إرسال الرسالة', 'error');
+            
             // Update modal subtitle
             const subject = academicData.subjects.find(s => s.id === subjectId);
             const subjectName = subject ? subject.name : 'المادة';
@@ -5492,82 +4847,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             if (subtitle) {
                 subtitle.textContent = `${subjectName} - ${typeLabel} - ${categoryLabel}`;
             }
-        }
-        
-        // ===== DATA LOADING =====
-        
-        async function loadInitialData() {
-            try {
-                console.log('📥 تحميل البيانات الأولية...');
-                
-                // تحميل البيانات من students_data
-                const { data: studentsData, error: studentsError } = await supabase
-                    .from('students_data')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                
-                if (studentsError) throw studentsError;
-                
-                // تحميل المستخدمين المتصلين
-                const { data: onlineData, error: onlineError } = await supabase
-                    .from('online_users')
-                    .select('*');
-                
-                if (!onlineError && onlineData) {
-                    onlineData.forEach(user => {
-                        onlineUsers.add(user.user_id);
-                    });
-                }
-                
-                // تصنيف البيانات
-                if (studentsData) {
-                    studentsData.forEach(record => {
-                        if (!record.data) return;
-                        
-                        const data = record.data;
-                        
-                        switch (data.type) {
-                            case 'post':
-                                posts.push(data);
-                                break;
-                            case 'file':
-                                files.push(data);
-                                break;
-                            case 'user':
-                                users.push(data);
-                                break;
-                            case 'chat_message':
-                                chatMessages.push(data);
-                                break;
-                        }
-                    });
-                }
-                
-                // ترتيب البيانات
-                posts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                files.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                chatMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-                
-                // تحديث واجهة المستخدم
-                updateOnlineCount();
-                renderCurrentTab();
-                
-                console.log(`✅ تم تحميل ${posts.length} منشور، ${files.length} ملف، ${users.length} مستخدم`);
-                
-            } catch (error) {
-                console.error('❌ خطأ في تحميل البيانات:', error);
             
             const modal = document.getElementById('fileUploadModal');
             if (modal) {
                 modal.classList.remove('hidden');
             }
         }
-        
-        // ===== UI RENDERING =====
-        
-        function renderPosts() {
-            const container = document.getElementById('postsList');
-            if (!container) return;
 
         function getSubjectFilesCount(subjectId) {
             return academicData.materials.filter(m => m.subjectId === subjectId).length;
@@ -5593,15 +4878,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
         function addSubject() {
             console.log('🔄 بدء عملية إضافة مادة جديدة...');
-
-            if (posts.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <div class="text-4xl mb-2">📝</div>
-                        <p>لا توجد منشورات حالياً</p>
-                    </div>
-                `;
-                return;
+            
             const yearSelect = document.getElementById('subjectYear');
             const semesterSelect = document.getElementById('subjectSemester');
             const nameInput = document.getElementById('subjectName');
@@ -5611,45 +4888,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 showNotification('خطأ في العثور على عناصر النموذج', 'error');
                 return false;
             }
-
-            container.innerHTML = posts.map(post => `
-                <div class="bg-gray-50 rounded-lg p-6 border border-gray-200 fade-in">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center space-x-3 space-x-reverse">
-                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                ${post.author_name.charAt(0)}
-                            </div>
-                            <div>
-                                <div class="font-medium text-gray-900">${escapeHtml(post.author_name)}</div>
-                                <div class="text-sm text-gray-500">${formatDate(post.timestamp)}</div>
-                            </div>
-                        </div>
-                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getPostTypeColor(post.type)}">
-                            ${getPostTypeLabel(post.type)}
-                        </span>
-                    </div>
-                    
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">${escapeHtml(post.title)}</h3>
-                    <p class="text-gray-700 leading-relaxed">${escapeHtml(post.content)}</p>
-                </div>
-            `).join('');
-        }
-        
-        function renderFiles() {
-            const container = document.getElementById('filesList');
-            if (!container) return;
+            
             const year = parseInt(yearSelect.value);
             const semester = parseInt(semesterSelect.value);
             const name = nameInput.value.trim();
-
-            if (files.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-8 text-gray-500">
-                        <div class="text-4xl mb-2">📁</div>
-                        <p>لا توجد ملفات حالياً</p>
-                    </div>
-                `;
-                return;
+            
             console.log(`📝 بيانات المادة: السنة=${year}, الفصل=${semester}, الاسم="${name}"`);
             
             if (!year || !semester || !name) {
@@ -5657,69 +4900,24 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 showNotification('يرجى إدخال جميع البيانات', 'error');
                 return false;
             }
-
-            container.innerHTML = files.map(file => `
-                <div class="bg-white rounded-lg p-6 border border-gray-200 card-hover fade-in">
-                    <div class="flex items-center space-x-3 space-x-reverse mb-4">
-                        <div class="text-3xl">${getFileIcon(file.file_name)}</div>
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-gray-900">${escapeHtml(file.title)}</h3>
-                            <p class="text-sm text-gray-500">${escapeHtml(file.file_name)}</p>
-                        </div>
-                    </div>
-                    
-                    <p class="text-gray-600 text-sm mb-4">${escapeHtml(file.description || 'لا يوجد وصف')}</p>
-                    
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                        <span>${formatFileSize(file.file_size)}</span>
-                        <span class="px-2 py-1 bg-gray-100 rounded-full">${getCategoryLabel(file.category)}</span>
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <div class="text-xs text-gray-400">
-                            ${escapeHtml(file.author_name)} • ${formatDate(file.timestamp)}
-                        </div>
-                        <a href="${file.file_url}" target="_blank" 
-                           class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
-                            📥 تحميل
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function renderUsers() {
-            const container = document.getElementById('usersList');
-            const totalElement = document.getElementById('totalUsers');
+            
             // Initialize subjects array if needed
             if (!academicData.subjects) {
                 academicData.subjects = [];
                 console.log('🔧 تم إنشاء مصفوفة المواد');
             }
-
-            if (!container) return;
+            
             // Check if subject already exists
             const existingSubject = academicData.subjects.find(s => 
                 s.name === name && s.year === year && s.semester === semester
             );
-
-            if (totalElement) {
-                totalElement.textContent = users.length;
+            
             if (existingSubject) {
                 console.log('⚠️ المادة موجودة بالفعل');
                 showNotification('هذه المادة موجودة بالفعل في نفس السنة والفصل', 'error');
                 return false;
             }
-
-            if (users.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-8 text-gray-500">
-                        <div class="text-4xl mb-2">👥</div>
-                        <p>لا يوجد مستخدمون</p>
-                    </div>
-                `;
-                return;
-            }
+            
             const subject = {
                 id: `subject_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 name: name,
@@ -5730,42 +4928,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 timestamp: new Date().toISOString(),
                 materialsCount: 0
             };
-
-            container.innerHTML = users.map(user => `
-                <div class="bg-white rounded-lg p-4 border border-gray-200 fade-in">
-                    <div class="flex items-center space-x-3 space-x-reverse">
-                        <div class="w-12 h-12 ${getRoleColor(user.role)} rounded-full flex items-center justify-center text-white font-bold">
-                            ${user.avatar}
-                        </div>
-                        <div class="flex-1">
-                            <div class="font-medium text-gray-900">${escapeHtml(user.name)}</div>
-                            <div class="text-sm text-gray-500">${getRoleLabel(user.role)}</div>
-                            <div class="text-xs text-gray-400">السنة ${user.year}</div>
-                        </div>
-                        <div class="flex items-center">
-                            ${onlineUsers.has(user.id) ? 
-                                '<div class="w-3 h-3 bg-green-500 rounded-full"></div>' : 
-                                '<div class="w-3 h-3 bg-gray-300 rounded-full"></div>'
-                            }
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function renderChatMessage(message) {
-            const container = document.getElementById('chatMessages');
-            if (!container) return;
+            
             console.log('✅ إنشاء مادة جديدة:', subject);
             
             // Add to subjects array
             academicData.subjects.push(subject);
             console.log(`📊 عدد المواد الآن: ${academicData.subjects.length}`);
-
-            // إزالة رسالة "ابدأ محادثة" إذا كانت موجودة
-            const emptyMessage = container.querySelector('.text-center');
-            if (emptyMessage) {
-                emptyMessage.remove();
+            
             // Save data to Supabase
             if (supabaseConnected) {
                 saveDataToSupabase(subject, 'subject').then(() => {
@@ -5774,27 +4943,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     console.error('❌ خطأ في حفظ المادة في Supabase:', error);
                 });
             }
-
-            const messageElement = document.createElement('div');
-            messageElement.className = `flex items-start space-x-3 space-x-reverse fade-in ${
-                message.author_id === currentUser?.id ? 'justify-end' : ''
-            }`;
+            
             // Save data locally
             saveDataToLocalStorage();
             console.log('💾 تم حفظ البيانات محلياً');
-
-            messageElement.innerHTML = `
-                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    ${message.author_name.charAt(0)}
-                </div>
-                <div class="flex-1 max-w-xs">
-                    <div class="bg-white rounded-lg p-3 border border-gray-200">
-                        <div class="font-medium text-sm text-gray-900 mb-1">${escapeHtml(message.author_name)}</div>
-                        <p class="text-gray-700">${escapeHtml(message.message)}</p>
-                        <div class="text-xs text-gray-400 mt-1">${formatTime(message.timestamp)}</div>
-                    </div>
-                </div>
-            `;
+            
             if (isOnline && !supabaseConnected) {
                 saveDataToCloud().then(() => {
                     console.log('☁️ تم حفظ البيانات في السحابة');
@@ -5809,48 +4962,30 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 loadMaterials(currentYear, currentSemester);
                 updateSubjectFilter();
             }, 200);
-
-            container.appendChild(messageElement);
+            
             showNotification(`تم إضافة مادة "${name}" بنجاح`, 'success');
             console.log('✅ تمت عملية إضافة المادة بنجاح');
             return true;
         }
-        
-        // ===== UI HELPERS =====
-        
-        function switchTab(tabName) {
-            currentTab = tabName;
 
         function deleteSubject(subjectId) {
             console.log(`🗑️ محاولة حذف المادة: ${subjectId}`);
-
-            // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('text-gray-700', 'hover:bg-gray-100');
-            });
+            
             if (!currentUser || !currentUser.isAdmin) {
                 console.log('❌ المستخدم ليس مديراً');
                 showNotification('غير مسموح لك بحذف المواد', 'error');
                 return;
             }
-
-            document.getElementById(tabName + 'Tab').classList.remove('text-gray-700', 'hover:bg-gray-100');
-            document.getElementById(tabName + 'Tab').classList.add('bg-blue-600', 'text-white');
+            
             const subject = academicData.subjects.find(s => s.id === subjectId);
             if (!subject) {
                 console.log('❌ لم يتم العثور على المادة');
                 showNotification('المادة غير موجودة', 'error');
                 return;
             }
-
-            // Show/hide content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
+            
             console.log(`📋 المادة الموجودة: ${subject.name}`);
-
-            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            
             if (confirm(`هل أنت متأكد من حذف مادة "${subject.name}"؟ سيتم حذف جميع الملفات المرتبطة بها.`)) {
                 console.log('✅ تأكيد الحذف من المستخدم');
                 
@@ -5898,9 +5033,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
         function deleteFile(fileId) {
             if (!currentUser || !currentUser.isAdmin) return;
-
-            // Render content
-            renderCurrentTab();
+            
             if (confirm('هل أنت متأكد من حذف هذا الملف؟')) {
                 academicData.materials = academicData.materials.filter(m => m.id !== fileId);
                 saveDataToLocalStorage();
@@ -5914,21 +5047,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 showNotification('تم حذف الملف', 'success');
             }
         }
-        
-        function renderCurrentTab() {
-            switch (currentTab) {
-                case 'posts':
-                    renderPosts();
-                    break;
-                case 'files':
-                    renderFiles();
-                    break;
-                case 'users':
-                    renderUsers();
-                    break;
-                case 'chat':
-                    renderChatMessages();
-                    break;
 
         // Logo handling functions
         function handleLogoSelect(event) {
@@ -5946,40 +5064,15 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             }
             event.target.classList.remove('dragover');
         }
-        
-        function renderChatMessages() {
-            const container = document.getElementById('chatMessages');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            if (chatMessages.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-gray-500 py-8">
-                        <div class="text-4xl mb-2">💬</div>
-                        <p>ابدأ محادثة جديدة!</p>
-                    </div>
-                `;
 
         function handleLogoFile(file) {
             if (file.size > 2 * 1024 * 1024) { // 2MB limit
                 showNotification('حجم الملف كبير جداً. الحد الأقصى 2MB', 'error');
                 return;
             }
-
-            chatMessages.forEach(message => {
-                renderChatMessage(message);
-            });
+            
             selectedLogoFile = file;
-
-            scrollChatToBottom();
-        }
-        
-        function scrollChatToBottom() {
-            const container = document.getElementById('chatMessages');
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 const previewContainer = document.getElementById('newLogoPreview');
@@ -5998,11 +5091,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             };
             reader.readAsDataURL(file);
         }
-        
-        function updateOnlineCount() {
-            const countElement = document.getElementById('onlineCount');
-            if (countElement) {
-                countElement.textContent = onlineUsers.size;
 
         function resetToDefaultLogo() {
             selectedLogoFile = null;
@@ -6022,53 +5110,20 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             updateLogoInUI();
             showNotification('تم إعادة تعيين الشعار الافتراضي', 'success');
         }
-        
-        function updateRealtimeStatus(status) {
-            const indicator = document.getElementById('realtimeStatus');
-            if (!indicator) return;
 
         function applyLogoChanges(logoData, platformName, platformDescription) {
             currentLogo = logoData;
             academicData.settings.logo = logoData;
             academicData.settings.name = platformName;
             academicData.settings.description = platformDescription;
-
-            indicator.className = `realtime-indicator ${status}`;
+            
             updateLogoInUI();
             saveDataToLocalStorage();
-
-            switch (status) {
-                case 'online':
-                    indicator.innerHTML = '🟢 متصل - مزامنة فورية';
-                    break;
-                case 'syncing':
-                    indicator.innerHTML = '🟡 جاري المزامنة...';
-                    break;
-                case 'offline':
-                    indicator.innerHTML = '🔴 غير متصل';
-                    break;
+            
             if (isOnline) {
                 saveDataToCloud().catch(console.error);
             }
         }
-        
-        // ===== MODAL FUNCTIONS =====
-        
-        function showAddPostModal() {
-            document.getElementById('addPostModal').classList.remove('hidden');
-        }
-        
-        function showUploadModal() {
-            document.getElementById('uploadModal').classList.remove('hidden');
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-            
-            // Reset forms
-            const form = document.querySelector(`#${modalId} form`);
-            if (form) {
-                form.reset();
 
         function updateLogoInUI() {
             // Update header logo
@@ -6080,11 +5135,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     headerLogo.innerHTML = `<span class="text-2xl">${currentLogo.icon}</span>`;
                 }
             }
-
-            // Reset file info
-            if (modalId === 'uploadModal') {
-                document.getElementById('fileInfo').classList.add('hidden');
-                selectedFile = null;
+            
             // Update platform name and description
             const platformNameElements = document.querySelectorAll('h1');
             const platformDescElements = document.querySelectorAll('p');
@@ -6105,108 +5156,44 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 }
             }
         }
-        
-        // ===== FILE HANDLING =====
-        
-        function handleFileSelect(event) {
 
         // Material file handling functions
         function handleMaterialFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
-                selectedFile = file;
-                showFileInfo(file);
                 handleMaterialFile(file);
             }
         }
-        
-        function handleFileDrop(event) {
 
         function handleMaterialFileDrop(event) {
             event.preventDefault();
             const file = event.dataTransfer.files[0];
             if (file) {
-                selectedFile = file;
-                showFileInfo(file);
                 handleMaterialFile(file);
             }
             event.target.classList.remove('dragover');
         }
-        
-        function handleDragOver(event) {
-            event.preventDefault();
-        }
-        
-        function showFileInfo(file) {
-            const fileInfo = document.getElementById('fileInfo');
-            const fileName = document.getElementById('fileName');
-            const fileSize = document.getElementById('fileSize');
-            const fileIcon = document.getElementById('fileIcon');
 
         function handleMaterialFile(file) {
             const fileInfo = document.getElementById('materialFileInfo');
             const fileName = document.getElementById('materialFileName');
             const fileSize = document.getElementById('materialFileSize');
             const fileIcon = document.getElementById('materialFileIcon');
-
+            
             if (fileInfo && fileName && fileSize && fileIcon) {
                 fileName.textContent = file.name;
                 fileSize.textContent = formatFileSize(file.size);
                 fileIcon.textContent = getFileIcon(file.name);
                 fileInfo.classList.remove('hidden');
             }
-        }
-        
-        function showUploadProgress(fileName, percent) {
-            const progressContainer = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressPercent = document.getElementById('uploadPercent');
-            const fileNameElement = document.getElementById('uploadFileName');
-
-            if (progressContainer && progressFill && progressPercent && fileNameElement) {
-                fileNameElement.textContent = fileName;
-                progressPercent.textContent = `${percent}%`;
-                progressFill.style.width = `${percent}%`;
-                progressContainer.classList.add('show');
-            }
-        }
-        
-        function hideUploadProgress() {
-            const progressContainer = document.getElementById('uploadProgress');
-            if (progressContainer) {
-                progressContainer.classList.remove('show');
-            }
-        }
-        
-        // ===== AUTHENTICATION =====
-        
-        function showLoginForm() {
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('registerSection').classList.add('hidden');
-        }
-        
-        function showRegisterForm() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('registerSection').classList.remove('hidden');
+            
             // Store file for upload
             window.selectedMaterialFile = file;
         }
-        
-        function showDashboard() {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('registerSection').classList.add('hidden');
-            document.getElementById('dashboardSection').classList.remove('hidden');
 
         function uploadMaterialFile() {
             console.log('📤 بدء عملية رفع الملف...');
-
-            // Update user info
-            if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userRole').textContent = getRoleLabel(currentUser.role);
-                document.getElementById('userAvatar').textContent = currentUser.avatar;
-                document.getElementById('userInfo').classList.remove('hidden');
-                document.getElementById('logoutBtn').classList.remove('hidden');
+            
             const subjectId = document.getElementById('uploadSubjectName').value;
             const materialType = document.getElementById('uploadMaterialType').value;
             const category = document.getElementById('uploadCategory').value;
@@ -6220,24 +5207,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 showNotification('يرجى اختيار ملف وإدخال جميع البيانات المطلوبة', 'error');
                 return false;
             }
-
-            renderCurrentTab();
-        }
-        
-        async function logout() {
-            if (currentUser) {
-                // Remove from online users
-                try {
-                    await supabase
-                        .from('online_users')
-                        .delete()
-                        .eq('user_id', currentUser.id);
-                } catch (error) {
-                    console.error('خطأ في تسجيل الخروج:', error);
-                }
-                
-                onlineUsers.delete(currentUser.id);
-                updateOnlineCount();
+            
             // Verify subject exists
             const subject = academicData.subjects.find(s => s.id === subjectId);
             if (!subject) {
@@ -6245,94 +5215,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 showNotification('المادة المحددة غير موجودة', 'error');
                 return false;
             }
-
-            currentUser = null;
+            
             // Create file URL (in real app, upload to server)
             const fileURL = URL.createObjectURL(window.selectedMaterialFile);
-
-            document.getElementById('dashboardSection').classList.add('hidden');
-            document.getElementById('userInfo').classList.add('hidden');
-            document.getElementById('logoutBtn').classList.add('hidden');
-            showLoginForm();
-        }
-        
-        // ===== UTILITY FUNCTIONS =====
-        
-        function generateId() {
-            return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('ar-SA', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
-        function formatTime(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleTimeString('ar-SA', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 بايت';
-            const k = 1024;
-            const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        function getFileIcon(fileName) {
-            const extension = fileName.split('.').pop().toLowerCase();
-            const icons = {
-                pdf: '📄',
-                doc: '📝',
-                docx: '📝',
-                ppt: '📊',
-                pptx: '📊',
-                xls: '📈',
-                xlsx: '📈',
-                jpg: '🖼️',
-                jpeg: '🖼️',
-                png: '🖼️',
-                gif: '🖼️',
-                mp4: '🎥',
-                mp3: '🎵',
-                zip: '📦',
-                rar: '📦'
-            };
-            return icons[extension] || '📄';
-        }
-        
-        function getPostTypeColor(type) {
-            const colors = {
-                announcement: 'bg-red-100 text-red-800',
-                news: 'bg-blue-100 text-blue-800',
-                reminder: 'bg-yellow-100 text-yellow-800',
-                update: 'bg-green-100 text-green-800'
-            };
-            return colors[type] || 'bg-gray-100 text-gray-800';
-        }
-        
-        function getPostTypeLabel(type) {
-            const labels = {
-                announcement: 'إعلان',
-                news: 'خبر',
-                reminder: 'تذكير',
-                update: 'تحديث'
+            
             const material = {
                 id: `material_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 subjectId: subjectId,
@@ -6348,181 +5234,19 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 authorName: currentUser.name,
                 timestamp: new Date().toISOString()
             };
-            return labels[type] || type;
-        }
-        
-        function getCategoryLabel(category) {
-            const labels = {
-                lecture: 'محاضرة',
-                assignment: 'واجب',
-                exam: 'امتحان',
-                reference: 'مرجع',
-                other: 'أخرى'
-            };
-            return labels[category] || category;
-        }
-        
-        function getRoleLabel(role) {
-            const labels = {
-                student: 'طالب',
-                teacher: 'مدرس',
-                admin: 'مشرف'
-            };
-            return labels[role] || role;
-        }
-        
-        function getRoleColor(role) {
-            const colors = {
-                student: 'bg-blue-600',
-                teacher: 'bg-green-600',
-                admin: 'bg-purple-600'
-            };
-            return colors[role] || 'bg-gray-600';
-        }
-        
-        function showNotification(message, type = 'info') {
-            const container = document.getElementById('notificationContainer');
-            if (!container) return;
             
-            const notification = document.createElement('div');
-            notification.className = `notification ${type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 
-                                                   type === 'error' ? 'bg-red-100 border-red-500 text-red-700' : 
-                                                   type === 'warning' ? 'bg-yellow-100 border-yellow-500 text-yellow-700' :
-                                                   'bg-blue-100 border-blue-500 text-blue-700'} border-r-4`;
-            
-            notification.innerHTML = `
-                <div class="flex items-center">
-                    <span class="text-lg mr-2">
-                        ${type === 'success' ? '✅' : 
-                          type === 'error' ? '❌' : 
-                          type === 'warning' ? '⚠️' : 'ℹ️'}
-                    </span>
-                    <span class="font-medium">${message}</span>
-                </div>
-            `;
-
-            container.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 5000);
-        }
-        
-        function showSetupInstructions() {
-            // Add setup instructions to the page
-            const setupDiv = document.createElement('div');
-            setupDiv.id = 'setupInstructions';
-            setupDiv.className = 'fixed bottom-0 left-0 right-0 bg-yellow-50 border-t-4 border-yellow-400 p-6 z-50';
-            setupDiv.innerHTML = `
-                <div class="max-w-4xl mx-auto">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-lg font-bold text-yellow-800">⚠️ يجب إعداد قاعدة البيانات أولاً</h3>
-                        <button onclick="document.getElementById('setupInstructions').remove()" 
-                                class="text-yellow-600 hover:text-yellow-800 text-xl">&times;</button>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-6 text-sm">
-                        <div>
-                            <h4 class="font-semibold text-yellow-800 mb-2">1️⃣ إنشاء جدول students_data:</h4>
-                            <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">CREATE TABLE students_data (
-  id BIGSERIAL PRIMARY KEY,
-  data JSONB NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);</pre>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-yellow-800 mb-2">2️⃣ إنشاء جدول online_users:</h4>
-                            <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto">CREATE TABLE online_users (
-  id BIGSERIAL PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  user_name TEXT NOT NULL,
-  login_time TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);</pre>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-yellow-800 mb-2">3️⃣ إنشاء Storage Bucket:</h4>
-                            <ul class="text-yellow-700 space-y-1">
-                                <li>• اذهب إلى Storage في Supabase</li>
-                                <li>• أنشئ bucket باسم: <code class="bg-yellow-200 px-1 rounded">academic-files</code></li>
-                                <li>• اجعله public للقراءة</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-semibold text-yellow-800 mb-2">4️⃣ تفعيل Realtime:</h4>
-                            <ul class="text-yellow-700 space-y-1">
-                                <li>• اذهب إلى Database → Replication</li>
-                                <li>• فعّل Realtime للجدولين</li>
-                                <li>• أعد تحميل الصفحة</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 text-center">
-                        <button onclick="location.reload()" 
-                                class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-                            🔄 إعادة المحاولة
-                        </button>
-                    </div>
-                </div>
-            `;
             console.log('✅ إنشاء ملف جديد:', material);
-
-            document.body.appendChild(setupDiv);
-        }
-        
-        // ===== EVENT LISTENERS =====
-        
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🚀 تهيئة المنصة الأكاديمية...');
+            
             // Add to materials array
             academicData.materials.push(material);
             console.log(`📊 عدد الملفات الآن: ${academicData.materials.length}`);
-
-            // Initialize Supabase Realtime
-            await initializeRealtime();
+            
             // Update subject materials count
             const subjectIndex = academicData.subjects.findIndex(s => s.id === subjectId);
             if (subjectIndex !== -1) {
                 academicData.subjects[subjectIndex].materialsCount = (academicData.subjects[subjectIndex].materialsCount || 0) + 1;
             }
-
-            // Login form
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const username = document.getElementById('loginUsername').value.trim();
-                const password = document.getElementById('loginPassword').value;
-                
-                // Simple authentication (في التطبيق الحقيقي، استخدم تشفير آمن)
-                const user = users.find(u => u.username === username);
-                if (user) {
-                    currentUser = user;
-                    
-                    // Add to online users
-                    try {
-                        await supabase
-                            .from('online_users')
-                            .insert([{
-                                user_id: user.id,
-                                user_name: user.name,
-                                login_time: new Date().toISOString()
-                            }]);
-                        
-                        onlineUsers.add(user.id);
-                    } catch (error) {
-                        console.error('خطأ في تحديث المستخدمين المتصلين:', error);
-                    }
-                    
-                    showDashboard();
-                    updateOnlineCount();
-                    showNotification(`مرحباً ${user.name}! 👋`, 'success');
-                } else {
-                    showNotification('اسم المستخدم غير موجود', 'error');
-                }
-            });
+            
             // Save to Supabase
             if (supabaseConnected) {
                 saveDataToSupabase(material, 'material').then(() => {
@@ -6531,44 +5255,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     console.error('❌ خطأ في حفظ الملف في Supabase:', error);
                 });
             }
-
-            // Register form
-            document.getElementById('registerForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const name = document.getElementById('registerName').value.trim();
-                const username = document.getElementById('registerUsername').value.trim();
-                const year = document.getElementById('registerYear').value;
-                const role = document.getElementById('registerRole').value;
-                const password = document.getElementById('registerPassword').value;
-                
-                if (!name || !username || !year || !role || !password) {
-                    showNotification('يرجى إدخال جميع البيانات', 'error');
-                    return;
-                }
-                
-                await registerUser(name, username, year, role, password);
-            });
+            
             saveDataToLocalStorage();
             console.log('💾 تم حفظ البيانات محلياً');
-
-            // Add post form
-            document.getElementById('addPostForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const title = document.getElementById('postTitle').value.trim();
-                const content = document.getElementById('postContent').value.trim();
-                const type = document.getElementById('postType').value;
-                
-                if (!title || !content || !type) {
-                    showNotification('يرجى إدخال جميع البيانات', 'error');
-                    return;
-                }
-                
-                if (await addPost(title, content, type)) {
-                    closeModal('addPostModal');
-                }
-            });
+            
             if (isOnline && !supabaseConnected) {
                 saveDataToCloud().then(() => {
                     console.log('☁️ تم حفظ البيانات في السحابة');
@@ -6576,24 +5266,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     console.error('❌ خطأ في حفظ البيانات في السحابة:', error);
                 });
             }
-
-            // Upload form
-            document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const title = document.getElementById('fileTitle').value.trim();
-                const description = document.getElementById('fileDescription').value.trim();
-                const category = document.getElementById('fileCategory').value;
-                
-                if (!selectedFile || !title || !category) {
-                    showNotification('يرجى اختيار ملف وإدخال جميع البيانات', 'error');
-                    return;
-                }
-                
-                if (await uploadFile(selectedFile, title, description, category)) {
-                    closeModal('uploadModal');
-                }
-            });
+            
             // Refresh view to show new file
             console.log('🔄 تحديث عرض المواد...');
             setTimeout(() => {
@@ -6603,15 +5276,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     showSubjectSection(subjectId, materialType);
                 }, 300);
             }, 200);
-
-            // Logout button
-            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
             // Reset form
             document.getElementById('fileUploadForm').reset();
             document.getElementById('materialFileInfo').classList.add('hidden');
             window.selectedMaterialFile = null;
-
-            console.log('✅ تم تهيئة المنصة بنجاح');
+            
             showNotification(`تم رفع "${title}" بنجاح في ${subject.name}`, 'success');
             console.log('✅ تمت عملية رفع الملف بنجاح');
             return true;
@@ -6622,17 +5292,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             initializeApp();
             setupAdminEventListeners();
         });
-        
-        // Handle page unload
-        window.addEventListener('beforeunload', async () => {
-            if (currentUser) {
-                try {
-                    await supabase
-                        .from('online_users')
-                        .delete()
-                        .eq('user_id', currentUser.id);
-                } catch (error) {
-                    console.error('خطأ في تنظيف المستخدمين المتصلين:', error);
 
         // Handle page visibility change for better sync
         document.addEventListener('visibilitychange', function() {
@@ -6677,6 +5336,5 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979901ccd46732ad',t:'MTc1Njk0MTkzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979942ad34e432ad',t:'MTc1Njk0NDU5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

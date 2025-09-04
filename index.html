@@ -1105,6 +1105,7 @@
                             </div>
                         </div>
                     </div>
+loadMaterialsFromSupabase(selectedYear, selectedSemester);
 
                     <!-- Current Logo Display -->
                     <div class="bg-blue-50 rounded-lg p-4">
@@ -1746,7 +1747,30 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             
             // Load saved logo
             loadSavedLogo();
-            
+            document.getElementById('fileUploadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fileInput = document.getElementById('materialFileInput'); // عدل id لو مختلف
+  const file = fileInput.files[0] || null;
+  const title = document.getElementById('fileTitle').value.trim();
+  const description = document.getElementById('fileDescription').value.trim();
+  const year = document.getElementById('uploadYear')?.value || document.getElementById('subjectYear')?.value;
+  const semester = document.getElementById('uploadSemester')?.value || document.getElementById('subjectSemester')?.value;
+
+  try {
+    await saveMaterialToSupabase({ year, semester, title, description, file });
+    showNotification('✅ تم رفع المادة/الملف بنجاح', 'success');
+    closeModal('fileUploadModal');
+
+    // تحديث واجهة المواد الحالية
+    loadMaterialsFromSupabase(selectedYear, selectedSemester);
+
+  } catch (err) {
+    console.error('Upload error:', err);
+    showNotification('❌ فشل رفع الملف', 'error');
+  }
+});
+
             // Initialize Supabase for real-time sync
             const supabaseConnected = await initializeSupabase();
             
@@ -1818,6 +1842,72 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         async function initializeSupabase() {
             try {
                 console.log('🔄 تهيئة Supabase...');
+// Upload file to Supabase Storage and return public URL
+async function uploadFileToStorage(file) {
+  if (!file) return null;
+
+  // اسم آمن للملف
+  const safeName = file.name.replace(/\s+/g, '_').replace(/[^\w\-.]/g, '');
+  const filePath = `materials/${Date.now()}_${safeName}`;
+
+  // رفع الملف
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('materials')
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadError) throw uploadError;
+    
+supabase.channel('materials-channel')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'students_data' }, payload => {
+    const mat = payload.new.data;
+    if (mat && mat.type === 'material' && mat.visible) {
+      if (String(mat.year) === String(selectedYear) && String(mat.semester) === String(selectedSemester)) {
+        const container = document.getElementById('materialsContent');
+        appendMaterialToUI(mat, container);
+      }
+    }
+  })
+  .subscribe();
+
+  // جلب الرابط العلني
+  const { data: publicData, error: publicError } = supabase.storage
+    .from('materials')
+    .getPublicUrl(filePath);
+
+  if (publicError) throw publicError;
+  return publicData?.publicUrl || null;
+}
+// Save a material record (uploads file if provided)
+async function saveMaterialToSupabase({ year, semester, title, description, file }) {
+  try {
+    let fileUrl = null;
+    if (file) {
+      fileUrl = await uploadFileToStorage(file);
+    }
+
+    const material = {
+      id: `mat_${Date.now()}`,
+      type: 'material',
+      year: String(year),
+      semester: String(semester),
+      title,
+      description: description || '',
+      fileUrl,
+      visible: true,
+      timestamp: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('students_data')
+      .insert([{ data: material }]);
+
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}
+
                 
                 // Initialize Supabase client
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1923,7 +2013,51 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     saveDataToLocalStorage();
                 }
             }
-            
+            async function loadMaterialsFromSupabase(year, semester) {
+  try {
+    const { data, error } = await supabase
+      .from('students_data')
+      .select('data')
+      .contains('data', { type: 'material', year: String(year), semester: String(semester), visible: true })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const container = document.getElementById('materialsContent');
+    container.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-16">
+          <div class="text-6xl mb-4">📂</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">لا توجد ملفات بعد</h3>
+          <p class="text-gray-600">انتظر حتى يضيف المشرفون مواد لهذا الفصل</p>
+        </div>`;
+      return;
+    }
+
+    data.forEach(row => {
+      const mat = row.data;
+      appendMaterialToUI(mat, container);
+    });
+
+  } catch (e) {
+    console.error('❌ فشل تحميل المواد:', e);
+    showNotification('فشل تحميل المواد من Supabase', 'error');
+  }
+}
+
+function appendMaterialToUI(mat, container) {
+  const card = document.createElement('div');
+  card.className = 'p-4 bg-white rounded-lg shadow mb-4';
+  card.innerHTML = `
+    <h4 class="font-bold text-lg mb-2">${mat.title}</h4>
+    <p class="text-gray-600 mb-2">${mat.description || ''}</p>
+    ${mat.fileUrl ? `<a href="${mat.fileUrl}" target="_blank" class="text-blue-600 underline">📂 فتح الملف</a>` : ''}
+  `;
+  container.appendChild(card);
+}
+
             // Check if it's a post
             else if (studentData.type === 'post') {
                 academicData.posts.unshift(studentData);

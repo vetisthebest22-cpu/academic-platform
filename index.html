@@ -1967,6 +1967,33 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     academicData.users[userIndex] = studentData;
                     saveDataToLocalStorage();
                 }
+            
+            else if (studentData.type === 'post') {
+                const idx = academicData.posts.findIndex(p => p.id === studentData.id);
+                if (idx !== -1) {
+                    academicData.posts[idx] = { ...academicData.posts[idx], ...studentData };
+                } else {
+                    academicData.posts.push(studentData);
+                }
+                saveDataToLocalStorage();
+                if (typeof loadPosts === 'function') loadPosts();
+            }
+            else if (studentData.type === 'material') {
+                const idx = academicData.materials.findIndex(m => m.id === studentData.id);
+                if (idx !== -1) {
+                    academicData.materials[idx] = { ...academicData.materials[idx], ...studentData };
+                } else {
+                    academicData.materials.push(studentData);
+                }
+                saveDataToLocalStorage();
+                if (typeof loadMaterials === 'function') {
+                    const activeYearBtn = document.querySelector('#materialsSection [data-year].bg-purple-600');
+                    const year = activeYearBtn ? parseInt(activeYearBtn.getAttribute('data-year')) : 1;
+                    const semSelect = document.getElementById('semesterSelect');
+                    const semester = semSelect ? parseInt(semSelect.value) : 1;
+                    try { loadMaterials(year, semester); } catch(e) {}
+                }
+            }
             }
             
             // Refresh current view if needed
@@ -4626,7 +4653,17 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     showNotification("الميزة فعالة الآن أو ستتوفر قريبًا!", 'info');
                 });
             });
+        
+
+        // ✅ ربط نموذج الشعار
+        const logoForm = document.getElementById('logoForm');
+        if (logoForm && typeof handleLogoSubmit === 'function') {
+            if (!logoForm.dataset.bound) {
+                logoForm.addEventListener('submit', handleLogoSubmit);
+                logoForm.dataset.bound = '1';
+            }
         }
+}
 
         function handleFileUpload() {
             if (!selectedFile) {

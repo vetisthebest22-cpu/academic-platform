@@ -2381,11 +2381,10 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             return Array.from(merged.values());
         }
 
-        async function saveDataToCloud() {
-            if (!isOnline || currentProvider !== 0) {
-                console.log('⚠️ غير متصل بالسحابة - حفظ محلي فقط');
-                return false;
-            }
+        async function saveDataToCloud(type, data) {
+    return await saveDataToSupabase(type, data);
+}
+
             
             console.log('📤 حفظ البيانات في السحابة...');
             showSyncIndicator();
@@ -2414,9 +2413,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                const result = await response.json();
-                console.log('✅ تم حفظ البيانات في السحابة');
-                return true;
+               async function saveDataToCloud(type, data) {
+    return await saveDataToSupabase(type, data);
+}
                 
             } catch (error) {
                 console.error('❌ خطأ في حفظ البيانات:', error.message);
@@ -2489,7 +2488,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 updateOnlineUsersCount();
                 
                 // محاولة حفظ البيانات
-                const saveSuccess = await saveDataToCloud();
+                const saveSuccess = await saveDataToSupabase();
                 
                 if (saveSuccess) {
                     // محاولة تحميل التحديثات

@@ -2111,110 +2111,102 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
         }
 
         // Save data to Supabase
-        async function saveDataToSupabase(data, type) {
-            if (!supabase || !supabaseConnected) {
-                console.log('⚠️ Supabase غير متصل - حفظ محلي فقط');
-                return false;
-            }
-            
-            try {
-                console.log(`📤 حفظ ${type} في Supabase...`);
-                
-                const record = {
-                    data: {
-                        ...data,
-                        type: type,
-                        timestamp: new Date().toISOString()
-                    }
-                };
-                
-                const { data: result, error } = await supabase
-                    .from('students_data')
-                    .insert([record])
-                    .select();
-                
-                if (error) {
-                    throw error;
-                }
-                
-                console.log(`✅ تم حفظ ${type} في Supabase:`, result);
-                return true;
-                
-            } catch (error) {
-                console.error(`❌ خطأ في حفظ ${type} في Supabase:`, error);
-                showNotification(`خطأ في حفظ ${type} في Supabase`, 'error');
-                return false;
-            }
-        }
+
+async function saveDataToSupabase(data, type) {
+    // Supabase is the primary source of truth. This function inserts a record
+    // into the 'students_data' table with a JSON payload.
+    if (!window.supabase || !window.supabaseConnected) {
+        console.log('⚠️ Supabase غير متصل - لن يتم الحفظ إلى السحابة.');
+        return false;
+    }
+
+    try {
+        const payload = {
+            type: type,
+            id: (data && data.id) ? data.id : (Date.now().toString()),
+            payload: data,
+            timestamp: new Date().toISOString()
+        };
+
+        const { data: result, error } = await supabase
+            .from('students_data')
+            .insert([{ data: payload }])
+            .select();
+
+        if (error) throw error;
+
+        console.log('✅ تم حفظ سجل في Supabase:', result);
+        return true;
+    } catch (err) {
+        console.error('❌ خطأ في حفظ إلى Supabase:', err);
+        if (typeof showNotification === 'function') showNotification(`خطأ في حفظ ${type} في Supabase`, 'error');
+        return false;
+    }
+}
+
 
         // Update data in Supabase
-        async function updateDataInSupabase(id, data, type) {
-            if (!supabase || !supabaseConnected) {
-                console.log('⚠️ Supabase غير متصل - تحديث محلي فقط');
-                return false;
-            }
-            
-            try {
-                console.log(`🔄 تحديث ${type} في Supabase...`);
-                
-                const record = {
-                    data: {
-                        ...data,
-                        type: type,
-                        lastUpdated: new Date().toISOString()
-                    }
-                };
-                
-                const { data: result, error } = await supabase
-                    .from('students_data')
-                    .update(record)
-                    .eq('data->>id', id)
-                    .eq('data->>type', type)
-                    .select();
-                
-                if (error) {
-                    throw error;
-                }
-                
-                console.log(`✅ تم تحديث ${type} في Supabase:`, result);
-                return true;
-                
-            } catch (error) {
-                console.error(`❌ خطأ في تحديث ${type} في Supabase:`, error);
-                showNotification(`خطأ في تحديث ${type} في Supabase`, 'error');
-                return false;
-            }
-        }
+
+async function updateDataInSupabase(id, data, type) {
+    if (!window.supabase || !window.supabaseConnected) {
+        console.log('⚠️ Supabase غير متصل - لن يتم التحديث في السحابة.');
+        return false;
+    }
+
+    try {
+        const payload = {
+            type: type,
+            id: id,
+            payload: data,
+            lastUpdated: new Date().toISOString()
+        };
+
+        // Update rows matching the JSON fields 'id' and 'type'
+        const { data: result, error } = await supabase
+            .from('students_data')
+            .update({ data: payload })
+            .eq('data->>id', id)
+            .eq('data->>type', type)
+            .select();
+
+        if (error) throw error;
+
+        console.log('✅ تم تحديث السجل في Supabase:', result);
+        return true;
+    } catch (err) {
+        console.error('❌ خطأ في تحديث Supabase:', err);
+        if (typeof showNotification === 'function') showNotification(`خطأ في تحديث ${type} في Supabase`, 'error');
+        return false;
+    }
+}
+
 
         // Delete data from Supabase
-        async function deleteDataFromSupabase(id, type) {
-            if (!supabase || !supabaseConnected) {
-                console.log('⚠️ Supabase غير متصل - حذف محلي فقط');
-                return false;
-            }
-            
-            try {
-                console.log(`🗑️ حذف ${type} من Supabase...`);
-                
-                const { data: result, error } = await supabase
-                    .from('students_data')
-                    .delete()
-                    .eq('data->>id', id)
-                    .eq('data->>type', type);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                console.log(`✅ تم حذف ${type} من Supabase`);
-                return true;
-                
-            } catch (error) {
-                console.error(`❌ خطأ في حذف ${type} من Supabase:`, error);
-                showNotification(`خطأ في حذف ${type} من Supabase`, 'error');
-                return false;
-            }
-        }
+
+async function deleteDataFromSupabase(id, type) {
+    if (!window.supabase || !window.supabaseConnected) {
+        console.log('⚠️ Supabase غير متصل - لن يتم الحذف في السحابة.');
+        return false;
+    }
+
+    try {
+        const { data: result, error } = await supabase
+            .from('students_data')
+            .delete()
+            .eq('data->>id', id)
+            .eq('data->>type', type);
+
+        if (error) throw error;
+
+        console.log('✅ تم حذف السجل من Supabase');
+        return true;
+    } catch (err) {
+        console.error('❌ خطأ في حذف من Supabase:', err);
+        if (typeof showNotification === 'function') showNotification(`خطأ في حذف ${type} من Supabase`, 'error');
+        return false;
+    }
+}
+
 
         // تفعيل أزرار المدير
         function enableAdminButtons() {
@@ -2381,10 +2373,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             return Array.from(merged.values());
         }
 
-        async function saveDataToCloud(type, data) {
-    return await saveDataToSupabase(type, data);
-}
-
+        async function saveDataToCloud() {
+            if (!isOnline || currentProvider !== 0) {
+                console.log('⚠️ غير متصل بالسحابة - حفظ محلي فقط');
+                return false;
+            }
             
             console.log('📤 حفظ البيانات في السحابة...');
             showSyncIndicator();
@@ -2413,9 +2406,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-               async function saveDataToCloud(type, data) {
-    return await saveDataToSupabase(type, data);
-}
+                const result = await response.json();
+                console.log('✅ تم حفظ البيانات في السحابة');
+                return true;
                 
             } catch (error) {
                 console.error('❌ خطأ في حفظ البيانات:', error.message);
@@ -2488,7 +2481,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
                 updateOnlineUsersCount();
                 
                 // محاولة حفظ البيانات
-                const saveSuccess = await saveDataToSupabase();
+                const saveSuccess = await saveDataToCloud();
                 
                 if (saveSuccess) {
                     // محاولة تحميل التحديثات
@@ -2574,15 +2567,14 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             }
         }
 
-        function saveDataToLocalStorage() {
-            try {
-                localStorage.setItem('academicData', JSON.stringify(academicData));
-                localStorage.setItem('lastSyncTime', lastSyncTime || new Date().toISOString());
-                console.log('💾 تم حفظ البيانات محلياً');
-            } catch (error) {
-                console.error('خطأ في حفظ البيانات محلياً:', error);
-            }
-        }
+
+function saveDataToLocalStorage() {
+    // التخزين المحلي مُعطل افتراضيًا — Supabase هو المصدر الوحيد للحقيقة.
+    // إن رغبت بتفعيل التخزين المحلي كـ fallback (offline)، يمكنك إضافة
+    // منطق الحفظ هنا.
+    return;
+}
+
 
         function loadDataFromLocalStorage() {
             try {
@@ -3321,40 +3313,39 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             `).join('');
         }
 
-        function addPost(title, content, type) {
-            if (!currentUser || !currentUser.isAdmin) return false;
-            
-            const post = {
-                id: Date.now().toString(),
-                title: title,
-                content: content,
-                type: type,
-                authorId: currentUser.id,
-                authorName: currentUser.name,
-                timestamp: new Date().toISOString()
-            };
-            
-            academicData.posts.unshift(post);
-            
-            // إرسال المنشور عبر Supabase للمزامنة المباشرة
-            if (supabaseConnected) {
-                saveDataToSupabase(post, 'post').catch(console.error);
-            }
-            
-            saveDataToLocalStorage();
-            if (isOnline && !supabaseConnected) {
-                saveDataToCloud().catch(console.error);
-            }
-            
-            // تحديث فوري للمنشورات
-            setTimeout(() => {
-                loadPosts();
-                console.log('🔄 تم تحديث المنشورات بعد الإضافة');
-            }, 100);
-            
-            showNotification('تم إضافة المنشور بنجاح', 'success');
-            return true;
+
+async function addPost(title, content, type) {
+    try {
+        const post = {
+            id: Date.now().toString(),
+            title,
+            content,
+            type,
+            authorId: (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'unknown',
+            authorName: (window.currentUser && window.currentUser.name) ? window.currentUser.name : 'unknown',
+            timestamp: new Date().toISOString()
+        };
+
+        const ok = await saveDataToSupabase(post, 'post');
+        if (!ok) {
+            if (typeof showNotification === 'function') showNotification('فشل حفظ المنشور على السحابة', 'error');
+            return false;
         }
+
+        // Optimistic UI update (optional). Realtime will sync to others.
+        if (!window.academicData) window.academicData = {};
+        if (!window.academicData.posts) window.academicData.posts = [];
+        window.academicData.posts.unshift(post);
+        if (typeof loadPosts === 'function') loadPosts();
+        if (typeof showNotification === 'function') showNotification('تم إضافة المنشور بنجاح', 'success');
+        return true;
+    } catch (err) {
+        console.error('خطأ في إضافة المنشور:', err);
+        if (typeof showNotification === 'function') showNotification('خطأ في إضافة المنشور', 'error');
+        return false;
+    }
+}
+
 
         // Materials functions - New Dynamic System
         function loadMaterials(year, semester) {
@@ -5372,5 +5363,73 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979942ad34e432ad',t:'MTc1Njk0NDU5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979942ad34e432ad',t:'MTc1Njk0NDU5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>
+
+// Upload file to Supabase Storage and save material metadata to 'students_data'
+async function uploadMaterialFileAndSave(subjectId, title, description, materialType, category) {
+    if (!window.selectedMaterialFile) {
+        if (typeof showNotification === 'function') showNotification('لم يتم اختيار ملف', 'error');
+        return false;
+    }
+    if (!window.supabase || !window.supabaseConnected) {
+        if (typeof showNotification === 'function') showNotification('غير متصل بالسحابة: لا يمكن رفع الملفات الآن', 'error');
+        return false;
+    }
+
+    try {
+        const file = window.selectedMaterialFile;
+        const ext = (file.name && file.name.split('.').pop()) || '';
+        const filePath = `materials/${subjectId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('materials')
+            .upload(filePath, file, { upsert: false });
+
+        if (uploadError) throw uploadError;
+        // Get public URL (works if bucket is public). If bucket is private, consider creating signed URLs.
+        const { data: publicData } = supabase.storage.from('materials').getPublicUrl(filePath);
+        const publicUrl = (publicData && publicData.publicUrl) ? publicData.publicUrl : '';
+
+        const material = {
+            id: `material_${Date.now()}_${Math.random().toString(36).substr(2,9)}`,
+            subjectId,
+            title,
+            description,
+            type: materialType || 'file',
+            category: category || '',
+            link: publicUrl,
+            fileName: file.name,
+            fileSize: file.size,
+            authorId: (window.currentUser && window.currentUser.id) ? window.currentUser.id : 'unknown',
+            authorName: (window.currentUser && window.currentUser.name) ? window.currentUser.name : 'unknown',
+            timestamp: new Date().toISOString()
+        };
+
+        await saveDataToSupabase(material, 'material');
+        if (typeof showNotification === 'function') showNotification('تم رفع الملف وحفظه على السحابة', 'success');
+        return true;
+    } catch (err) {
+        console.error('خطأ في رفع الملف:', err);
+        if (typeof showNotification === 'function') showNotification('فشل رفع الملف إلى السحابة', 'error');
+        return false;
+    }
+}
+
+</script>
+
+<script>
+
+async function addMaterialFromForm(subjectId, title, description, materialType, category) {
+    // This function expects window.selectedMaterialFile to be set by the file input handler.
+    const ok = await uploadMaterialFileAndSave(subjectId, title, description, materialType, category);
+    if (ok) {
+        // Re-load data; realtime should also sync to other clients.
+        if (typeof loadDataFromSupabase === 'function') await loadDataFromSupabase();
+        if (typeof loadMaterials === 'function') loadMaterials(window.currentYear, window.currentSemester);
+    }
+}
+
+</script>
+</body>
 </html>
